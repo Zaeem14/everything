@@ -1,0 +1,48 @@
+body {
+    margin: 0;
+}
+#container {
+    background-color: lightgray;
+    display: flex;
+    width: 100vw;  
+    height: 100vh;
+}
+
+#feature-menu {
+    background-color: aqua;
+    width: 10%;
+}
+
+.strip {
+      height: 100%;
+      display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        margin-top: 10px;
+}
+
+#todolist-menu {
+    background-color: blue;
+    width: 15%;
+}
+
+#todo-container {
+    background-color: lightblue;
+    width: 65%;
+}
+
+#todo-stats {
+    background-color: lightgreen;
+    width: 10%;
+}
+
+.todo-date {
+    padding: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#today {
+    background-color: lightyellow;
+    
+}

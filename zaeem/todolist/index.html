@@ -5,22 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
     <link rel="stylesheet" href="style.css">
-
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="feature-menu"></div>
-    <div id="todolist-menu">
-        <div class="todo-dates"></div>
-        <div class="todo-folders"></div>
-        <div></div>
-    </div>
-    <div id="todo-container">
-        <div class="header-container">
-            <h1 class="todo-date"></h1>
-            <div></div>    
+    <div id="container">
+        <div id="feature-menu" class="strip"></div>
+        <div id="todolist-menu" class="strip">
+            <div class="todo-dates">
+                <div class="todo-date" id="today">Today</div>
+                <div class="todo-date" id="tomorrow">Tomorrow</div>
+                <div class="todo-date" id="yesterday">Yesterday</div>
+                <div class="todo-date" id="week">Week</div>
+            </div>
+            <div class="todo-folders"></div>
+            <div></div>
         </div>
-    </div>
-    <div id="todo-stats"></div>
+        <div id="todo-container" class="strip">
+            <div class="header-container">
+                <h1 class="todo-date"></h1>
+                <div></div>    
+            </div>
+        </div>
+        <div id="todo-stats" class="strip"></div>
+    </div> 
 </body>
 </html>
