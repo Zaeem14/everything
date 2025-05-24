@@ -1,8 +1,8 @@
 body {
     margin: 0;
+    padding: 0;
 }
 #container {
-    background-color: lightgray;
     display: flex;
     width: 100vw;  
     height: 100vh;
@@ -10,7 +10,7 @@ body {
 
 #feature-menu {
     background-color: aqua;
-    width: 10%;
+    width: 3%;
 }
 
 .strip {
@@ -18,17 +18,16 @@ body {
       display: flex;
         flex-direction: column;
         flex-shrink: 0;
-        margin-top: 10px;
 }
 
 #todolist-menu {
-    background-color: blue;
-    width: 15%;
+    width: 17%;
+    margin-top: 10px;
 }
 
 #todo-container {
     background-color: lightblue;
-    width: 65%;
+    width: 70%;
 }
 
 #todo-stats {
@@ -36,13 +35,106 @@ body {
     width: 10%;
 }
 
-.todo-date {
-    padding: 5px;
-    font-size: 16px;
-    box-sizing: border-box;
+.todo-date-container{
+    padding-left: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    gap: 5px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
 }
 
-#today {
-    background-color: lightyellow;
-    
+.todo-date-container:hover{
+    background-color: rgb(234, 234, 234);
+    cursor: pointer;
 }
+.todo-date-container:active{
+    background-color: rgb(200, 200, 200);
+}
+
+.todo-dates, .todo-folders{
+    margin: 10px;
+}
+
+.todo-date{
+    font-size: 14px;
+    box-sizing:border-box;
+    font-family: 'Inter', sans-serif;
+    height: 20px;
+    width: 100%;
+    padding-left: 5px;
+}
+
+.todo-date-icon{
+    width: 20px;
+    height: 20px;
+}
+
+.vertical-line-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.vertical-line {
+    background-color: gray;
+    height: 1px;
+    margin: 10px 0;
+    width: 90%;
+
+}
+
+.todo-folder-text {
+    font-weight: 600;
+}
+
+/* ---------- RESET THE DEFAULT MARKER ---------- */
+summary::-webkit-details-marker { display: none; }  /* Chrome / Safari */
+summary { list-style: none; }                      /* Firefox */
+
+/* ---------- LAYOUT OF THE SUMMARY ROW ---------- */
+.summary-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  cursor: pointer;
+  font: 600 1rem/1.3 "Inter", sans-serif;          /* pick your font */
+  padding: .3rem .4rem;
+  border-radius: .4rem;
+  user-select: none;
+}
+
+.summary-row:hover {
+  background: #f3f5fa;                             /* optional hover */
+}
+
+/* ---------- THE CUSTOM ARROW ---------- */
+.arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #333;                      /* ▼ shape */
+  transition: transform .25s;
+}
+
+/* rotate arrow when the <details> is open */
+details[open] > summary .arrow {
+  transform: rotate(180deg);                       /* ▲ */
+}
+
+/* ---------- CONTENT LIST ---------- */
+.folder-list {
+  margin: .3rem 0 .3rem 1.2rem;                    /* indent children */
+  padding-left: 0;
+}
+
+.folder-list li {
+  margin: .2rem 0;
+}
+
+/* --------- OPTIONAL: nicer bullet ---------- */
+.folder-list li::marker { color: dodgerblue; }

@@ -6,27 +6,63 @@
     <title>Todo List</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="container">
         <div id="feature-menu" class="strip"></div>
         <div id="todolist-menu" class="strip">
             <div class="todo-dates">
-                <div class="todo-date" id="today">Today</div>
-                <div class="todo-date" id="tomorrow">Tomorrow</div>
-                <div class="todo-date" id="yesterday">Yesterday</div>
-                <div class="todo-date" id="week">Week</div>
+                <div class="todo-date-container">
+                    <img src="images/todo-dates-icons/all_icon.png" alt="all" class="todo-date-icon">
+                    <div class="todo-date" id="all">All</div>
+                </div>
+                <div class="todo-date-container">
+                    <img src="images/todo-dates-icons/today_icon.png" alt="today" class="todo-date-icon">
+                    <div class="todo-date" id="today">Today</div>
+                </div>
+                <div class="todo-date-container">
+                    <img src="images/todo-dates-icons/tomorrow_icon.png" alt="tomorrow" class="todo-date-icon">
+                    <div class="todo-date" id="tomorrow">Tomorrow</div>
+                </div>
+                <div class="todo-date-container">
+                    <img src="images/todo-dates-icons/yesterday_icon.png" alt="yesterday" class="todo-date-icon">
+                    <div class="todo-date" id="yesterday">Yesterday</div>
+                </div>
+                <div class="todo-date-container">
+                    <img src="images/todo-dates-icons/week_icon.png" alt="week" class="todo-date-icon">
+                    <div class="todo-date" id="week">Week</div>
+                </div>
+            </div> 
+            <div class="vertical-line-container">
+                <div class="vertical-line"></div>
             </div>
-            <div class="todo-folders"></div>
-            <div></div>
+            <div class="todo-folders">
+                <!-- TOP-LEVEL FOLDER -->
+                <details open class="folder">
+                    <summary class="summary-row">
+                        <span class="arrow"></span>
+                        <span>Folders</span>
+                    </summary>
+
+                    <ul class="folder-list">
+                        <div>Photos</div>
+                        <div>Music</div>
+                    </ul>
+                </details>
+            </div>
         </div>
+    
         <div id="todo-container" class="strip">
             <div class="header-container">
-                <h1 class="todo-date"></h1>
+                <h1></h1>
                 <div></div>    
             </div>
         </div>
         <div id="todo-stats" class="strip"></div>
-    </div> 
+    </div>
 </body>
 </html>
