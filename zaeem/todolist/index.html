@@ -42,17 +42,50 @@
             </div>
             <div class="todo-folders">
                 <!-- TOP-LEVEL FOLDER -->
-                <details open class="folder">
+                <details open class="folder-container">
                     <summary class="summary-row">
                         <span class="arrow"></span>
-                        <span>Folders</span>
+                        <div class="folder-addition-container">
+                            <span>Folders</span>
+                            <img src="images/todo-folders-icons/plus_icon.png" class="add-folder-icon">
+                        </div>
                     </summary>
-
-                    <ul class="folder-list">
-                        <div>Photos</div>
-                        <div>Music</div>
-                    </ul>
+                    <div class="folder-list">
+                        <div class="folder-div">
+                            <img src="images/todo-folders-icons/dollar.png" class="folder-icon">
+                            <div class="folder">Business</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/todo-folders-icons/family.png" class="folder-icon">
+                            <div class="folder">Family</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/todo-folders-icons/kaaba.png" class="folder-icon">
+                            <div class="folder">Islam</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/todo-folders-icons/personal_icon.png" class="folder-icon">
+                            <div class="folder">Personal</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/todo-folders-icons/school.png" class="folder-icon">
+                            <div class="folder">School</div>
+                        </div>
+                    </div>
                 </details>
+            </div>
+            <div class="vertical-line-container">
+                <div class="vertical-line"></div>
+            </div>
+            <div class="todo-features-container">
+                <div class="time-tracker-container">
+                    <img src="images/features-icons/time_tracker.png" alt="time tracker" class="todo-feature-icon">
+                    <div class="todolist-feature" id="time-tracker">Time Tracker</div>
+                </div>
+                <div class="matrix-container">
+                    <img src="images/features-icons/matrix.png" class="todo-feature-icon">
+                    <div class="todolist-feature" id="eisenhower-matrix">Eisenhower Matrix</div>
+                </div>
             </div>
         </div>
     
