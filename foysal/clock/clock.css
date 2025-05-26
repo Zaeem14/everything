@@ -1,15 +1,12 @@
 .clock-button{
     display: block;
     unicode-bidi: isolate;
-    -webkit-transition-duration: 0.15s;
-    -webkit-transition-timing-function: linear;
     position: absolute;
     left: 0;
     right: 0;
     bottom: -50px;
     height: 50px;
     background-image: linear-gradient(#383838, #2a2a2a 50%, #222222 51%, #1b1b1b);
-    -webkit-transform: translate3D(0, -50px, 0);
 }
 .current-time{
     background: rgb(0, 0, 0);
@@ -25,4 +22,3 @@
     height: 100vh; /* Full screen height */
     background-color: #111
     }
-}
