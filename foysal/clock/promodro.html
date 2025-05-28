@@ -13,8 +13,9 @@
     </style>
 </head>
 <body>
+    <div class="feature-menu"></div>
     <div class="clock-button">
-        <button>Clock</button>
+        <a href="clock.html"><button>Clock</button></a>
         <button>Promodro</button>
     </div>
     <div class="current-time">
@@ -23,15 +24,7 @@
     
 
     <script>
-        let time = document.getElementById("current-time");
 
-        setInterval(() => {
-            let d = new Date();
-            time.innerHTML = d.toLocaleTimeString();
-        }, 1000);
-
-        let d = new Date();
-        time.innerHTML = d.toLocaleTimeString();
     </script>
 </body>
 </html>

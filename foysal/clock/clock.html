@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ✅ Link to your external CSS fil, which name is clock.css -->
+    <link rel="stylesheet" href="clock.css">
+
+    <!-- You can still use inline <style> if needed -->
+    <style>
+        /* Optional internal styles */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="feature-menu"></div>
+        <div class="clock-container">
+            <div class="current-time">
+                <h3 id="current-time"></h3>
+            </div>
+
+            <div class="button-container">
+                <button>Clock</button>
+                <a href="promodro.html"><button>Promodro</button></a>
+            </div>
+            
+        </div>
+    </div>
+
+
+    <script>
+        let time = document.getElementById("current-time");
+
+        setInterval(() => {
+            let d = new Date();
+            time.innerHTML = d.toLocaleTimeString();
+        }, 1000);
+
+        let d = new Date();
+        time.innerHTML = d.toLocaleTimeString();
+    </script>
+</body>
+</html>
