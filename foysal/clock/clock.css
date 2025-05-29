@@ -32,12 +32,17 @@ body, html {
 
 #current-time{
     font-size: 150px;
-    height: 90%;
 }
 
 .button-container {
-    height: 10%;
-    padding: 15px 0 0;
-    background-color: yellow;
+    background-color: white;
+    position: relative;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    flex-direction: row;
+    z-index: 1000;
+    bottom:-40px;
+    height: 50px;
 }
