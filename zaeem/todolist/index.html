@@ -29,13 +29,18 @@
                     <div class="todo-date" id="tomorrow">Tomorrow</div>
                 </div>
                 <div class="todo-date-container">
-                    <img src="images/todo-dates-icons/yesterday_icon.png" alt="yesterday" class="todo-date-icon">
-                    <div class="todo-date" id="yesterday">Yesterday</div>
+                    <img src="images/todo-dates-icons/overdue.png" alt="Overdue" class="todo-date-icon">
+                    <div class="todo-date" id="overdue">Overdue</div>
                 </div>
                 <div class="todo-date-container">
                     <img src="images/todo-dates-icons/week_icon.png" alt="week" class="todo-date-icon">
-                    <div class="todo-date" id="week">Week</div>
+                    <div class="todo-date" id="week">This Week</div>
                 </div>
+                <div class="todo-date-container">
+                    <img src="images/todo-dates-icons/planner.png" alt="month" class="todo-date-icon">
+                    <div class="todo-date" id="month">Task Que</div>
+                </div>
+
             </div> 
             <div class="vertical-line-container">
                 <div class="vertical-line"></div>
@@ -88,18 +93,47 @@
                 </div>
             </div>
         </div>
-    
         <div id="todo-container" class="strip">
-            <div class="header-container">
-                <div class="todo-header">
-                    <img src="images/todo-container/collapse.png" alt="collapse" class="collapse-sidebar-icon">
-                    <h2 class="todo-container-date">All</h2>
+            <div class="todo-container-header">
+                <div class="header-container">
+                    <div class="todo-header">
+                        <img src="images/todo-container/collapse.png" alt="collapse" class="collapse-sidebar-icon">
+                        <h2 class="todo-container-date">All</h2>
+                    </div>
+                    <div class="todo-header-icons">
+                        <img src="images/todo-container/sort.png" class="todo-header-icon" alt="sort">
+                        <img src="images/todo-container/more.png" class="todo-header-icon" alt="more">
+                    </div>    
                 </div>
-                <div class="todo-header-icons">
-                    <img src="images/todo-container/sort.png" class="todo-header-icon" alt="sort">
-                    <img src="images/todo-container/more.png" class="todo-header-icon" alt="more">
-                </div>    
+                <div class="todo-input-container">
+                    <div class="input-plus-add-icon-container">
+                        <input type="text" id="todo-input" placeholder="+ Add a new task...">
+                    </div>
+                    <div class="todo-input-modifier-icons-div">
+                        <div class="todo-input-modifier-icons-container">
+                            <div class="todo-date-icon-container">
+                                <img src="images/todo-container/calendar.png" alt="date" class="todo-input-modifier-icons hidden">
+                            </div>
+                            <div class="todo-priority-icon-container">
+                                <img src="images/todo-container/priorities-icon/grey_flag.png" alt="priority-grey" class="todo-input-modifier-icons hidden">
+                            </div>
+                            <div class="todo-folder-icon-container">
+                                <img src="images/todo-container/move_folder.png" alt="folder" class="todo-input-modifier-icons hidden">
+                            </div>
+                        </div>
+                        <div class="todo-input-icon-container">
+                            <img src="images/todo-container/add.png" class="todo-input-icon add-task-button hidden" alt="add">
+                        </div> 
+                    </div> 
+                </div>
             </div>
+            <div class="todo-list-container">
+                <div class="todo-list">
+                    <div class="task-group"></div>
+                </div>
+                <footer></footer>
+            </div>
+            
         </div>
         <div id="todo-stats" class="strip"></div>
     </div>

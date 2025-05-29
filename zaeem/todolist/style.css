@@ -36,12 +36,12 @@ h2 {
 }
 
 #todo-container {
-    width: 70%;
+    width: 50%;
 }
 
 #todo-stats {
     background-color: lightgreen;
-    width: 10%;
+    width: 30%;
 }
 
 .todo-date-container{
@@ -62,22 +62,32 @@ h2 {
 .time-tracker-container:hover, 
 .matrix-container:hover,
 .collapse-sidebar-icon:hover,
-.todo-header-icon:hover{
+.todo-header-icon:hover,
+.habits-container:hover,
+.todo-input-icon:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
+}
+
+.todo-input-icon:hover {
+    background-color: rgba(0, 0, 255, 0.5);
+    transition: background-color 0.3s ease;
 }
 .todo-date-container:active{
     background-color: rgb(200, 200, 200);
 }
 
-.todo-dates, .folder-container, 
+.todo-dates, 
+.folder-container, 
 .todo-features-container{
     margin: 10px;
 }
 
-.todo-date, .folder, 
+.todo-date, 
+.folder, 
 .matrix-container, 
-.time-tracker-container{
+.time-tracker-container,
+.habits-container {
     font-size: 14px;
     box-sizing:border-box;
     font-family: 'Inter', sans-serif;
@@ -86,11 +96,14 @@ h2 {
     padding-left: 5px;
 }
 
-.todo-date-icon, .add-folder-icon, 
+.todo-date-icon, 
+.add-folder-icon, 
 .folder-icon, 
 .todo-feature-icon,
 .collapse-sidebar-icon,
-.todo-header-icon {
+.todo-header-icon,
+.todo-input-icon,
+.todo-input-modifier-icons {
     width: 20px;
     height: 20px;
 }
@@ -156,7 +169,8 @@ details[open] > summary .arrow {
 
 .folder-div, 
 .time-tracker-container, 
-.matrix-container {
+.matrix-container,
+.habits-container {
     display: flex;
     flex-direction: row;
     gap: 5px;
@@ -200,3 +214,132 @@ details[open] > summary .arrow {
     border-radius: 50%;
 }
 
+.todo-container-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+    justify-content: center;
+
+}
+
+.todo-input-container {
+    width: 95%;
+    display: flex;
+    flex-direction: column; /* stack children vertically */
+    justify-content: center;
+    position: relative;
+    margin: 10px auto;
+    padding: 5px 0; /* add some vertical padding */
+}
+
+#todo-input {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    border: 0px;
+    padding: 0 10px;
+    outline: none;
+    background-color: transparent;
+}
+
+.input-plus-add-icon-container {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: rgb(234, 234, 234);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+
+.active-todo-input {
+  height: 60px;
+  border: 1px solid blue;
+  background-color: transparent;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: height 0.3s ease-in-out;
+  padding: 0 0 5px;
+}
+
+.active-todo-input-box {
+    background-color: transparent;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    border: 0;
+}
+
+.todo-input-gray {
+  padding: 0 0 5px;
+  height: 60px;
+  border: 1px solid gray;
+  background-color: transparent;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.todo-input-icon-container {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    position: absolute;
+    right: 10px;
+}
+
+.todo-input-modifier-icons-div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: space-between;
+}
+
+
+.todo-input-modifier-icons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 12.5px;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.shown {
+    display: block;
+}
+
+.add-task-button {
+    border-radius: 4px;
+    background-color: blue;
+    padding: 2.5px 10px;
+}
+
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    
+}
+.task-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-self: center;;
+    width: 95%;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: yellow;
+    margin: 10px auto;
+    padding: 5px 0;
+}
