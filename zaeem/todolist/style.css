@@ -64,9 +64,14 @@ h2 {
 .collapse-sidebar-icon:hover,
 .todo-header-icon:hover,
 .habits-container:hover,
-.todo-input-icon:hover {
+.todo-input-icon:hover,
+.due-date {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
+}
+
+.task:hover {
+    background-color: rgb(240, 240, 240);
 }
 
 .todo-input-icon:hover {
@@ -332,14 +337,80 @@ details[open] > summary .arrow {
 }
 .task-group {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     align-self: center;;
     width: 95%;
     padding: 5px 10px;
     border-radius: 4px;
-    background-color: yellow;
     margin: 10px auto;
-    padding: 5px 0;
+    padding: 10px;
+}
+
+.task-group-header {
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+    gap: 7.5px;
+    width: 100%;
+}
+
+.tasks {
+    width: 100%;
+}
+
+.task {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 5px 10px 5px 0;
+    border-radius: 4px;
+    margin-top: 5px;
+    justify-content:space-between;
+    height: 40px;
+}
+
+.left-side-task, .right-side-task {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+}
+
+.left-side-task {
+    gap: 5px;
+}
+.right-side-task {
+    gap: 5px;
+    margin-right: 10px;
+}
+
+.folder-color-code-bar {
+    background-color: rgb(0, 132, 255);
+    width: 4px;
+    height: 100%;
+
+}
+
+.task-text {
+    width: 100%;
+}
+
+.task-text, 
+.group-header,
+.task-folder,
+.due-date,
+.number-of-tasks {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+.folder-color-code-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgb(0, 132, 255);
 }
