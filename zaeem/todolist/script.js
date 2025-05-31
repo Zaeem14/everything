@@ -38,4 +38,13 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Toggle arrow in task-group-header and show/hide tasks
+const taskGroupHeaders = document.querySelectorAll('.task-group-header');
+taskGroupHeaders.forEach(header => {
+  header.addEventListener('click', () => {
+    const group = header.closest('.task-group');
+    group.classList.toggle('open');
+  });
+});
+
 
