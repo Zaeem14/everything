@@ -2,5 +2,8 @@
     "cSpell.words": [
         "todolist"
     ],
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 500  // optional, sets delay in ms
 }
