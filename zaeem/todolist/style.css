@@ -52,7 +52,7 @@ footer a:hover {
     height: 100%;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
+
 }
 
 #todolist-menu {
@@ -63,6 +63,7 @@ footer a:hover {
 
 #todo-container {
     width: 50%;
+    border-right: gray 1px solid;
 }
 
 .todo-list-container {
@@ -73,10 +74,17 @@ footer a:hover {
     height: 100%;
     overflow-y: auto;
     position: relative;
+    
+
 }
 
 #todo-stats {
     width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
 }
 
 .todo-date-container{
@@ -99,7 +107,10 @@ footer a:hover {
 .collapse-sidebar-icon:hover,
 .todo-header-icon:hover,
 .habits-container:hover,
-.todo-input-icon:hover{
+.todo-input-icon:hover,
+.task-due-date-container-stats:hover,
+.task-priority-container-stats:hover,
+.task-description-icon-container:hover{
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }
@@ -150,7 +161,11 @@ footer a:hover {
 .collapse-sidebar-icon,
 .todo-header-icon,
 .todo-input-icon,
-.todo-input-modifier-icons {
+.todo-input-modifier-icons,
+.due-date-icon,
+.task-priority-icon,
+.task-listing-icon,
+.description-text-edit-icon{
     width: 20px;
     height: 20px;
 }
@@ -496,7 +511,7 @@ details[open] > summary .arrow {
     background-color: rgb(0, 132, 255);
 }
 
-input[type="checkbox"] {
+input{
   -webkit-appearance: none; /* Remove default style */
   appearance: none;
   width: 17.5px;
@@ -510,7 +525,7 @@ input[type="checkbox"] {
 
 
 /* Add a custom checkmark for all checkboxes when checked */
-input[type="checkbox"]:checked::after {
+input:checked::after {
   content: "";
   position: absolute;
   top: -1px;
@@ -522,23 +537,23 @@ input[type="checkbox"]:checked::after {
   transform: rotate(45deg);
 }
 
-#priority-high-checkbox {
+.priority-high-checkbox {
     border: 1.25px solid red;
 }
 
-#priority-low-checkbox {
+.priority-low-checkbox {
     border: 1.25px solid blue;
 }
 
 /* Optional: change background or border when checked */
-#priority-high-checkbox:checked {
+.priority-high-checkbox:checked {
   background-color: rgba(255, 0, 0, 0.1);
-  border-color: red;
+
 }
 
-#priority-low-checkbox:checked {
+.priority-low-checkbox:checked {
   background-color: rgba(0, 0, 255, 0.1);
-  border-color: blue;
+  
 }
 
 .task-group.open > .task-group-header .arrow {
@@ -559,4 +574,78 @@ input[type="checkbox"]:checked::after {
 
 .task-more-icon-container:hover {
     background-color: rgba(0, 0, 0, 0.1);
+}
+
+.important-task-info-container {
+    justify-content: space-between;
+    height: 50px;
+    border-bottom: 1px solid gray;
+    
+}
+
+
+.important-task-info-container, 
+.important-task-info-container-right,
+.important-task-info-container-left,
+.task-due-date-container-stats,
+.task-input-container-stats {
+    gap: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: center;
+}
+
+.important-task-info-container,
+.task-title, 
+.task-description-container, 
+.task-edit-container {
+    padding: 10px;
+}
+
+.task-checkbox-stats {
+    width: 15px; 
+}
+
+.task-due-date-container-stats {
+    height: 30px;
+}
+
+.task-due-date-container-stats,
+.task-priority-container-stats,
+.task-description-icon-container {
+    
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.task-title {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.task-edit-container,
+.task-edit-container-right{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+}
+
+
+
+.task-edit-container {
+    height: 40px;
+    padding: 5px;
+    justify-content: space-between;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.task-edit-container-right {
+    gap: 10px;
+    justify-content: flex-end;
 }
