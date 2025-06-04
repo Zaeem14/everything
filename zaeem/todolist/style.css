@@ -11,6 +11,32 @@ h2 {
     font-weight: 600;
     margin: 0;
 }
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 75%;
+    height: 5%;
+    background-color: #f1f1f1;
+    color: gray;
+    text-align: center;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+footer a {
+    margin: 0 0.25rem;
+    color: gray;
+    text-decoration: none;
+    font-weight: 600;
+}
+footer a:hover {
+    text-decoration: underline;
+}
 #container {
     display: flex;
     width: 100vw;  
@@ -37,6 +63,16 @@ h2 {
 
 #todo-container {
     width: 50%;
+}
+
+.todo-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    position: relative;
 }
 
 #todo-stats {
@@ -373,12 +409,19 @@ details[open] > summary .arrow {
   display: block;
 }
 
+.task-more-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .task {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 97.5%;
-    padding: 0 10px 0;
+    width: 100%;
+    padding: 0 0 0 10px;
     border-radius: 4px 4px 0 0;
     justify-content:space-between;
     height: 30px;
@@ -391,7 +434,7 @@ details[open] > summary .arrow {
     align-items: center;
     height: 100%;
     justify-content: center;
-    position: relative;
+    position: relative;   
 }
 
 .left-side-task {
@@ -399,7 +442,15 @@ details[open] > summary .arrow {
 }
 .right-side-task {
     gap: 5px;
-    margin-right: 10px;
+
+}
+
+.right-side-task-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
 }
 
 .folder-color-code-bar {
@@ -428,7 +479,7 @@ details[open] > summary .arrow {
 .due-date,
 .number-of-tasks {
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .task-folder {
@@ -493,4 +544,20 @@ input[type="checkbox"]:checked::after {
 
 .task-group.open > .task-group-header .arrow {
   transform: rotate(90deg);
+}
+
+.task-more-icon-container {
+    position: relative;
+    right: -10px;
+}
+
+.task-more-icon {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: transparent;
+}
+
+.task-more-icon-container:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
