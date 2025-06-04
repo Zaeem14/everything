@@ -1,0 +1,59 @@
+promodro_50minbody, html {
+    margin: 0;
+    padding: 0;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+
+.feature-menu {
+    width: 3%;
+    background-color: aqua;
+    display: block;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(0, 0, 0);
+}
+
+.button-container {
+    background-color: white;
+    position: fixed;
+    width: 97%;
+    display: flex;
+    bottom:-100;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-direction: row;
+    z-index: 1000;
+    bottom:0px;
+    height: 7%;
+}
+
+.flipClock-container {
+    width: 97%;
+    height: 95%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction:column;
+    background-color: black;
+    color: white;
+}
+
+#flip-clock{
+    font-size: 150px;
+}
+
+.TimerButtons-Container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ✅ Link to your external CSS fil, which name is clock.css -->
+    <link rel="stylesheet" href="/foysal/Flip Clock/promodro/30 minute Session/promodro_30min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="feature-menu"></div>
+        <div class="flipClock-container">
+            <h1>Pomodoro Timer</h1>
+            <div id="timer-display">30:00</div>
+            <div class="TimerButtons-Container">
+                <button id="start-button">Start</button>
+                <button id="reset-button">Reset</button>
+                <button id="pause-button" onclick="pauseTimer()">Pause</button>
+            </div>
+        </div>
+        <div class="button-container">
+                <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html"><button class="promodro-button">Promodro</button></a>
+                <a href="/foysal/Flip Clock/clock/clock.html"class="clock-button" ><button>Clock</button></a>
+        </div>
+            
+        </div>
+    </div>
+
+
+    <script>
+        let timer;
+        let timeLeft = 30 * 60; // 30 minutes in seconds
+        let isRunning = false;
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timer);
+                    isRunning = false;
+                    alert('Time for a break!');
+                }
+            }, 1000);
+        }
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 30 * 60;
+            isRunning = false;
+            updateDisplay();
+        }
+
+        document.getElementById('start-button').addEventListener('click', startTimer);
+        document.getElementById('reset-button').addEventListener('click', resetTimer);
+
+        updateDisplay(); // Initialize display
+    </script>
+</body>
+</html>
