@@ -85,7 +85,7 @@
             <div class="todo-features-container">
                 <div class="time-tracker-container">
                     <img src="images/features-icons/time_tracker.png" alt="time tracker" class="todo-feature-icon">
-                    <div class="todolist-feature" id="time-tracker">Time Tracker</div>
+                    <div class="todolist-feature" id="time-tracker">Event Tracker</div>
                 </div>
                 <div class="matrix-container">
                     <img src="images/features-icons/matrix.png" class="todo-feature-icon">
@@ -101,9 +101,54 @@
                         <h2 class="todo-container-date">All</h2>
                     </div>
                     <div class="todo-header-icons">
-                        <img src="images/todo-container/sort.png" class="todo-header-icon" alt="sort">
-                        <img src="images/todo-container/more.png" class="todo-header-icon" alt="more">
-                    </div>    
+                        <div class="todo-sort-header-icon-container">
+                            <img src="images/todo-container/sort.png" class="todo-header-icon" alt="sort">
+                            <div class="sort-header-icon-menu-container">
+                                <div class="group-by-container">
+                                    <div class="group-by-container-left">
+                                        <div class="group-by-icon-container"></div>
+                                        <div class="group-by-text">Group by</div>
+                                    </div>
+                                    <div class="group-by-container-right">
+                                        <div class="grouped-by-text">Date</div>
+                                        <div class="arrow"></div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="sort-by-container">
+                                    <div class="sort-by-container-left">
+                                        <div class="sort-by-icon-container"></div>
+                                        <div class="sort-by-text">Sort by</div>
+                                    </div>
+                                    <div class="sort-by-container-right">
+                                        <div class="sorted-by-text">Date</div>
+                                        <div class="arrow"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="todo-more-header-icon-container">
+                            <img src="images/todo-container/more.png" class="todo-header-icon" alt="more">
+                            <div class="more-header-icon-menu-container">
+                                <div class="menu-title">View</div>
+                                <div class="vertical-line-menu"></div>
+                                <div class="task-view-options-container">
+                                    <img src="images/todo-container/list-view.png" alt="list view" class="task-list-view-option-icon">
+                                    <img src="images/todo-container/bar-graph.png" alt="grid view" class="task-bar-view-option-icon">
+                                </div>
+                                <div class="vertical-line-menu"></div>
+                                
+                                <div class="todo-default-setting-container">
+                                    <div class="show-completed-tasks-container">
+                                        <img src="images/todo-container/task-complete.png" alt="show completed tasks" class="show-completed-tasks-icon">
+                                        <div class="show-completed-tasks-text">Show Completed</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        
                 </div>
                 <div class="todo-input-container">
                     <div class="input-plus-add-icon-container">
@@ -266,7 +311,19 @@
                 complete this project as soon as possible or else
             </div>
             <div class="task-description-container">
+                <div class="description" contenteditable="true"></div>
+            </div>
+            <div class="task-item-container">
 
+            </div>
+            <div class="sub-task-container">
+                <div class="sub-task">
+                    <input type="checkbox" class="task-checkbox priority-low-checkbox">
+                    <div class="task-text">complete this project </div>
+                </div>
+                <div class="task-more-container">
+                    <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
+                </div>
             </div>
             <div class="task-edit-container">
                 <div class="task-edit-container-left">

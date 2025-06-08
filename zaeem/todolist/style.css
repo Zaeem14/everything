@@ -115,7 +115,8 @@ footer a:hover {
     cursor: pointer;
 }
 
-.task:hover {
+.task:hover,
+.sub-task:hover {
     background-color: rgb(240, 240, 240);
 }
 
@@ -273,7 +274,7 @@ details[open] > summary .arrow {
 .todo-header-icon, 
 .collapse-sidebar-icon {
     padding: 5px;
-    border-radius: 50%;
+    border-radius: 4px;
 }
 
 .todo-container-header {
@@ -649,3 +650,144 @@ input:checked::after {
     gap: 10px;
     justify-content: flex-end;
 }
+
+.description {
+    outline: none;
+    cursor: text;
+}
+
+.description:empty::before {
+    content: "Write something or type / for commands";
+    color: #999;
+    
+}
+
+.sub-task-container,
+.sub-task {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.sub-task-container {
+    border-top: 1px solid gray;
+    justify-content: space-between;
+    padding: 10px;
+    height: 40px;
+    display: none;
+}
+
+.sub-task {
+    border-radius: 4px;
+    height: 100%;
+    width: 100%;
+    gap: 5px;
+    margin-right: 10px;
+}
+
+.todo-more-header-icon-container,
+.todo-sort-header-icon-container {
+    position: relative;
+    display: inline-block;
+}
+
+.more-header-icon-menu-container,
+.sort-header-icon-menu-container {
+    position: absolute;
+    top: 150%; /* directly below the image */
+    left: -95px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100px;
+    z-index: 100;
+    transform: translateY(-10px); /* bottom: -10px effect */
+}
+
+.more-header-icon-menu-container {
+    display: none;
+}
+
+.sort-header-icon-menu-container {
+    width: 150px;
+    display: none;
+}
+.task-view-options-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.menu-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: gray;
+}
+
+
+.task-list-view-option-icon,
+.task-bar-view-option-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.show-completed-tasks-icon {
+    width: 15px;
+    height: 15px;
+}
+
+.show-completed-tasks-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    height: 30px;
+    border-radius: 4px;
+    padding: 0 5px;
+}
+
+.show-completed-tasks-container:hover,
+.group-by-container:hover,
+.sort-by-container:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.show-completed-tasks-text,
+.group-by-text,
+.grouped-by-text,
+.sorted-by-text,
+.sort-by-text {
+    font-size: 12px;
+}
+
+
+.vertical-line-menu {
+    background-color: gray;
+    height: 1px;
+    margin: 5px 0;
+    width: 100%;
+}
+
+.group-by-container,
+.group-by-container-left,
+.group-by-container-right,
+.sort-by-container,
+.sort-by-container-left,
+.sort-by-container-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.group-by-container,
+.sort-by-container {
+    height: 30px;
+    border-radius: 4px;
+    padding: 0 5px;
+    justify-content: space-between;
+}
+
