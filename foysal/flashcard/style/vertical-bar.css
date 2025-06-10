@@ -1,0 +1,16 @@
+    #flashcard-menu {
+        width: 17%;
+        border-right: gray 1px solid;
+        height: 100%;
+        background-color: salmon;
+        margin-top: 55px;
+    }
+
+
+.vertical-flashcardMenu{
+    display: inline-block; /* Makes the boxes behave as inline-block elements */
+    width: 180px;
+    height: 180px;
+    background-color: lightgreen;
+    margin-top: 5px;
+}
