@@ -7,10 +7,83 @@
     }
 
 
-.vertical-flashcardMenu{
+.vertical-flashcardMenu_1{
     display: inline-block; /* Makes the boxes behave as inline-block elements */
-    width: 180px;
+    width: 222px;
     height: 180px;
     background-color: lightgreen;
-    margin-top: 5px;
+}
+.vertical-flashcardMenu_2{
+    display: inline-block; /* Makes the boxes behave as inline-block elements */
+    width: 222px;
+    height: 180px;
+    background-color: rgb(244, 38, 6);
+}
+
+.vertical-flashcardMenu_3{
+    display: inline-block; /* Makes the boxes behave as inline-block elements */
+    width: 222px;
+    height: 190px;
+    background-color: rgb(4, 18, 19);
+}
+
+.right-section{
+    width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.upload-icon{
+    height: 24px;
+
+}
+
+.current-user-pictures{
+    height: 32px;
+    border-radius: 16px;
+}
+
+.upgrade_button{
+    position: relative;
+    border-radius: 0px;
+
+}
+.search-button,
+.voice-search-button,
+.upload-icon-container,
+.upgrade_button,
+.profile-picture-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.upload-icon-container:hover .tooltip,
+.upgrade_button:hover .tooltip{
+    font-family: Roboto, Arial;
+    position: absolute;
+    background-color: grey;
+    color: white;
+    margin-top: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 2px;
+    font-size: 12px;
+    bottom: -10;
+    top: 100;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 1;
+}
+
+.upgrade_button{
+    position: relative;
 }
