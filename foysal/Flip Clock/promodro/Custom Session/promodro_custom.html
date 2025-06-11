@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ✅ Link to your external CSS fil, which name is clock.css -->
+    <link rel="stylesheet" href="/foysal/Flip Clock/promodro/Custom Session/promodro_custom.css">
+</head>
+<body>
+    <div class="container">
+        <div class="feature-menu"></div>
+        <div class="flipClock-container">
+            <h1>Pomodoro Timer</h1>
+            
+            <div id="timer-display">None</div>
+            <div class="TimerButtons-Container">
+                <button id="start-button">Start</button>
+                <button id="reset-button">Reset</button>
+                <button id="pause-button" onclick="pauseTimer()">Pause</button>
+                <button id="break-button">Break</button>
+                <button id="skip-button">Skip</button>
+            </div>
+            <div>
+                <label>Session (minutes): <input type="number" id="session-input" value="25" min="1"></label>
+                <label>Break (minutes): <input type="number" id="break-input" value="5" min="1"></label>
+            </div>
+        </div>
+        <div class="button-container">
+                <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html"><button class="promodro-button">Promodro</button></a>
+                <a href="/foysal/Flip Clock/clock/clock.html"class="clock-button" ><button>Clock</button></a>
+        </div>
+            
+        </div>
+    </div>
+
+
+    <script>
+        let timer;
+        let sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
+        let breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
+        let timeLeft = sessionMinutes * 60;
+        let isRunning = false;
+        let isBreak = false;
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
+            breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
+            if (!isBreak) timeLeft = sessionMinutes * 60;
+            isRunning = true;
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timer);
+                    isRunning = false;
+                    alert(isBreak ? 'Break is over!' : 'Time for a break!');
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
+            timeLeft = sessionMinutes * 60;
+            isRunning = false;
+            isBreak = false;
+            updateDisplay();
+        }
+
+        function startBreak() {
+            clearInterval(timer);
+            breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
+            timeLeft = breakMinutes * 60;
+            isRunning = false;
+            isBreak = true;
+            updateDisplay();
+        }
+
+        function skipSession() {
+            clearInterval(timer);
+            sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
+            breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
+            if (isBreak) {
+                timeLeft = sessionMinutes * 60;
+                isBreak = false;
+            } else {
+                timeLeft = breakMinutes * 60;
+                isBreak = true;
+            }
+            isRunning = false;
+            updateDisplay();
+        }
+
+
+                // Update timer when user changes session or break input
+        document.getElementById('session-input').addEventListener('input', function() {
+            if (!isRunning && !isBreak) {
+                sessionMinutes = parseInt(this.value) || 25;
+                timeLeft = sessionMinutes * 60;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('break-input').addEventListener('input', function() {
+            if (!isRunning && isBreak) {
+                breakMinutes = parseInt(this.value) || 5;
+                timeLeft = breakMinutes * 60;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('start-button').addEventListener('click', startTimer);
+        document.getElementById('reset-button').addEventListener('click', resetTimer);
+        document.getElementById('break-button').addEventListener('click', startBreak);
+        document.getElementById('skip-button').addEventListener('click', skipSession);
+
+        updateDisplay();
+    </script>
+</body>
+</html>

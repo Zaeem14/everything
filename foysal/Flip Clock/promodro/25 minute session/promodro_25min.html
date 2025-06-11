@@ -17,6 +17,8 @@
                 <button id="start-button">Start</button>
                 <button id="reset-button">Reset</button>
                 <button id="pause-button" onclick="pauseTimer()">Pause</button>
+                <button id="break-button">Break</button>
+                <button id="skip-button">Skip</button>
             </div>
         </div>
         <div class="button-container">
@@ -30,8 +32,9 @@
 
     <script>
         let timer;
-        let timeLeft = 25 * 60; // 25 minutes in seconds
+        let timeLeft = 25 * 60; // 50 minutes in seconds
         let isRunning = false;
+        let isBreak = false; // Track if currently in break
 
         function updateDisplay() {
             const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
@@ -42,6 +45,7 @@
         function startTimer() {
             if (isRunning) return;
             isRunning = true;
+            isBreak = false;
             timer = setInterval(() => {
                 if (timeLeft > 0) {
                     timeLeft--;
@@ -53,6 +57,7 @@
                 }
             }, 1000);
         }
+
         function pauseTimer() {
             clearInterval(timer);
             isRunning = false;
@@ -62,11 +67,37 @@
             clearInterval(timer);
             timeLeft = 25 * 60;
             isRunning = false;
+            isBreak = false;
+            updateDisplay();
+        }
+
+        function startBreak() {
+            clearInterval(timer);
+            timeLeft = 5 * 60; // 5 minutes
+            isRunning = false;
+            isBreak = true;
+            updateDisplay();
+        }
+
+        function skipSession() {
+            clearInterval(timer);
+            if (isBreak) {
+                // If in break, reset to work session
+                timeLeft = 25 * 60;
+                isBreak = false;
+            } else {
+                // If in work session, reset to break
+                timeLeft = 5 * 60;
+                isBreak = true;
+            }
+            isRunning = false;
             updateDisplay();
         }
 
         document.getElementById('start-button').addEventListener('click', startTimer);
         document.getElementById('reset-button').addEventListener('click', resetTimer);
+        document.getElementById('break-button').addEventListener('click', startBreak);
+        document.getElementById('skip-button').addEventListener('click', skipSession);
 
         updateDisplay(); // Initialize display
     </script>
