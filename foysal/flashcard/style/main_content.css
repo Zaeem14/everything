@@ -1,0 +1,68 @@
+    .Main-content{
+        display: flexbox;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-left: 20px;
+        background-color: #103be6;
+        padding-top: 200px;
+        padding-bottom: 40px; /* Add bottom padding for space */
+    }
+
+    .showbox{
+        display: flex;
+        width: 95%;
+        height: 50%;
+        background-color: aqua;
+        position: relative;
+        padding: 10px;
+        top: -100px;
+    }
+    .create_box{
+        display: flex; /* Makes the boxes behave as inline-block elements */
+        width: 100%;
+        height: 95%;
+        background-color: lightgreen;
+        flex-direction: column;
+        margin: 10px;
+    }
+    .recent_box{
+        display: flex; /* Makes the boxes behave as inline-block elements */
+        width: 100%;
+        height: 95%;
+        background-color: rgb(17, 156, 231);
+        flex-direction: column;
+        margin: 10px;
+    }
+    .reminder_box{
+        display: flex; /* Makes the boxes behave as inline-block elements */
+        width: 100%;
+        height: 95%;
+        background-color: red;
+        margin: 10px;
+    }
+
+    .libary{
+        display: flex;
+        width: 95%;
+        min-height: 60%;
+        background-color: rgb(231, 8, 8);
+        position: relative;
+        padding: 10px;
+        top: -100px;
+        margin-top: 40px;
+        margin-bottom: 10px;   
+    }
+    /* Add this to ensure space at the bottom of the page */
+    body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .Main-content {
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
