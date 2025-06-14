@@ -24,13 +24,15 @@ h2 {
     width: 3%;
 }
 
-#todolist-menu {
+#todolist-menu,
+#habits-menu {
     width: 17%;
     border-right: gray 1px solid;
     height: 100%;
 }
 
-.todo-date-container{
+.todo-date-container,
+.habits-time-container{
     padding-left: 10px;
     border-radius: 10px;
     display: flex;
@@ -50,12 +52,15 @@ h2 {
 }
 
 .todo-dates, 
+.habits-times,
 .folder-container, 
-.todo-features-container{
+.todo-features-container,
+.habits-more-container{
     margin: 10px;
 }
 
 .todo-date, 
+.habits-time,
 .folder, 
 .matrix-container, 
 .time-tracker-container{
@@ -68,6 +73,7 @@ h2 {
 }
 
 .todo-date-icon, 
+.habits-time-icon,
 .add-folder-icon, 
 .folder-icon, 
 .todo-feature-icon,
@@ -84,6 +90,7 @@ h2 {
 }
 
 .todo-date-container:hover, 
+.habits-time-container:hover,
 .summary-row:hover, 
 .folder-div:hover, 
 .time-tracker-container:hover, 
@@ -166,7 +173,8 @@ details[open] > summary .arrow {
 }
 
 /* ---------- CONTENT LIST ---------- */
-.folder-list {                
+.folder-list,
+.habits-folder-list {                
   padding-left: 0;
 }
 
@@ -178,8 +186,7 @@ details[open] > summary .arrow {
 
 .folder-div, 
 .time-tracker-container, 
-.matrix-container,
-.habits-container {
+.matrix-container {
     display: flex;
     flex-direction: row;
     gap: 5px;
@@ -190,7 +197,8 @@ details[open] > summary .arrow {
     border-radius: 10px;
 }
 
-.todo-folders {
+.todo-folders,
+.habits-folders {
     margin: 0 10px 0 0;
     padding: 0;
 }

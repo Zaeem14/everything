@@ -3,12 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo List</title>
-    <link rel="stylesheet" href="style.css">
-
+    <title>Habits</title>
+    <link rel="stylesheet" href="../todolist/styles/mix.css">
     <script src="script.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    
+    <div id="container">
+        <div id="feature-menu" class="strip"></div>
+        <div id="habits-menu" class="strip">
+            <div class="habits-times">
+                <div class="habits-time-container">
+                    <img src="images/habits_menu_icons/all_icon.png" alt="all" class="habits-time-icon">
+                    <div class="habits-time" id="all">All</div>
+                </div>
+                <div class="habits-time-container">
+                    <img src="images/habits_menu_icons/sunrise.png" alt="Morning" class="habits-time-icon">
+                    <div class="habits-time" id="morning">Morning</div>
+                </div>
+                <div class="habits-time-container">
+                    <img src="images/habits_menu_icons/weather.png" alt="afternoon" class="habits-time-icon">
+                    <div class="habits-time" id="afternoon">Afternoon</div>
+                </div>
+                <div class="habits-time-container">
+                    <img src="images/habits_menu_icons/moon.png" alt="night" class="habits-time-icon">
+                    <div class="habits-time" id="night">Night</div>
+                </div>
+                <div class="habits-time-container">
+                    <img src="images/habits_menu_icons/sleeping.png" alt="evening" class="habits-time-icon">
+                    <div class="habits-time" id="evening">Evening</div>
+                </div>
+                <div class="habits-time-container">
+                    <img src="images/habits_menu_icons/hours.png" alt="anytime" class="habits-time-icon">
+                    <div class="habits-time" id="anytime">Anytime</div>
+                </div>
+
+            </div> 
+            <div class="vertical-line-container">
+                <div class="vertical-line"></div>
+            </div>
+            <div class="habits-folders">
+                <!-- TOP-LEVEL FOLDER -->
+                <details open class="folder-container">
+                    <summary class="summary-row">
+                        <span class="arrow"></span>
+                        <div class="folder-addition-container">
+                            <span>Folders</span>
+                            <img src="images/habits-folder-icons/plus_icon.png" class="add-folder-icon">
+                        </div>
+                    </summary>
+                    <div class="habits-folder-list">
+                        <div class="folder-div">
+                            <img src="images/habits-folder-icons/dollar.png" class="folder-icon">
+                            <div class="folder">Business</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/habits-folder-icons/family.png" class="folder-icon">
+                            <div class="folder">Family</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/habits-folder-icons/kaaba.png" class="folder-icon">
+                            <div class="folder">Islam</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/habits-folder-icons/personal_icon.png" class="folder-icon">
+                            <div class="folder">Personal</div>
+                        </div>
+                        <div class="folder-div">
+                            <img src="images/habits-folder-icons/school.png" class="folder-icon">
+                            <div class="folder">School</div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            <div class="vertical-line-container">
+                <div class="vertical-line"></div>
+            </div>
+            <div class="habits-more-container">
+                <div class="time-tracker-container">
+                    <img src="images/features-icons/time_tracker.png" alt="time tracker" class="todo-feature-icon">
+                    <div class="todolist-feature" id="time-tracker">Event Tracker</div>
+                </div>
+                <div class="matrix-container">
+                    <img src="images/features-icons/matrix.png" class="todo-feature-icon">
+                    <div class="todolist-feature" id="eisenhower-matrix">Eisenhower Matrix</div>
+                </div>
+            </div>
+        </div>
+        <div class="habits"></div>
+        <div></div>
+    </div>
 </body>
 </html>
