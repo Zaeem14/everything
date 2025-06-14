@@ -4,19 +4,31 @@
         display: block;
     }
 
-    body, html {
+    /* Add or update in your CSS file */
+    html, body {
+        height: 100%;
         margin: 0;
         padding: 0;
-        overflow-y: hidden;
+        box-sizing: border-box;
+        background: --bs-primary-bg-subtle; /* or your preferred color */
         overflow-x: hidden;
-        background-color:#b0c4de;
     }
-    .container {
+
+    body {
         width: 100vw;
         height: 100vh;
+    }
+
+    .container {
+        min-width: 100vw;
+        min-height: 100vh;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         display: flex;
         flex-direction: row;
-        background-color: rgb(0, 166, 255);
     }
 
     .strip {
@@ -32,6 +44,6 @@
         align-items: center;
         justify-content: center;
         flex-direction:column;
-        background-color: black;
+
         color: white;
     }
