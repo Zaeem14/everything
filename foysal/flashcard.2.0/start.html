@@ -5,7 +5,9 @@
         <link rel="stylesheet" href="style/header.css">
         <link rel="stylesheet" href="style/vertical-bar.css">
         <link rel="stylesheet" href="style/main_content.css">
+        <link rel="stylesheet" href="style/start.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="javasript/start.js" defer></script>
 
         <style>
 
@@ -25,7 +27,7 @@
                     <div class="menu-section">
                         <button class="menu-btn active">
                             <span class="menu-icon">&#8962;</span>
-                            <span class="menu-label">Home</span>
+                            <span class="menu-label"><a href="index.html">Home</a></span>
                         </button>
                         <button class="menu-btn">
                             <span class="menu-icon">&#9889;</span>
@@ -47,17 +49,10 @@
                             <span class="menu-icon">&#128193;</span>
                             <span class="menu-label">New Folder</span>
                         </button>
-                        <details open class="folder-container" style="color: black;">
-                            <summary class="summary-row">
-                                <span class="arrow"><div class="folder-addition-container">
-                                    <span class="folder-icon">📁 Your Folder</span>
-                            </summary>
-                            <div class="folder-list">
-                                <div class="folder-div">
-                                    <span class="folder-icon">📁Business</span>
-                                </div>
-                            </div>
-                        </details>
+                        <button class="menu-btn">
+                            <span class="menu-icon">&#128451;</span>
+                            <span class="menu-label">Your Folder</span>
+                        </button>
                     </div>
                     <hr class="menu-divider">
                     <!-- Section: Reminder -->
@@ -101,21 +96,42 @@
 
             <!-- Main area -->
             <div class="Main-content">
-                <div class="showbox">
-                    <div class="create_box">
-                        <button class="create_button"><img class="bi-plus-square" src="image/plus-square.svg"></button>
-                    </div>
-                    <div class="recent_box">
-                        <p>your recent flashcard</p>
-                    </div>
-                    <div class="reminder_box">
-                        <a href="/zaeem/todolist/index.html">Check #2 Me</a>
+                <div class="showbox" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f0f0;">
+                    <h1>Welcome to the Flashcard App</h1>
+                    <p>Start creating your flashcards and enhance your learning experience!</p>
+                    <!-- Flashcard App -->
+                    <div id="flashcard-app" class="card shadow-sm mt-4" style="max-width: 500px; margin: 0 auto; border-radius: 16px;">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3 text-primary">Add a Flashcard</h3>
+                            <form id="flashcard-form" class="row g-2 align-items-center" autocomplete="off">
+                                <div class="col-12 col-md-12 mb-2">
+                                    <input type="text" id="set-title" placeholder="Set Title" required class="form-control" maxlength="100">
+                                </div>
+                                <div id="flashcard-fields" class="w-100">
+                                    <div class="row g-2 mb-2 flashcard-row">
+                                        <div class="col-12 col-md-5">
+                                            <input type="text" class="form-control question-input" placeholder="Question" required maxlength="100">
+                                        </div>
+                                        <div class="col-12 col-md-5">
+                                            <input type="text" class="form-control answer-input" placeholder="Answer" required maxlength="100">
+                                        </div>
+                                        <div class="col-12 col-md-2 d-grid">
+                                            <button type="button" class="btn btn-danger remove-flashcard" title="Remove">&times;</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-2">
+                                    <button type="button" id="add-flashcard" class="btn btn-outline-primary w-100">Add Another Card</button>
+                                </div>
+                                <div class="col-12 mb-2">
+                                    <button type="submit" id="save-set" class="btn btn-success w-100">Save Flashcard Set</button>
+                                </div>
+                                <div class="col-12 mb-2">
+                                    <div id="recent-flashcards" class="mt-2"></div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            
-                
-        </div>
     </body>
 </html>
