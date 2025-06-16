@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habits</title>
     <link rel="stylesheet" href="../todolist/styles/mix.css">
+    <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,8 +94,145 @@
                 </div>
             </div>
         </div>
-        <div class="habits"></div>
-        <div></div>
+        <div id="habits-container" class="strip">
+            <header class="habits-header-container">
+                <div class="habits-header-container-left">
+                    <img src="images/habits-container-icons/collapse.png" alt="collapse" class="collapse-sidebar-icon">
+                    <h2 class="habits-time-title">All</h2>
+                </div>
+                <div class="habits-actions-container">
+                    <input type="date" class="habits-date-display habits-action">
+                    <div class="habits-order habits-action"></div>
+                    <div class="add-habits-container habits-action"></div>
+                </div>
+            </header>
+            <div class="habits-list-container">
+                <div class="habits-list">
+                    <section class="habits-group">
+                        <div class="habits-group-header">
+                            <div class="arrow"></div>
+                            <div class="group-header">Anytime</div>
+                            <div class="number-of-habits">2</div>
+                        </div>
+                        <div class="habits hidden">
+                            <div class="habits-more-container">
+                                <div class="habit">
+                                    <div class="habit-icon-container">
+                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
+                                    </div>
+                                    <div class="habit-content-container">
+                                        <div class="left-side-habit">
+                                            <div class="habit-text">Fajr Prayer</div>
+                                            <div class="habit-times-number">0 / 1 times</div>
+                                        </div>
+                                        <div class="right-side-habit">
+                                            <div class="habit-folder-container habit-editor">Islam</div>
+                                            <div class="habit-done-container habit-editor">
+                                                <div class="habit-done-icon-container">
+                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
+                                                </div>
+                                                <div class="habit-done-text">Done</div>
+                                            </div>
+                                            <div class="habit-more-container habit-editor">
+                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-more-container">
+                                <div class="habit">
+                                    <div class="habit-icon-container">
+                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
+                                    </div>
+                                    <div class="habit-content-container">
+                                        <div class="left-side-habit">
+                                            <div class="habit-text">Asr Prayer</div>
+                                            <div class="habit-times-number">0 / 1 times</div>
+                                        </div>
+                                        <div class="right-side-habit">
+                                            <div class="habit-folder-container habit-editor">Islam</div>
+                                            <div class="habit-done-container habit-editor">
+                                                <div class="habit-done-icon-container">
+                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
+                                                </div>
+                                                <div class="habit-done-text">Done</div>
+                                            </div>
+                                            <div class="habit-more-container habit-editor">
+                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="habits-group">
+                        <div class="habits-group-header">
+                            <div class="arrow"></div>
+                            <div class="group-header">Anytime</div>
+                            <div class="number-of-habits">2</div>
+                        </div>
+                        <div class="habits hidden">
+                            <div class="habits-more-container">
+                                <div class="habit">
+                                    <div class="habit-icon-container">
+                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
+                                    </div>
+                                    <div class="habit-content-container">
+                                        <div class="left-side-habit">
+                                            <div class="habit-text">Fajr Prayer</div>
+                                            <div class="habit-times-number">0 / 1 times</div>
+                                        </div>
+                                        <div class="right-side-habit">
+                                            <div class="habit-folder-container habit-editor">Islam</div>
+                                            <div class="habit-done-container habit-editor">
+                                                <div class="habit-done-icon-container">
+                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
+                                                </div>
+                                                <div class="habit-done-text">Done</div>
+                                            </div>
+                                            <div class="habit-more-container habit-editor">
+                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-more-container">
+                                <div class="habit">
+                                    <div class="habit-icon-container">
+                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
+                                    </div>
+                                    <div class="habit-content-container">
+                                        <div class="left-side-habit">
+                                            <div class="habit-text">Asr Prayer</div>
+                                            <div class="habit-times-number">0 / 1 times</div>
+                                        </div>
+                                        <div class="right-side-habit">
+                                            <div class="habit-folder-container habit-editor">Islam</div>
+                                            <div class="habit-done-container habit-editor">
+                                                <div class="habit-done-icon-container">
+                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
+                                                </div>
+                                                <div class="habit-done-text">Done</div>
+                                            </div>
+                                            <div class="habit-more-container habit-editor">
+                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div id="habits-stats" class="strip"></div>
     </div>
 </body>
 </html>
