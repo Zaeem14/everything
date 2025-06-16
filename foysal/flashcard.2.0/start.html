@@ -47,12 +47,26 @@
                     <div class="menu-section">
                         <button class="menu-btn">
                             <span class="menu-icon">&#128193;</span>
-                            <span class="menu-label">New Folder</span>
+                            <span class="menu-label js-createFolder">New Folder</span>
                         </button>
-                        <button class="menu-btn">
-                            <span class="menu-icon">&#128451;</span>
-                            <span class="menu-label">Your Folder</span>
-                        </button>
+                        <details class="folder-container" style="color: black;">
+                            <summary class="summary-row">
+                                <div class="folder-addition-container" style="padding-left: 20px;">
+                                    <span class="folder-icon fs-6 fw-semibold">📁 Your Folder</span>
+                                </div>
+                            </summary>
+                            <div class="folder-list" style="padding-left: 20px;">
+                                <div class="folder-div" style="padding-left: 20px;">
+                                    <span class="folder-icon">📁 Business</span>
+                                </div>
+                                <div class="folder-div" style="padding-left: 20px;">
+                                    <span class="folder-icon">📁 Personal</span>
+                                </div>
+                                <div class="folder-div" style="padding-left: 20px;">
+                                    <span class="folder-icon">📁 Study</span>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                     <hr class="menu-divider">
                     <!-- Section: Reminder -->
@@ -133,5 +147,20 @@
                         </div>
                     </div>
                 </div>
+            <script>
+                document.querySelector('.js-createFolder').addEventListener('click', function() {
+                    // Handle menu label click
+                    alert('New Folder Has Added');
+                    // Add your folder creation logic here
+                    const folderName = prompt('Enter folder name:');
+                    if (folderName) {
+                        // Create the new folder element
+                        const newFolder = document.createElement('div');
+                        newFolder.classList.add('folder-div');
+                        newFolder.innerHTML = `<span class="folder-icon">📁 ${folderName}</span>`;
+                        document.querySelector('.folder-list').appendChild(newFolder);
+                    }
+                });
+            </script>
     </body>
 </html>
