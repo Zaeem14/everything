@@ -10,6 +10,7 @@
     justify-content: space-between;
     padding: 10px;
     border-bottom: 1px solid black;
+    height: 36px;
 }
 .habits-header-container-left,
 .habits-actions-container {
@@ -92,3 +93,100 @@
     gap: 5px;
 }
 
+.habits-stats-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid black;
+    height: 36px;
+}
+
+.habits-stats-header-left, 
+.habits-stats-header-right {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.habits-stats-folder, 
+.habits-stats-more-icon-container,
+.habits-stats-edit-icon-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color:rgb(141, 141, 141);
+    border-radius: 4px;
+    padding: 2px 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.habits-stats-title {
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+.habits-stats-folder {
+    color: white;
+}
+
+.habits-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+}
+
+.habit-current-streaks-stats-container,
+.habit-completed-times-stats-container,
+.habit-failed-times-stats-container, 
+.habit-skipped-times-stats-container
+{
+    width: 95%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.streak-stats-container,
+.completed-stats-container,
+.failed-stats-container,
+.skipped-stats-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.current-streak-title,
+.current-completed-title,
+.current-failed-title,
+.current-skipped-title {
+    margin: 0;
+    padding: 0;
+    color: gray;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.current-streak,
+.current-completed,
+.current-failed,
+.current-skipped {
+    color: black;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+}
