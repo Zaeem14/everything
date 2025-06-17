@@ -25,8 +25,37 @@
 }
 
 .habits-action {
-    background-color: aqua;
-    min-width: 125px;
+    background-color: rgb(141, 141, 141);
+    border: none;
+    width: fit-content;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7.5px;
+    padding: 5px 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    color: white;
+    font-size: 15px;
+}
+
+.add-habits-container {
+    background-color: rgb(4, 91, 221);
+}
+
+.add-habits-container:hover {
+    cursor: pointer;
+    background-color: rgb(21, 75, 141);
+    transition: background-color 0.3s ease;
+}
+
+.habits-arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #ffffff;
+
 }
 
 .hidden {

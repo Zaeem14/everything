@@ -245,7 +245,8 @@ h2 {
 }
 
 .habit-editor:hover,
-.habits-stats-header-right div:hover {
+.habits-stats-header-right div:hover,
+.habits-action:hover {
     background-color: rgb(69, 69, 69);
     cursor: pointer;
     transition: background-color 0.3s ease;
