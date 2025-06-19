@@ -38,7 +38,7 @@ h2 {
 }
 
 #todo-stats,
-#habits-stats {
+#habits-stats-container {
     width: 30%;
     height: 100%;
     display: flex;
@@ -214,6 +214,8 @@ h2 {
 .habit-done-icon,
 .habit-icon,
 .habit-more-icon,
+.habit-more-icons,
+.habit-edit-icon,
 .description-text-edit-icon{
     width: 20px;
     height: 20px;
@@ -242,7 +244,9 @@ h2 {
     background-color: rgb(240, 240, 240);
 }
 
-.habit-editor:hover {
+.habit-editor:hover,
+.habits-stats-header-right div:hover,
+.habits-action:hover {
     background-color: rgb(69, 69, 69);
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -346,3 +350,5 @@ details[open] > summary .arrow {
     padding: 5px;
     border-radius: 4px;
 }
+
+
