@@ -1,6 +1,6 @@
 
     /* for the header */
-    .header{
+.header{
     height: 55px;
     display: flex;
     flex-direction: row;
