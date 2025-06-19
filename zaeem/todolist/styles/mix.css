@@ -203,6 +203,7 @@ h2 {
 .habits-time-icon,
 .add-folder-icon, 
 .folder-icon, 
+.priority-icon,
 .todo-feature-icon,
 .collapse-sidebar-icon,
 .todo-header-icon,
@@ -233,7 +234,11 @@ h2 {
 .todo-input-icon:hover,
 .task-due-date-container-stats:hover,
 .task-priority-container-stats:hover,
-.task-description-icon-container:hover {
+.task-description-icon-container:hover,
+.todo-high-priority-container:hover,
+.todo-medium-priority-container:hover,
+.todo-low-priority-container:hover,
+.todo-none-priority-container:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }

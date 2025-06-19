@@ -55,6 +55,10 @@
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-top: 6px solid #ffffff;
+  margin-left: 2px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  transition: transform 0.3s ease;
 
 }
 
@@ -219,3 +223,189 @@
     margin: 0;
     padding: 0;
 }
+
+
+/* Overlay: covers the whole page */
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.25); /* transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Box */
+.modal {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #0003;
+  width: 100%;
+  max-width: 500px;
+  gap: 15px;
+  font-size: 14px;
+}
+
+.modal h2 {
+    margin: 5px 5px 5px 0;
+    padding: 0;
+    font-size: 25px;
+    font-weight: bolder;
+}
+
+.new-habit-name-icon-container,
+.habit-occurrence-container,
+.habit-time-date-container {
+    width: 100%;
+}
+
+.modal label {
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    text-transform: uppercase;
+    color: gray;
+}
+
+
+
+.new-habit-name-icon-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.new-habit-name-container {
+    width: 90%;
+}
+
+#new-habit-name {
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+    padding: 2px 5px;
+}
+
+.new-habit-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+    width: fit-content;
+    position: relative;
+    height: 20px;
+    margin: 0;
+    padding: 2px 5px;
+    top: 8px
+}
+
+.habit-occurrence-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.habit-goal-container,
+.habit-repeat-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.habit-occurrence-info-input-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.occurrence {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 4px;
+    padding: 2px 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+}
+
+.per, 
+.times{
+    width: 72.5px;
+}
+
+.habit-repeat-text {
+    width: 107.5px
+}
+
+.input-arrow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-arrow-up, 
+.input-arrow-down {
+    width: 10px;
+    height: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+.habit-time-date-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.habit-time-input-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 2px 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.habit-time-text {
+    width: 20rem;
+}
+
+.new-habit-description-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+#new-habit-description {
+    width: 100%;
+    height: 40px;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 2px 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    resize: none;
+}
+
+
+
