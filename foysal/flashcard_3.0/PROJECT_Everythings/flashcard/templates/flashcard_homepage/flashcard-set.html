@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flashcard Sets</title>
+  <link rel="stylesheet" href="style.css"> <!-- optional -->
+</head>
+<body>
+  <h2>My Flashcard Sets</h2>
+  <div id="sets-container"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+  const setsContainer = document.getElementById('sets-container');
+
+  const sets = JSON.parse(localStorage.getItem('flashcardSets') || '[]');
+
+  if (sets.length === 0) {
+    setsContainer.innerHTML = '<p>No flashcard sets found.</p>';
+    return;
+  }
+
+  // Build cards
+  sets.forEach((set, index) => {
+    const card = document.createElement('div');
+    card.classList.add('flashcard-set');
+    card.innerHTML = `
+      <h3>${set.title}</h3>
+      <ul>
+        ${set.cards.map(c => `<li><b>Q:</b> ${c.question} <br><b>A:</b> ${c.answer}</li>`).join('')}
+      </ul>
+      <hr>
+    `;
+    setsContainer.appendChild(card);
+  });
+});
+  </script>
+</body>
+</html>
