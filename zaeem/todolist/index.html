@@ -6,7 +6,7 @@
     <title>Todo List</title>
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/mix.css">
-    <script src="script.js" defer></script>
+    <script src="script.js" async></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,6 +161,10 @@
                         <div class="todo-input-modifier-icons-container">
                             <div class="todo-date-icon-container">
                                 <img src="images/todo-container/calendar.png" alt="date" class="todo-input-modifier-icons hidden">
+                                <div class="todo-date-input-container">
+                                    <input type="date" id="todo-date-input" class="todo-date-input">
+                                </div>
+                                
                             </div>
                             <div class="todo-priority-icon-container">
                                 <img src="images/todo-container/priorities-icon/grey_flag.png" alt="priority-grey" class="todo-input-modifier-icons hidden">
@@ -191,11 +195,60 @@
                                     </div>
                                 </div>
                             </div>
-
-                            
-
                             <div class="todo-folder-icon-container">
                                 <img src="images/todo-container/move_folder.png" alt="folder" class="todo-input-modifier-icons hidden">
+                                <div class="todo-folder-menu">
+                                    <div class="search-folder-container">
+                                        <img src="images/todo-container/icons8-search-16.png" alt="search icon" class="search-folder-icon">
+                                        <input type="text" placeholder="Search folders..." class="search-folder-input">
+                                    </div>
+                                    <div class="folder-menu-list-container">
+                                        <div class="task-queue-container folder-menu-container">
+                                            <img src="images/todo-dates-icons/planner.png" class="todo-date-icon">
+                                            <div class="folder-menu-name">Task Queue</div>
+                                            <div class="folder-menu-additoinal-container">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="folder-menu-container">
+                                            <div class="folder-menu-icon-container">
+                                                <img src="images/todo-folders-icons/personal_icon.png" class="folder-icon">
+                                            </div>
+                                            <div class="folder-menu-name">Personal</div>
+                                            <div class="folder-menu-additional-container">
+                                                <img src="images/todo-container/icons8-forward-16.png" class="folder-menu-additional-sections">
+                                            </div>
+                                        </div>
+                                        <div class="folder-menu-container current-folder">
+                                            <div class="folder-menu-icon-container">
+                                                <img src="images/todo-folders-icons/family.png" class="folder-icon">
+                                            </div>
+                                            <div class="folder-menu-name">Family</div>
+                                            <div class="folder-menu-additional-container">
+                                                <img src="images/todo-container/icons8-done-16.png" class="folder-menu-additional-sections">
+                                            </div>
+                                        </div>
+                                        <div class="folder-menu-container">
+                                            <div class="folder-menu-icon-container">
+                                                <img src="images/todo-folders-icons/kaaba.png" class="folder-icon">
+                                            </div>
+                                            <div class="folder-menu-name">Islam</div>
+                                            <div class="folder-menu-additional-container">
+                                                <img src="images/todo-container/icons8-forward-16.png" class="folder-menu-additional-sections">
+                                            </div>
+                                        </div>
+                                        <div class="folder-menu-container">
+                                            <div class="folder-menu-icon-container">
+                                                <img src="images/todo-folders-icons/dollar.png" class="folder-icon">
+                                            </div>
+                                            <div class="folder-menu-name">Business</div>
+                                            <div class="folder-menu-additional-container">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
                             </div>
                         </div>
                         <div class="todo-input-icon-container">
@@ -228,6 +281,49 @@
                                 </div>
                                 <div class="task-more-icon-container">
                                     <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
+                                    <div class="task-more-icon-menu-container">
+                                        <section class="task-more-date-section">
+                                            <div class="menu-header">Date</div>
+                                            <div class="task-more-date-icons">
+                                                <img src="images/todo-dates-icons/today_icon.png" alt="today" class="task-more-date-icon">
+                                                <img src="images/todo-dates-icons/tomorrow_icon.png"  alt="tomorrow" class="task-more-date-icon">
+                                                <img src="images/todo-dates-icons/week_icon.png" alt="week" class="task-more-date-icon">
+                                                <img src="images/todo-container/icons8-day-off-24.png" alt="clear date" class="task-more-date-icon">
+                                            </div>
+                                        </section>
+                                        <section class="task-more-priority-section">
+                                            <div class="task-more-priority menu-header">Priority</div>
+                                            <div class="task-more-priority-icons">
+                                                <img src="images/todo-container/priorities-icon/red_flag.png" alt="priority" class="task-more-priority-icon">
+                                                <img src="images/todo-container/priorities-icon/yellow_flag.png" alt="priority" class="task-more-priority-icon">
+                                                <img src="images/todo-container/priorities-icon/blue_flag.png" alt="priority" class="task-more-priority-icon">
+                                                <img src="images/todo-container/priorities-icon/grey_flag.png" alt="priority" class="task-more-priority-icon">
+                                            </div>
+                                        </section>
+                                        <section class="task-more-section">
+                                            <div class="task-more-icon-section-container">
+                                                <img src="images/todo-container/Subtask.png" alt="subtask" class="task-more-section-icon">
+                                                <div class="task-more-action-name">Add Subtask</div>
+                                            </div>
+                                            <div class="task-more-icon-section-container">
+                                                <img src="images/todo-container/move_folder.png" alt="move" class="task-more-section-icon">
+                                                <div class="task-more-action-name">Move To</div>
+                                                <div class="task-more-folder-icon-container">
+                                                    <img src="images/todo-container/icons8-forward-16.png" class="task-more-folder-icon">
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <section class="task-more-section">
+                                            <div class="task-more-icon-section-container">
+                                                <img src="images/todo-container/icons8-remove-50.png" alt="edit" class="task-more-section-icon">
+                                                <div class="task-more-action-name">Won't Do</div>
+                                            </div>
+                                            <div class="task-more-icon-section-container">
+                                                <img src="images/todo-container/icons8-trash-can-50.png" alt="delete" class="task-more-section-icon">
+                                                <div class="task-more-action-name">Delete</div>
+                                            </div>
+                                        </section>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -322,15 +418,41 @@
                 <div class="important-task-info-container-left">
                     <input type="checkbox" class="task-checkbox-stats priority-low-checkbox">
                     <div class="task-due-date-container-stats">
-                        <div class="due-date-icon">
-                            <img src="images/todo-container/calendar.png" alt="due date" class="due-date-icon">
+                        <div class="due-date-icon-container">
+                            <input type="date" class="todo-date-input-stats">
                         </div>
-                        3 days ago, May 30
+                        <div class="task-due-date-stats">3 days ago, May 30</div>
                     </div>
                 </div>
                 <div class="important-task-info-container-right">
                     <div class="task-priority-container-stats">
                         <img src="images/todo-container/priorities-icon/blue_flag.png" alt="priority" class="task-priority-icon">
+                        <div class="todo-priority-menu-stats">
+                            <div class="todo-high-priority-container">
+                                <div class="priority-icon-container">
+                                    <img src="images/todo-container/priorities-icon/red_flag.png" alt="red flag" class="priority-icon">
+                                </div>
+                                <div class="priority-text">High</div>
+                            </div>
+                            <div class="todo-medium-priority-container">
+                                <div class="priority-icon-container">
+                                    <img src="images/todo-container/priorities-icon/yellow_flag.png" alt="yellow flag flag" class="priority-icon">
+                                </div>
+                                <div class="priority-text">Medium</div>
+                            </div>
+                            <div class="todo-low-priority-container">
+                                <div class="priority-icon-container">
+                                    <img src="images/todo-container/priorities-icon/blue_flag.png" alt="blue flag" class="priority-icon">
+                                </div>
+                                <div class="priority-text">Low</div>
+                            </div>
+                            <div class="todo-none-priority-container">
+                                <div class="priority-icon-container">
+                                    <img src="images/todo-container/priorities-icon/grey_flag.png" alt="grey flag" class="priority-icon">
+                                </div>
+                                <div class="priority-text">None</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="task-description-icon-container">
                         <img src="images/todo-container/list.png" alt="description" class="task-listing-icon">
@@ -344,9 +466,6 @@
             </div>
             <div class="task-description-container">
                 <div class="description" contenteditable="true"></div>
-            </div>
-            <div class="task-item-container">
-
             </div>
             <div class="sub-task-container">
                 <div class="sub-task">
@@ -369,6 +488,28 @@
                     
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="modal-overlay">
+        <div class="modal-box">
+            <header class="modal-box-header">
+                <h4>ADD A FOLDER</h4>
+                <div class="close-modal-icon-container">
+                    <img src="images/todo-container/icons8-close-16.png" class="close-modal-icon">
+                </div>
+            </header>
+            <div class="folder-name-icon-input-container">
+                <div class="folder-icon-container">
+                    <img src="images/todo-container/icons8-menu-16.png" class="folder-icon">
+                </div>
+                <input type="text" placeholder="Folder Name" class="folder-name-input">
+            </div>
+            <div class="folder-color-picker-container">
+                <div class="folder-color-picker-label">Folder Color: </div>
+                <img src="images/todo-container/icons8-color-mode-16.png" class="color-picker-icon" id="colorPickerIcon">
+                <input type="color" id="folderColorPicker" class="hidden-color-picker">
+            </div>
+
         </div>
     </div>
 </body>

@@ -217,7 +217,10 @@ h2 {
 .habit-more-icon,
 .habit-more-icons,
 .habit-edit-icon,
-.description-text-edit-icon{
+.description-text-edit-icon,
+.task-more-date-icon,
+.task-more-priority-icon,
+.task-more-section-icon{
     width: 20px;
     height: 20px;
 }
@@ -232,13 +235,17 @@ h2 {
 .todo-header-icon:hover,
 .habits-container:hover,
 .todo-input-icon:hover,
-.task-due-date-container-stats:hover,
 .task-priority-container-stats:hover,
 .task-description-icon-container:hover,
 .todo-high-priority-container:hover,
 .todo-medium-priority-container:hover,
 .todo-low-priority-container:hover,
-.todo-none-priority-container:hover {
+.todo-none-priority-container:hover,
+.folder-menu-container:hover,
+.close-modal-icon-container:hover,
+.task-more-date-icon:hover,
+.task-more-priority-icon:hover,
+.task-more-icon-section-container:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }
@@ -251,7 +258,7 @@ h2 {
 
 .habit-editor:hover,
 .habits-stats-header-right div:hover,
-.habits-action:hover {
+.habits-action:hover{
     background-color: rgb(69, 69, 69);
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -357,3 +364,112 @@ details[open] > summary .arrow {
 }
 
 
+/* Overlay: covers the whole page */
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.25); /* transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  display: none;
+}
+
+/* Modal Box */
+.modal {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #0003;
+  width: 100%;
+  max-width: 500px;
+  gap: 15px;
+  font-size: 14px;
+}
+
+.modal-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    max-width: 350px;
+    font-size: 14px;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #0003;
+    background-color: white;
+}
+
+.modal-box h4 {
+    margin: 0;
+    padding: 0;
+}
+
+.modal-box-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-modal-icon-container {
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-name-icon-input-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid gray;
+    gap: 7.5px;
+}
+
+.folder-icon-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid gray;
+    padding: 5px;
+}
+
+
+.folder-name-input {
+    width: 100%;
+    border: none;
+    height: inherit;
+    outline: none;
+}
+
+.folder-color-picker-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10px;
+    gap: 7.5px;
+}
+
+
+
+
+#folderColorPicker {
+    position: relative;
+    outline: none;
+    border: none;
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    right: 22px;
+}

@@ -225,33 +225,7 @@
 }
 
 
-/* Overlay: covers the whole page */
-#modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.25); /* transparent black */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
 
-/* Modal Box */
-.modal {
-  display: flex;
-  flex-direction: column;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px #0003;
-  width: 100%;
-  max-width: 500px;
-  gap: 15px;
-  font-size: 14px;
-}
 
 .modal h2 {
     margin: 5px 5px 5px 0;

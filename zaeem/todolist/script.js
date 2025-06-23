@@ -48,3 +48,23 @@ taskGroupHeaders.forEach(header => {
 });
 
 
+const dateInput = document.getElementById("todo-date-input");
+  const icon = document.getElementById("todo-date-icon");
+
+  icon.addEventListener("click", () => {
+    if (dateInput.showPicker) {
+      dateInput.showPicker(); // Modern browser support
+    } else {
+      dateInput.focus(); // Fallback
+    }
+  });
+
+
+
+const colorInput = document.getElementById("folderColorPicker");
+const colorIcon = document.getElementById("colorPickerIcon");
+
+colorIcon.addEventListener("click", () => {
+  colorInput.click();
+  
+});
