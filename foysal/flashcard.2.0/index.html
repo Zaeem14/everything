@@ -127,18 +127,34 @@
 
             <script>
                 document.querySelector('.js-createFolder').addEventListener('click', function() {
-                    // Handle menu label click
-                    alert('New Folder Has Added');
-                    // Add your folder creation logic here
                     const folderName = prompt('Enter folder name:');
                     if (folderName) {
-                        // Create the new folder element
-                        const newFolder = document.createElement('div');
-                        newFolder.classList.add('folder-div');
-                        newFolder.innerHTML = `<span class="folder-icon">📁 ${folderName}</span>`;
-                        document.querySelector('.folder-list').appendChild(newFolder);
+                        addFolderToUI(folderName);
+                        saveFolder(folderName);
                     }
                 });
+
+                function addFolderToUI(folderName) {
+                    const newFolder = document.createElement('div');
+                    newFolder.classList.add('folder-div');
+                    newFolder.innerHTML = `<span class="folder-icon">📁 ${folderName}</span>`;
+                    document.querySelector('.folder-list').appendChild(newFolder);
+                }
+
+                function saveFolder(folderName) {
+                    const folders = JSON.parse(localStorage.getItem('flashcardFolders') || '[]');
+                    folders.push(folderName);
+                    localStorage.setItem('flashcardFolders', JSON.stringify(folders));
+                }
+
+                function loadFolders() {
+                    const folders = JSON.parse(localStorage.getItem('flashcardFolders') || '[]');
+                    folders.forEach(folderName => addFolderToUI(folderName));
+                }
+
+                // Load folders on page load
+                loadFolders();
+
             </script>
                 
         </div>
