@@ -164,9 +164,7 @@
                 <div class="flashcard-History">
                     <div class="container text-center">
                         <div id="grid">
-                            <div class="grid-item">Flashcard 1</div>
-                            <div class="grid-item more">Flashcard 2</div>
-
+                            <div class="grid-item js-flashcard-library"></div>
                         </div>
                     </div>
                 </div>
@@ -186,6 +184,52 @@
                         document.querySelector('.folder-list').appendChild(newFolder);
                     }
                 });
+
+                // Display all localStorage sets as clickable file icons
+                function displayFlashcardSets() {
+                    const container = document.querySelector('.js-flashcard-library');
+                    container.innerHTML = ''; // Clear previous content
+
+                    if (localStorage.length === 0) {
+                        container.textContent = 'No flashcard sets found in local storage.';
+                        return;
+                    }
+
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+
+                        // Create a clickable set icon
+                        const setDiv = document.createElement('div');
+                        setDiv.className = 'flashcard-set-icon';
+                        setDiv.style = 'display: inline-block; margin: 16px; cursor: pointer; text-align: center;';
+
+                        // File icon
+                        const icon = document.createElement('span');
+                        icon.textContent = '📄';
+                        icon.style = 'font-size: 48px; display: block;';
+
+                        // Set name
+                        const label = document.createElement('div');
+                        label.textContent = key;
+                        label.style = 'margin-top: 8px; color: #222; font-weight: bold;';
+
+                        setDiv.appendChild(icon);
+                        setDiv.appendChild(label);
+
+                        // Click event to open set in new page
+                        setDiv.addEventListener('click', function() {
+                            // Store the selected set key in sessionStorage
+                            sessionStorage.setItem('selectedSetKey', key);
+                            // Open the flashcard set page (create this page if not exists)
+                            window.open('flashcard-set.html', '_blank');
+                        });
+
+                        container.appendChild(setDiv);
+                    }
+                }
+
+                // Call the function on page load
+                displayFlashcardSets();
             </script>
     </body>
 </html>

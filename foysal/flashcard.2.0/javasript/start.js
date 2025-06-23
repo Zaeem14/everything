@@ -75,6 +75,12 @@ flashcardForm.onsubmit = function(e) {
         if (q && a) cards.push({ question: q, answer: a }); // Add to cards if both filled
     });
     if (!cards.length) return; // If no cards, stop
+
+    // Send the new set data to library.html via localStorage event
+    localStorage.setItem('newFlashcardSet', JSON.stringify({ title: setTitle, cards }));
+
+    // Optionally, you can redirect to library.html or trigger a custom event here
+    // window.location.href = 'library.html';
     // Get existing sets from localStorage (or empty array)
     const sets = JSON.parse(localStorage.getItem('flashcardSets') || '[]');
     // Add the new set with title and cards
