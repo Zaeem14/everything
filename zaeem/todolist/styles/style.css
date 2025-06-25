@@ -15,7 +15,8 @@ h2 {
 footer {
     position: absolute;
     bottom: 0;
-    width: 75%;
+    max-width: 75%;
+    width: fit-content;
     height: 5%;
     background-color: #f1f1f1;
     color: gray;
@@ -26,6 +27,7 @@ footer {
     justify-content: center;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    flex: 1 1 auto; /* grow & shrink */
 }
 
 footer a {
@@ -33,17 +35,18 @@ footer a {
     color: gray;
     text-decoration: none;
     font-weight: 600;
+    display: flex;
+    width: fit-content;
 }
 footer a:hover {
     text-decoration: underline;
 }
+
 #container {
     display: flex;
     width: 100vw;  
     height: 100vh;
 }
-
-
 
 .header-container {
     justify-content: space-between;
@@ -341,22 +344,19 @@ footer a:hover {
     justify-content:space-between;
     height: 30px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.25);
-}
-
-.left-side-task, .right-side-task {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 100%;
-    justify-content: center;
-    position: relative;   
+    overflow: hidden;
 }
 
 .left-side-task {
-    gap: 5px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 .right-side-task {
     gap: 5px;
+    flex-shrink: 0;
 
 }
 
@@ -372,13 +372,17 @@ footer a:hover {
     background-color: rgb(0, 132, 255);
     width: 4px;
     height: 100%;
-    box-sizing: border-box;
-    position: absolute;
-    left: -10px;
+    border-radius: 4px 0 0 4px;
+    position: relative;
+    left: 0;
 }
 
 .task-text {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;       /* Prevent text from wrapping */
+    overflow: hidden;          /* Hide overflowed text */
+    text-overflow: ellipsis;   /* Show "..." at the end */
 }
 
 .task-divider {
@@ -422,6 +426,10 @@ input{
   background-color: white;
   cursor: pointer;
   position: relative;
+}
+
+.task-checkbox {
+  flex-shrink: 0; /* 🔒 Prevent shrinking */
 }
 
 
@@ -581,7 +589,7 @@ input:checked::after {
 
 .todo-date-input-stats {
     height: 20px;
-    
+
 }
 
 .task-due-date-stats {
@@ -706,13 +714,10 @@ input:checked::after {
     transform: translateY(-10px); /* bottom: -10px effect */
 }
 
-.more-header-icon-menu-container {
-    display: fixed;
-}
+
 
 .sort-header-icon-menu-container {
     width: 150px;
-    display: fixed;
     z-index: 1000;
 }
 .task-view-options-container {
@@ -793,3 +798,53 @@ input:checked::after {
     justify-content: space-between;
 }
 
+.hidden-element {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hidden-menu {
+    position: absolute;
+    left: -9999px;
+}
+
+.add-folder-icon:hover,
+.close-modal-icon:hover {
+    filter: grayscale(100%) brightness(0%);
+}
+
+.add-folder-button {
+    background-color: rgb(34, 171, 245);
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.add-folder-button:hover {
+    background-color: rgb(47, 164, 248);
+}
+
+@media (max-width: 1094px) {
+    #todo-stats {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #todolist-menu {
+        position: absolute;
+        left: -9999px;
+    }
+}
+
+@media (min-width: 769px) {
+    #todolist-menu {
+        position: none;
+        left: none;
+    }
+}

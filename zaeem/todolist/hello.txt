@@ -1,0 +1,23 @@
+<div class="folder-div">
+    <div class="folder-div-left">
+        <div class="folder-div-icon">🧰</div>
+        <div class="folder">Work</div>
+    </div>
+    <div class="folder-div-right">
+        <div class="folder-color-circle" style="background-color: #ff0000;"></div>
+        <div class="folder-more-icon-container hidden-element">
+            <img class="folder-more-icon" src="images/todo-container/icons8-more-30.png">
+            <div class="folder-more-icon-menu-container hidden-element">
+                <div class="folder-more-icon-menu">
+                    <img src="images/todo-folders-icons/icons8-edit-16.png" id="folder-edit-icon">
+                    <div id="folder-edit">Edit</div>
+                </div>
+                <div class="folder-more-icon-menu">
+                    <img src="images/todo-container/icons8-trash-can-50.png" id="folder-delete-icon">
+                    <div id="folder-delete">Delete</div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>

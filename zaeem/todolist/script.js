@@ -48,18 +48,6 @@ taskGroupHeaders.forEach(header => {
 });
 
 
-const dateInput = document.getElementById("todo-date-input");
-  const icon = document.getElementById("todo-date-icon");
-
-  icon.addEventListener("click", () => {
-    if (dateInput.showPicker) {
-      dateInput.showPicker(); // Modern browser support
-    } else {
-      dateInput.focus(); // Fallback
-    }
-  });
-
-
 
 const colorInput = document.getElementById("folderColorPicker");
 const colorIcon = document.getElementById("colorPickerIcon");
@@ -68,3 +56,173 @@ colorIcon.addEventListener("click", () => {
   colorInput.click();
   
 });
+
+// header icons 
+const todolistSortIcon = document.querySelector(".todo-header-sort-icon-js");
+const todolistMoreIcon = document.querySelector(".todo-header-more-icon-js");
+
+// header icons hidden menus
+const sortIconMenu = document.querySelector(".sort-header-icon-menu-container");
+const moreIconMenu = document.querySelector(".more-header-icon-menu-container");
+
+// Toggle visibility on icon click
+todolistSortIcon?.addEventListener("click", (e) => {
+  e.stopPropagation(); // Prevent it from triggering the document click
+  sortIconMenu.classList.toggle("hidden-element");
+  moreIconMenu.classList.add("hidden-element"); // optional: close the other menu
+});
+
+todolistMoreIcon?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  moreIconMenu.classList.toggle("hidden-element");
+  sortIconMenu.classList.add("hidden-element"); // optional: close the other menu
+});
+
+// Hide menus if clicking outside
+document.addEventListener("click", (e) => {
+  if (
+    !todolistSortIcon.contains(e.target) &&
+    !sortIconMenu.contains(e.target)
+  ) {
+    sortIconMenu.classList.add("hidden-element");
+  }
+
+  if (
+    !todolistMoreIcon.contains(e.target) &&
+    !moreIconMenu.contains(e.target)
+  ) {
+    moreIconMenu.classList.add("hidden-element");
+  }
+});
+
+
+
+// stats priority icon 
+const priorityIconStats = document.querySelector(".task-priority-container-stats");
+// stats priority icon hidden menu
+const priorityIconMenuStats = document.querySelector(".todo-priority-menu-stats");
+
+priorityIconStats.addEventListener("click", () => {
+  priorityIconMenuStats.classList.toggle("hidden-element");
+})
+
+document.addEventListener("click", (e) => {
+  if (
+    priorityIconMenuStats &&
+    !priorityIconStats.contains(e.target) &&
+    !priorityIconMenuStats.contains(e.target)
+  ) {
+    priorityIconMenuStats.classList.add("hidden-element");
+  }
+});
+
+
+const inputPriorityIcon = document.querySelector(".todo-input-priority-icon-js");
+const inputPriorityIconMenu = document.querySelector(".todo-priority-menu");
+
+inputPriorityIcon?.addEventListener("click", (e) => {
+  e.stopPropagation(); // Prevent immediate hiding
+  inputPriorityIconMenu?.classList.toggle("hidden-element");
+});
+
+document.addEventListener("click", (e) => {
+  // ONLY keep it open if click is on icon or on menu
+  const clickedOnIcon = inputPriorityIcon?.contains(e.target);
+  const clickedOnMenu = inputPriorityIconMenu?.contains(e.target);
+
+  if (!clickedOnIcon && !clickedOnMenu) {
+    inputPriorityIconMenu?.classList.add("hidden-element");
+  }
+});
+
+const inputFolderIcon = document.querySelector(".todo-input-folder-icon-js");
+const inputFolderIconMenu = document.querySelector(".todo-folder-menu");
+
+inputFolderIcon.addEventListener("click", () => {
+  inputFolderIconMenu.classList.toggle("hidden-element");
+});
+
+document.addEventListener("click", (e) => {
+  if (
+    inputFolderIconMenu &&
+    !inputFolderIcon.contains(e.target) &&
+    !inputFolderIconMenu.contains(e.target)
+  ) {
+    inputFolderIconMenu.classList.add("hidden-element");
+  }
+});
+
+const addFolderIcon = document.querySelector(".add-folder-icon");
+const addFolderIconModalOverlay = document.getElementById("modal-overlay");
+const addFolderIconModalCloseIcon = document.querySelector(".close-modal-icon");
+
+addFolderIcon.addEventListener("click", () => {
+  addFolderIconModalOverlay.classList.remove("hidden-element");
+});
+
+addFolderIconModalCloseIcon.addEventListener("click", () => {
+  addFolderIconModalOverlay.classList.add("hidden-element");
+})
+
+const taskMoreIcon = document.querySelector(".task-more-icon");
+const taskMoreIconMenu = document.querySelector(".task-more-icon-menu-container");
+
+taskMoreIcon.addEventListener("click", () => {
+  taskMoreIconMenu.classList.toggle("hidden-element");
+});
+
+document.addEventListener("click", (e) => {
+  if (
+    taskMoreIconMenu &&
+    !taskMoreIcon.contains(e.target) &&
+    !taskMoreIconMenu.contains(e.target)
+  ) {
+    taskMoreIconMenu.classList.add("hidden-element");
+  }
+});
+
+const sidebarIcon = document.querySelector(".collapse-sidebar-icon"); // initial class
+const menuBar = document.getElementById("todolist-menu");
+const todoContainer = document.getElementById("todo-container");
+
+sidebarIcon.addEventListener("click", () => {
+  if (sidebarIcon.classList.contains("collapse-sidebar-icon")) {
+    // Collapse sidebar
+    menuBar.classList.add("hidden-menu");
+    todoContainer.style.width = "67%";
+    sidebarIcon.src = "images/todo-container/expand.png";
+    sidebarIcon.classList.remove("collapse-sidebar-icon");
+    sidebarIcon.classList.add("expand-sidebar-icon");
+  } else {
+    // Expand sidebar
+    menuBar.classList.remove("hidden-menu");
+    todoContainer.style.width = "50%";
+    sidebarIcon.src = "images/todo-container/collapse.png";
+    sidebarIcon.classList.remove("expand-sidebar-icon");
+    sidebarIcon.classList.add("collapse-sidebar-icon");
+  }
+});
+
+function updateExpandSideBarIconSrc(e) {
+  if (e.matches) {
+    sidebarIcon.src = "images/todo-container/expand.png";
+  } 
+}
+
+function updateCollapseSideBarIconSrc(e) {
+  if (e.matches) {
+    sidebarIcon.src = "images/todo-container/collapse.png";
+  }
+}
+
+// Create a media query list
+const mq = window.matchMedia('(max-width: 768px)');
+const mq2 = window.matchMedia('(min-width: 769px)');
+
+// Initial check
+updateExpandSideBarIconSrc(mq);
+updateCollapseSideBarIconSrc(mq2);
+
+// Listen for viewport changes
+mq.addEventListener('change', updateExpandSideBarIconSrc);
+mq2.addEventListener('change', updateCollapseSideBarIconSrc);

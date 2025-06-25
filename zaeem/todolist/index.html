@@ -6,7 +6,32 @@
     <title>Todo List</title>
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/mix.css">
-    <script src="script.js" async></script>
+    <script type="module">
+        import { EmojiButton } from 'https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const folderIcon = document.getElementById("folderIcon");
+
+            const picker = new EmojiButton({
+            position: 'bottom-start',
+            zIndex: 9999,
+            autoHide: true,
+            showPreview: false,
+            showRecents: true,
+            theme: 'light'
+            });
+
+            picker.on('emoji', emoji => {
+                folderIcon.textContent = emoji.emoji;
+            });
+
+            folderIcon.addEventListener('click', () => {
+                picker.togglePicker(folderIcon);
+            });
+        });
+    </script>
+    <script src="data//folder.js" defer></script>
+    <script src="script.js" defer></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,30 +78,11 @@
                         <span class="arrow"></span>
                         <div class="folder-addition-container">
                             <span>Folders</span>
-                            <img src="images/todo-folders-icons/plus_icon.png" class="add-folder-icon">
+                            <img src="images/todo-folders-icons/icons8-plus-math-16.png" class="add-folder-icon">
                         </div>
                     </summary>
                     <div class="folder-list">
-                        <div class="folder-div">
-                            <img src="images/todo-folders-icons/dollar.png" class="folder-icon">
-                            <div class="folder">Business</div>
-                        </div>
-                        <div class="folder-div">
-                            <img src="images/todo-folders-icons/family.png" class="folder-icon">
-                            <div class="folder">Family</div>
-                        </div>
-                        <div class="folder-div">
-                            <img src="images/todo-folders-icons/kaaba.png" class="folder-icon">
-                            <div class="folder">Islam</div>
-                        </div>
-                        <div class="folder-div">
-                            <img src="images/todo-folders-icons/personal_icon.png" class="folder-icon">
-                            <div class="folder">Personal</div>
-                        </div>
-                        <div class="folder-div">
-                            <img src="images/todo-folders-icons/school.png" class="folder-icon">
-                            <div class="folder">School</div>
-                        </div>
+                        
                     </div>
                 </details>
             </div>
@@ -105,8 +111,8 @@
                     </div>
                     <div class="todo-header-icons">
                         <div class="todo-sort-header-icon-container">
-                            <img src="images/todo-container/sort.png" class="todo-header-icon" alt="sort">
-                            <div class="sort-header-icon-menu-container">
+                            <img src="images/todo-container/sort.png" class="todo-header-icon todo-header-sort-icon-js" alt="sort">
+                            <div class="sort-header-icon-menu-container hidden-element">
                                 <div class="group-by-container">
                                     <div class="group-by-container-left">
                                         <div class="group-by-icon-container"></div>
@@ -116,7 +122,6 @@
                                         <div class="grouped-by-text">Date</div>
                                         <div class="arrow"></div>
                                     </div>
-                                    
                                 </div>
                                 <div class="sort-by-container">
                                     <div class="sort-by-container-left">
@@ -132,8 +137,8 @@
                         </div>
                         
                         <div class="todo-more-header-icon-container">
-                            <img src="images/todo-container/more.png" class="todo-header-icon" alt="more">
-                            <div class="more-header-icon-menu-container">
+                            <img src="images/todo-container/more.png" class="todo-header-icon todo-header-more-icon-js" alt="more">
+                            <div class="more-header-icon-menu-container hidden-element">
                                 <div class="menu-title">View</div>
                                 <div class="vertical-line-menu"></div>
                                 <div class="task-view-options-container">
@@ -167,8 +172,8 @@
                                 
                             </div>
                             <div class="todo-priority-icon-container">
-                                <img src="images/todo-container/priorities-icon/grey_flag.png" alt="priority-grey" class="todo-input-modifier-icons hidden">
-                                <div class="todo-priority-menu">
+                                <img src="images/todo-container/priorities-icon/grey_flag.png" alt="priority-grey" class="todo-input-modifier-icons todo-input-priority-icon-js hidden">
+                                <div class="todo-priority-menu hidden-element">
                                     <div class="todo-high-priority-container">
                                         <div class="priority-icon-container">
                                             <img src="images/todo-container/priorities-icon/red_flag.png" alt="red flag" class="priority-icon">
@@ -196,8 +201,8 @@
                                 </div>
                             </div>
                             <div class="todo-folder-icon-container">
-                                <img src="images/todo-container/move_folder.png" alt="folder" class="todo-input-modifier-icons hidden">
-                                <div class="todo-folder-menu">
+                                <img src="images/todo-container/move_folder.png" alt="folder" class="todo-input-modifier-icons todo-input-folder-icon-js hidden">
+                                <div class="todo-folder-menu hidden-element">
                                     <div class="search-folder-container">
                                         <img src="images/todo-container/icons8-search-16.png" alt="search icon" class="search-folder-icon">
                                         <input type="text" placeholder="Search folders..." class="search-folder-input">
@@ -271,7 +276,7 @@
                                     <div class="left-side-task">
                                         <div class="folder-color-code-bar"></div>
                                         <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                                        <div class="task-text">complete this project </div>
+                                        <div class="task-text">topijsadofjaslkdjfalsdjflsadkjflasdnvwqgphp24o</div>
                                     </div>
                                     <div class="right-side-task">
                                         <div class="folder-color-code-circle"></div>
@@ -281,7 +286,7 @@
                                 </div>
                                 <div class="task-more-icon-container">
                                     <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                                    <div class="task-more-icon-menu-container">
+                                    <div class="task-more-icon-menu-container hidden-element">
                                         <section class="task-more-date-section">
                                             <div class="menu-header">Date</div>
                                             <div class="task-more-date-icons">
@@ -407,9 +412,12 @@
                         </div>
                     </div>
                 </div>
-                <footer>
-                    This website is highly inspired by the <a href="https://ticktick.com/" target="_blank">TickTick</a> todolist.
+                <footer class="responsive-footer">
+                    This website is highly inspired by the 
+                    <a href="https://ticktick.com/" target="_blank">TickTick</a>
+                    to-do list.
                 </footer>
+
             </div>
             
         </div>
@@ -427,7 +435,7 @@
                 <div class="important-task-info-container-right">
                     <div class="task-priority-container-stats">
                         <img src="images/todo-container/priorities-icon/blue_flag.png" alt="priority" class="task-priority-icon">
-                        <div class="todo-priority-menu-stats">
+                        <div class="todo-priority-menu-stats hidden-element">
                             <div class="todo-high-priority-container">
                                 <div class="priority-icon-container">
                                     <img src="images/todo-container/priorities-icon/red_flag.png" alt="red flag" class="priority-icon">
@@ -490,7 +498,7 @@
             </div>
         </div>
     </div>
-    <div id="modal-overlay">
+    <div id="modal-overlay" class="hidden-element">
         <div class="modal-box">
             <header class="modal-box-header">
                 <h4>ADD A FOLDER</h4>
@@ -500,8 +508,9 @@
             </header>
             <div class="folder-name-icon-input-container">
                 <div class="folder-icon-container">
-                    <img src="images/todo-container/icons8-menu-16.png" class="folder-icon">
+                    <div class="folder-icon" id="folderIcon">📁</div>
                 </div>
+
                 <input type="text" placeholder="Folder Name" class="folder-name-input">
             </div>
             <div class="folder-color-picker-container">
@@ -509,7 +518,7 @@
                 <img src="images/todo-container/icons8-color-mode-16.png" class="color-picker-icon" id="colorPickerIcon">
                 <input type="color" id="folderColorPicker" class="hidden-color-picker">
             </div>
-
+            <button class="add-folder-button">Add Folder</button>
         </div>
     </div>
 </body>
