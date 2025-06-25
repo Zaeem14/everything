@@ -27,7 +27,7 @@ function createFlashcardRow(question = '', answer = '') {
         updateRecentFlashcards(); // Update the recent flashcards list
     };
     // If user presses Enter in answer input, add a new flashcard row
-    row.querySelector('.answer-input').addEventListener('keydown', function(e) {
+    row.querySelector('.answer-input').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             addFlashcardBtn.click();
@@ -59,7 +59,7 @@ addFlashcardBtn.onclick = () => {
 };
 
 // When the form is submitted (user clicks save)
-flashcardForm.onsubmit = function(e) {
+flashcardForm.onsubmit = function (e) {
     e.preventDefault(); // Stop the page from reloading
     const setTitle = setTitleInput.value.trim(); // Get the set title
     // If title is empty, focus on title input and stop
@@ -121,7 +121,7 @@ function updateRecentFlashcards() {
 
     // Add remove button logic for each recent card
     recentFlashcards.querySelectorAll('.remove-recent').forEach(btn => {
-        btn.onclick = function() {
+        btn.onclick = function () {
             const idx = parseInt(this.getAttribute('data-idx')); // Get index of card
             // Remove the matching flashcard row
             const rows = flashcardFields.querySelectorAll('.flashcard-row');
@@ -136,3 +136,4 @@ if (!flashcardFields.querySelector('.flashcard-row')) {
     flashcardFields.appendChild(createFlashcardRow());
 }
 updateRecentFlashcards(); // Show the recent flashcards at the start
+
