@@ -5,12 +5,60 @@ document.addEventListener("DOMContentLoaded", () => {
         folderAddButton.addEventListener("click", () => {
             console.log("Button clicked!");
             addFolder();
+            closeModal();
         });
     } else {
         console.warn("Add Folder button not found.");
     }
 
+    renderFolderPickerMenu(); // ✅ render this before any event listener
     loadFoldersFromLocalStorage();
+
+    const inputFolderIconContainer = document.querySelector(".todo-input-folder-icon-container");
+    const inputFolderIcon = document.querySelector(".todo-input-folder-icon-js");
+    const inputFolderIconMenu = document.querySelector(".todo-folder-menu");
+
+    inputFolderIconContainer.addEventListener("click", () => {
+        if (!inputFolderIconContainer.classList.contains("hidden")) {
+            inputFolderIconMenu.classList.remove("hidden-element");
+        }
+        
+    });
+
+    document.addEventListener("click", (e) => {
+        if (
+            inputFolderIconMenu &&
+            !inputFolderIcon.contains(e.target) &&
+            !inputFolderIconMenu.contains(e.target)
+        ) {
+            inputFolderIconMenu.classList.add("hidden-element");
+        }
+    });
+
+
+    // Event delegation to handle clicks on folder options
+    inputFolderIconMenu.addEventListener("click", (event) => {
+        const option = event.target.closest(".folder-menu-container");
+        if (!option) return;
+
+        // Get icon + name from clicked option
+        const folderName = option.querySelector(".folder-menu-name").textContent.trim();
+        const folderIcon = option.querySelector(".folder-icon").textContent.trim();
+
+        // Replace selected folder display
+        inputFolderIconContainer.innerHTML = `${folderIcon} ${folderName}`;
+        inputFolderIconContainer.setAttribute("data-id", option.getAttribute("data-id")); // optional if storing id
+
+        // Highlight selected in menu
+        document.querySelectorAll(".folder-menu-container").forEach(opt =>
+            opt.classList.remove("current-folder")
+        );
+        option.classList.add("current-folder");
+        inputFolderIconContainer.classList.add("current-folder");
+
+        // Hide menu
+        inputFolderIconMenu.classList.add("hidden-element");
+    });
 });
 
 
@@ -33,6 +81,7 @@ function addFolder() {
     folders.push(newFolder);
     addFolderToThePage(folderIcon, folderName, folderColor, folderId);
     saveFoldersToLocalStorage();
+    renderFolderPickerMenu();
 
     // Reset
     document.querySelector(".folder-name-input").value = "";
@@ -102,6 +151,7 @@ function loadFoldersFromLocalStorage() {
     if (storedFolders) {
         folders = JSON.parse(storedFolders);
         renderAllFolders();
+        renderFolderPickerMenu();
     }
 }
 
@@ -136,5 +186,43 @@ document.addEventListener("click", () => {
         menu.classList.add("hidden-element");
     });
 });
+
+
+const addFolderIcon = document.querySelector(".add-folder-icon");
+const addFolderIconModalOverlay = document.getElementById("modal-overlay");
+const addFolderIconModalCloseIcon = document.querySelector(".close-modal-icon-container");
+
+addFolderIcon.addEventListener("click", () => {
+  addFolderIconModalOverlay.classList.remove("hidden-element");
+});
+
+addFolderIconModalCloseIcon.addEventListener("click", () => {
+  closeModal();
+})
+
+function closeModal() {
+  addFolderIconModalOverlay.classList.add("hidden-element");
+}
+
+function renderFolderPickerMenu() {
+    const dynamicMenu = document.querySelector(".folder-menu-dynamic");
+    dynamicMenu.innerHTML = ""; // ✅ Only clears folder items
+
+    folders.forEach(folder => {
+        const folderPicker = document.createElement("div");
+        folderPicker.classList.add("folder-menu-container");
+        folderPicker.setAttribute("data-id", folder.folderId);
+
+        folderPicker.innerHTML = `
+            <div class="folder-menu-icon-container">
+                <div class="folder-icon">${folder.folderIcon}</div>
+            </div>
+            <div class="folder-menu-name">${folder.folderName}</div>
+        `;
+
+        dynamicMenu.appendChild(folderPicker);
+    });
+}
+
 
 

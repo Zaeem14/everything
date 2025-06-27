@@ -160,9 +160,13 @@ footer a:hover {
 .todo-input-modifier-icons-container {
     display: flex;
     flex-direction: row;
-    gap: 12.5px;
     align-items: center;
     margin-left: 10px;
+}
+
+.todo-input-modifier-icons {
+    width: 18px;
+    height: 18px;
 }
 
 .hidden {
@@ -181,13 +185,40 @@ footer a:hover {
 
 .todo-date-icon-container {
     display: flex;
-    width: 20px;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    gap: 5px;
+}
+
+.todo-input-modifier-icons-container > div {
+    border-radius: 4px;
+    padding: 2.5px 5px;
+}
+
+.todo-date-chosen {
+    font-size: 14px;
+    width: fit-content;
+    
+}
+
+.previous-date {
+    color: rgb(224, 49, 49)
+}
+
+.future-date {
+    color: rgb(71,114,250);
 }
 
 .todo-date-input-container {
     opacity: 0;
-    position: relative;
-    right: 20px;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto; /* allow clicking */
+
 }
 
 .todo-priority-menu {
@@ -292,6 +323,9 @@ footer a:hover {
     color: rgb(71,114,250);
 }
 
+.todo-input-folder-icon-container.current-folder {
+    font-size: 16px;
+}
 
 .todo-list {
     display: flex;
@@ -847,4 +881,8 @@ input:checked::after {
         position: none;
         left: none;
     }
+}
+
+.folder-menu-dynamic {
+    width: 100%;
 }

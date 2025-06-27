@@ -135,6 +135,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
+
 const inputFolderIcon = document.querySelector(".todo-input-folder-icon-js");
 const inputFolderIconMenu = document.querySelector(".todo-folder-menu");
 
@@ -142,27 +143,10 @@ inputFolderIcon.addEventListener("click", () => {
   inputFolderIconMenu.classList.toggle("hidden-element");
 });
 
-document.addEventListener("click", (e) => {
-  if (
-    inputFolderIconMenu &&
-    !inputFolderIcon.contains(e.target) &&
-    !inputFolderIconMenu.contains(e.target)
-  ) {
-    inputFolderIconMenu.classList.add("hidden-element");
-  }
-});
 
-const addFolderIcon = document.querySelector(".add-folder-icon");
-const addFolderIconModalOverlay = document.getElementById("modal-overlay");
-const addFolderIconModalCloseIcon = document.querySelector(".close-modal-icon");
 
-addFolderIcon.addEventListener("click", () => {
-  addFolderIconModalOverlay.classList.remove("hidden-element");
-});
 
-addFolderIconModalCloseIcon.addEventListener("click", () => {
-  addFolderIconModalOverlay.classList.add("hidden-element");
-})
+
 
 const taskMoreIcon = document.querySelector(".task-more-icon");
 const taskMoreIconMenu = document.querySelector(".task-more-icon-menu-container");

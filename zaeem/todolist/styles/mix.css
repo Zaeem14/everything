@@ -228,7 +228,6 @@ h2 {
 .collapse-sidebar-icon,
 .todo-header-icon,
 .todo-input-icon,
-.todo-input-modifier-icons,
 .due-date-icon,
 .task-priority-icon,
 .task-listing-icon,
@@ -270,7 +269,8 @@ h2 {
 .task-more-date-icon:hover,
 .task-more-priority-icon:hover,
 .task-more-icon-section-container:hover,
-.folder-more-icon-menu:hover {
+.folder-more-icon-menu:hover,
+.todo-input-modifier-icons-container > div:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }
