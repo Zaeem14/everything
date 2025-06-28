@@ -135,36 +135,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-
-const inputFolderIcon = document.querySelector(".todo-input-folder-icon-js");
-const inputFolderIconMenu = document.querySelector(".todo-folder-menu");
-
-inputFolderIcon.addEventListener("click", () => {
-  inputFolderIconMenu.classList.toggle("hidden-element");
-});
-
-
-
-
-
-
-const taskMoreIcon = document.querySelector(".task-more-icon");
-const taskMoreIconMenu = document.querySelector(".task-more-icon-menu-container");
-
-taskMoreIcon.addEventListener("click", () => {
-  taskMoreIconMenu.classList.toggle("hidden-element");
-});
-
-document.addEventListener("click", (e) => {
-  if (
-    taskMoreIconMenu &&
-    !taskMoreIcon.contains(e.target) &&
-    !taskMoreIconMenu.contains(e.target)
-  ) {
-    taskMoreIconMenu.classList.add("hidden-element");
-  }
-});
-
 const sidebarIcon = document.querySelector(".collapse-sidebar-icon"); // initial class
 const menuBar = document.getElementById("todolist-menu");
 const todoContainer = document.getElementById("todo-container");
@@ -210,3 +180,14 @@ updateCollapseSideBarIconSrc(mq2);
 // Listen for viewport changes
 mq.addEventListener('change', updateExpandSideBarIconSrc);
 mq2.addEventListener('change', updateCollapseSideBarIconSrc);
+
+const taskStatsDueDateContainer = document.querySelector('.task-due-date-container-stats');
+const taskStatsDueDateInput = document.querySelector(".todo-date-input-stats");
+
+taskStatsDueDateContainer.addEventListener('click', () => {
+  if (taskStatsDueDateInput.showPicker) {
+    taskStatsDueDateInput.showPicker(); // Modern browsers only (Chrome, Edge)
+  } else {
+    taskStatsDueDateInput.focus(); // Fallback for older/unsupported browsers
+  }
+});

@@ -328,11 +328,7 @@ footer a:hover {
 }
 
 .todo-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    
+    overflow-y: scroll;
 }
 
 .task-group {
@@ -453,7 +449,7 @@ footer a:hover {
 input{
   -webkit-appearance: none; /* Remove default style */
   appearance: none;
-  width: 17.5px;
+  width: 15px;
   height: 15px;
   border: 1.25px solid gray; /* Your custom border color */
   border-radius: 3px;
@@ -623,7 +619,7 @@ input:checked::after {
 
 .todo-date-input-stats {
     height: 20px;
-
+    width: 17.5px;
 }
 
 .task-due-date-stats {
@@ -862,6 +858,8 @@ input:checked::after {
 .add-folder-button:hover {
     background-color: rgb(47, 164, 248);
 }
+
+
 
 @media (max-width: 1094px) {
     #todo-stats {

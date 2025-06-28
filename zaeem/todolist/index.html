@@ -162,7 +162,7 @@
                 </div>
                 <div class="todo-input-container">
                     <div class="input-plus-add-icon-container">
-                        <input type="text" id="todo-input" placeholder="+ Add a new task...">
+                        <input type="text" id="todo-input" placeholder="+ Add a new task..." autocomplete="off">
                     </div>
                     <div class="todo-input-modifier-icons-div">
                         <div class="todo-input-modifier-icons-container">
@@ -231,6 +231,7 @@
             </div>
             <div class="todo-list-container">
                 <div class="todo-list">
+
                     <div class="task-group">
                         <div class="task-group-header">
                             <div class="arrow"></div>
@@ -290,7 +291,7 @@
                                                 <img src="images/todo-container/icons8-remove-50.png" alt="edit" class="task-more-section-icon">
                                                 <div class="task-more-action-name">Won't Do</div>
                                             </div>
-                                            <div class="task-more-icon-section-container">
+                                            <div class="task-more-icon-section-containe task-delete-icon-container">
                                                 <img src="images/todo-container/icons8-trash-can-50.png" alt="delete" class="task-more-section-icon">
                                                 <div class="task-more-action-name">Delete</div>
                                             </div>
@@ -298,95 +299,15 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="task-more-container">
-                                <div class="task">
-                                    <div class="left-side-task">
-                                        <div class="folder-color-code-bar"></div>
-                                        <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                                        <div class="task-text">complete this project </div>
-                                    </div>
-                                    <div class="right-side-task">
-                                        <div class="folder-color-code-circle"></div>
-                                        <div class="task-folder">Personal</div>
-                                        <div class="due-date">Overdue</div>
-                                    </div>
-                                </div>
-                                <div class="task-more-icon-container">
-                                    <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                                </div>
-                            </div>
                         </div>
-                    </div>
-                    <div class="task-group">
-                        <div class="task-group-header">
-                            <div class="arrow"></div>
-                            <div class="group-header">Overdue</div>
-                            <div class="number-of-tasks">3</div>
-                        </div>
-                        <div class="tasks">
-                             <div class="task-more-container">
-                                <div class="task">
-                                    <div class="left-side-task">
-                                        <div class="folder-color-code-bar"></div>
-                                        <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                                        <div class="task-text">complete this project </div>
-                                    </div>
-                                    <div class="right-side-task">
-                                        <div class="folder-color-code-circle"></div>
-                                        <div class="task-folder">Personal</div>
-                                        <div class="due-date">Overdue</div>
-                                    </div>
-                                </div>
-                                <div class="task-more-icon-container">
-                                    <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                                </div>
-                            </div>
-                             <div class="task-more-container">
-                                <div class="task">
-                                    <div class="left-side-task">
-                                        <div class="folder-color-code-bar"></div>
-                                        <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                                        <div class="task-text">complete this project </div>
-                                    </div>
-                                    <div class="right-side-task">
-                                        <div class="folder-color-code-circle"></div>
-                                        <div class="task-folder">Personal</div>
-                                        <div class="due-date">Overdue</div>
-                                    </div>
-                                </div>
-                                <div class="task-more-icon-container">
-                                    <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                                </div>
-                            </div>
-                            <div class="task-more-container">
-                                <div class="task">
-                                    <div class="left-side-task">
-                                        <div class="folder-color-code-bar"></div>
-                                        <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                                        <div class="task-text">complete this project </div>
-                                    </div>
-                                    <div class="right-side-task">
-                                        <div class="folder-color-code-circle"></div>
-                                        <div class="task-folder">Personal</div>
-                                        <div class="due-date">Overdue</div>
-                                    </div>
-                                </div>
-                                <div class="task-more-icon-container">
-                                    <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <footer class="responsive-footer">
                     This website is highly inspired by the 
                     <a href="https://ticktick.com/" target="_blank">TickTick</a>
                     to-do list.
                 </footer>
-
             </div>
-            
+        </div>
         </div>
         <div id="todo-stats">
             <div class="important-task-info-container">

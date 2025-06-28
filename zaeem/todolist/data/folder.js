@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (folderAddButton) {
         folderAddButton.addEventListener("click", () => {
-            console.log("Button clicked!");
             addFolder();
             closeModal();
         });
@@ -48,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Replace selected folder display
         inputFolderIconContainer.innerHTML = `${folderIcon} ${folderName}`;
         inputFolderIconContainer.setAttribute("data-id", option.getAttribute("data-id")); // optional if storing id
+        
+
 
         // Highlight selected in menu
         document.querySelectorAll(".folder-menu-container").forEach(opt =>
@@ -62,23 +63,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-let folders = [];
+export let folders = {};
 
 function addFolder() {
-    const folderId = folders.length + 1;
+    const folderId = Date.now(); // Unique folder ID
 
-    let folderName = document.querySelector(".folder-name-input").value;
-    let folderColor = document.getElementById("folderColorPicker").value;
-    let folderIcon = document.getElementById("folderIcon").textContent;
+    const folderName = document.querySelector(".folder-name-input").value;
+    const folderColor = document.getElementById("folderColorPicker").value;
+    const folderIcon = document.getElementById("folderIcon").textContent;
 
     const newFolder = {
-        folderId: folderId,
-        folderName: folderName,
-        folderColor: folderColor,
-        folderIcon: folderIcon
+        folderId,
+        folderName,
+        folderColor,
+        folderIcon
     };
 
-    folders.push(newFolder);
+    folders[folderId] = newFolder;
     addFolderToThePage(folderIcon, folderName, folderColor, folderId);
     saveFoldersToLocalStorage();
     renderFolderPickerMenu();
@@ -90,6 +91,7 @@ function addFolder() {
 
     console.log(folders);
 }
+
 
 function addFolderToThePage(folderIcon, folderName, folderColor, folderId) {
     const folderContainer = document.querySelector(".folder-list");
@@ -149,7 +151,8 @@ function saveFoldersToLocalStorage() {
 function loadFoldersFromLocalStorage() {
     const storedFolders = localStorage.getItem("folders");
     if (storedFolders) {
-        folders = JSON.parse(storedFolders);
+        const parsedFolders = JSON.parse(storedFolders);
+        Object.assign(folders, parsedFolders); // ✅ merge into existing object
         renderAllFolders();
         renderFolderPickerMenu();
     }
@@ -160,9 +163,11 @@ function loadFoldersFromLocalStorage() {
 
 
 
+
 function deleteFolder(folderId) {
     // Remove from array
-    folders = folders.filter(folder => folder.folderId !== folderId);
+    delete folders[folderId];
+    /*folders = folders.filter(folder => folder.folderId !== folderId);*/
 
     // Save updated array
     saveFoldersToLocalStorage();
@@ -175,9 +180,10 @@ function renderAllFolders() {
     const folderContainer = document.querySelector(".folder-list");
     folderContainer.innerHTML = ""; // Clear
 
-    folders.forEach(folder => {
+    Object.values(folders).forEach(folder => {
         addFolderToThePage(folder.folderIcon, folder.folderName, folder.folderColor, folder.folderId);
     });
+
 }
 
 
@@ -208,7 +214,7 @@ function renderFolderPickerMenu() {
     const dynamicMenu = document.querySelector(".folder-menu-dynamic");
     dynamicMenu.innerHTML = ""; // ✅ Only clears folder items
 
-    folders.forEach(folder => {
+    Object.values(folders).forEach(folder => {
         const folderPicker = document.createElement("div");
         folderPicker.classList.add("folder-menu-container");
         folderPicker.setAttribute("data-id", folder.folderId);
@@ -223,6 +229,3 @@ function renderFolderPickerMenu() {
         dynamicMenu.appendChild(folderPicker);
     });
 }
-
-
-
