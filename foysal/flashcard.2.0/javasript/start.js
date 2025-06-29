@@ -87,7 +87,9 @@ flashcardForm.onsubmit = function (e) {
     sets.push({ title: setTitle, cards });
     // Save back to localStorage
     localStorage.setItem('flashcardSets', JSON.stringify(sets));
-    // Reset the form: clear title, remove all rows, add one empty row
+
+    // To show all the set titles in library.html, add this script to library.html:
+    // (See library.html for the code to display the flashcard sets)
     setTitleInput.value = '';
     flashcardFields.innerHTML = '';
     flashcardFields.appendChild(createFlashcardRow());

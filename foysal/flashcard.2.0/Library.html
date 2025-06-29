@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style/main_content.css">
     <link rel="stylesheet" href="style/start.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="javasript/start.js" defer></script>
+    <script src='javasript/start.js' defer></script>
 
     <style>
         #grid {
@@ -167,56 +167,30 @@
                 flashcards to help you learn and memorize various topics.</p>
             <div class="flashcard-History">
                 <div class="container text-center">
-                    <div id="grid" class="js-flashcard-library"></div>
+                    <div id="grid">
+                        <ul class="js-flashcard-library">
+                            <li></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
 
         <script>
-            function renderSets() {
-                const grid = document.getElementById('grid');
-                grid.innerHTML = '';
-                // Find all keys that start with 'set:'
-                const setKeys = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('set:')) setKeys.push(key);
+            document.addEventListener("DOMContentLoaded", function () {
+                let flashcardSet = localStorage.getItem('flashcardSets');
+                if (flashcardSet) {
+                    let sets = JSON.parse(flashcardSet);
+                    let ul = document.querySelector(".js-flashcard-library");
+                    ul.innerHTML = ""; // Clear any existing content
+                    sets.forEach(function (set) {
+                        let setLi = document.createElement("li");
+                        setLi.innerHTML = `<strong>${set.title}</strong> (${set.cards.length} cards)<ul>`;
+                        setLi.innerHTML += "</ul>";
+                        ul.appendChild(setLi);
+                    });
                 }
-                if (setKeys.length === 0) {
-                    grid.innerHTML = "<p>No flashcard sets found.</p>";
-                    return;
-                }
-                setKeys.forEach(key => {
-                    const setName = key.substring(4);
-                    // Create the set "file" icon
-                    const setDiv = document.createElement('div');
-                    setDiv.className = 'flashcard-set-icon';
-                    setDiv.style = 'width: 120px; height: 120px; background: #f5f5f5; border-radius: 12px; box-shadow: 0 2px 8px #0001; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: box-shadow 0.2s;';
-                    setDiv.onmouseover = () => setDiv.style.boxShadow = '0 4px 16px #0002';
-                    setDiv.onmouseout = () => setDiv.style.boxShadow = '0 2px 8px #0001';
-
-                    // Emoji icon
-                    const icon = document.createElement('span');
-                    icon.textContent = '📄';
-                    icon.style = 'font-size: 48px;';
-
-                    // Set name
-                    const label = document.createElement('div');
-                    label.textContent = setName;
-                    label.style = 'margin-top: 12px; font-weight: bold; color: #222; font-size: 1.1em; text-align: center;';
-
-                    setDiv.appendChild(icon);
-                    setDiv.appendChild(label);
-
-                    setDiv.onclick = function () {
-                        const setName = encodeURIComponent(key.substring(4)); // Remove 'set:' and encode
-                        window.location.href = `flashcard-view.html?set=${setName}`;
-                    };
-
-                    grid.appendChild(setDiv);
-                });
-            }
-            renderSets();
+            });
         </script>
 </body>
 
