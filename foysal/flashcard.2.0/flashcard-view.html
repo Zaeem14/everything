@@ -1,52 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title id="page-title">Flashcard Set</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <style>
-        body { font-family: Arial; padding: 20px; background: #f9f9f9; }
-        .card {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px #ccc;
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif, Arial;
+            background: #f9f9f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            margin: 0;
+            height: auto;
+            min-height: 100%;
+            overflow-y: auto;
+        }
+
+        .Flashcard_View {
+            background-color: #6c757d;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            min-width: 300px;
+            width: 50vw;
+            max-width: 600px;
+            height: 80vh;
+            max-height: 500px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            padding: 20px;
+            margin-top: 70px;
+            margin-bottom: 20px;
+        }
+
+        #header {
+            background-color: #007bff;
+            color: white;
+            height: 60px;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            font-size: 1.8em;
+            padding: 0 15px;
+        }
+
+        .flashcard-content {
+            font-size: 2.2em;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .flashcard-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            padding-top: 20px;
+        }
+
+        .flashcard-buttons-container .btn {
+            flex: 1;
+            max-width: 150px;
+            font-size: 1.1em;
+        }
+
+        /* New styles for navigation buttons */
+        .flashcard-nav-buttons {
+            display: flex;
+            justify-content: space-between; /* Space out prev/next buttons */
+            width: 100%;
+            margin-top: 15px; /* Space above nav buttons */
+        }
+
+        .flashcard-nav-buttons .btn {
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .all {
+            margin-top: 20px;
+            min-height: 300px;
+            background-color: #e9ecef;
+            width: 90%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
     </style>
 </head>
+
 <body>
-    <h1 id="heading">Flashcard Set</h1>
-    <div id="card-list"></div>
+
+    <h1 id="header" class="js-header_name"></h1>
+
+    <div class="Flashcard_View js-flashcardview">
+        <div class="js-show flashcard-content"></div>
+        <div class="flashcard-buttons-container">
+            <button class="btn btn-primary" id="js-question" type="button">Question</button>
+            <button class="btn btn-primary" id="js-answer" type="button">Answer</button>
+        </div>
+        <div class="flashcard-nav-buttons">
+            <button class="btn btn-secondary" id="js-prev" type="button">Previous</button>
+            <button class="btn btn-secondary" id="js-next" type="button">Next</button>
+        </div>
+    </div>
+
+    <div class="All-js all">
+        <h2>All Flashcards in this Set</h2>
+        <ul id="all-flashcards-list" class="list-group w-100">
+            </ul>
+    </div>
 
     <script>
-        // 1. Get the set name from the URL
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
+        // lets load the website
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const setName = params.get('set'); // Get the specific set title from the URL
+            const defaultTitle = 'Flashcard Set';
+            document.querySelector('.js-header_name').textContent = setName || defaultTitle; // Set header based on URL or default
 
-        const setName = getQueryParam("set");
-        const heading = document.getElementById("heading");
-        const title = document.getElementById("page-title");
-        const cardList = document.getElementById("card-list");
 
-        // 2. Update page title and heading
-        heading.textContent = "Flashcard Set: " + setName;
-        title.textContent = "Set: " + setName;
+            // variable
+            const questionButton = document.getElementById('js-question');
+            const answerButton = document.getElementById('js-answer');
+            const prevButton = document.getElementById('js-prev'); 
+            const nextButton = document.getElementById('js-next'); 
+            const flashcardDisplay = document.querySelector('.js-show'); // this is where we will shows the flashcard
+            const allFlashcardsList = document.getElementById('all-flashcards-list');
 
-        // 3. Load flashcards from localStorage
-        const raw = localStorage.getItem("set:" + setName);
-        if (!raw) {
-            cardList.innerHTML = "<p style='color:red;'>⚠️ Flashcard set not found.</p>";
-        } else {
-            const flashcards = JSON.parse(raw);
-            flashcards.forEach(card => {
-                const div = document.createElement("div");
-                div.className = "card";
-                div.innerHTML = `<p><strong>Q:</strong> ${card.question}</p><p><strong>A:</strong> ${card.answer}</p>`;
-                cardList.appendChild(div);
+            let allFlashcardSets = [];
+            let currentFlashcardSet = null;
+            let currentCardIndex = 0; // The index of the card being displayed
+
+            // Function to load all flashcard sets from localStorage
+            function loadAllFlashcardSets() {
+                const storedDataString = localStorage.getItem('flashcardSets'); // let get my flashcard from the Local storage
+                if (storedDataString) { 
+                    try {
+                        allFlashcardSets = JSON.parse(storedDataString);
+                        console.log("All flashcard sets loaded:", allFlashcardSets);
+                    } catch (e) {
+                        console.error("Error parsing flashcardSets from localStorage:", e);
+                        allFlashcardSets = [];
+                        alert("Error loading flashcard sets. Data might be corrupted.");
+                    }
+                } else {
+                    console.log("No flashcard sets found in localStorage.");
+                    allFlashcardSets = [];
+                }
+            }
+
+            // Function to find and set the current flashcard set
+            function findAndSetCurrentFlashcardSet() {
+                if (setName && allFlashcardSets.length > 0) { //
+                    currentFlashcardSet = allFlashcardSets.find(set => set.title === setName);
+                }
+
+
+                // error checking
+                if (!currentFlashcardSet) {
+                    console.warn(`Flashcard set with title "${setName}" not found or no sets available.`);
+                    flashcardDisplay.textContent = `Flashcard set "${setName || 'N/A'}" not found.`;
+                    // Disable all buttons if no set is found
+                    questionButton.disabled = true;
+                    answerButton.disabled = true;
+                    prevButton.disabled = true;
+                    nextButton.disabled = true;
+                }
+            }
+
+            // Function to display the current flashcard (question by default)
+            function displayCurrentFlashcard() {
+                if (currentFlashcardSet && currentFlashcardSet.cards && currentFlashcardSet.cards.length > 0) {
+                    flashcardDisplay.textContent = currentFlashcardSet.cards[currentCardIndex].question;
+                } else {
+                    flashcardDisplay.textContent = "No flashcards in this set.";
+                }
+            }
+
+            // Function to populate the "All Flashcards" section for the current set
+            function populateAllFlashcardsInSet() {
+                allFlashcardsList.innerHTML = '';
+                if (currentFlashcardSet && currentFlashcardSet.cards && currentFlashcardSet.cards.length > 0) {
+                    currentFlashcardSet.cards.forEach((card, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                        listItem.innerHTML = `
+                            <div>
+                                <strong>Q:</strong> ${card.question}<br>
+                                <strong>A:</strong> ${card.answer}
+                            </div>
+                            <button class="btn btn-sm btn-info" data-index="${index}">View</button>
+                        `;
+                        allFlashcardsList.appendChild(listItem);
+
+                        listItem.querySelector('button').addEventListener('click', (event) => {
+                            const indexToView = parseInt(event.target.dataset.index);
+                            currentCardIndex = indexToView; // Update the current index
+                            displayCurrentFlashcard(); // Display the question of the selected card
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        });
+                    });
+                } else {
+                    allFlashcardsList.innerHTML = '<li class="list-group-item">No flashcards in this set to display.</li>';
+                }
+            }
+
+            // Lets load all the :
+            loadAllFlashcardSets();
+            findAndSetCurrentFlashcardSet();
+            // run the function
+            if (currentFlashcardSet) {
+                displayCurrentFlashcard();
+                populateAllFlashcardsInSet();
+            }
+
+
+            // it will show you the question of the flashcard--
+            questionButton.addEventListener('click', () => {
+                if (currentFlashcardSet && currentFlashcardSet.cards && currentFlashcardSet.cards.length > 0) {
+                    flashcardDisplay.textContent = currentFlashcardSet.cards[currentCardIndex].question;
+                } else {
+                    flashcardDisplay.textContent = "No question available in this set.";
+                }
             });
-        }
+
+            // it will show you the answer of the flashcard
+            answerButton.addEventListener('click', () => {
+                if (currentFlashcardSet && currentFlashcardSet.cards && currentFlashcardSet.cards.length > 0) {
+                    flashcardDisplay.textContent = currentFlashcardSet.cards[currentCardIndex].answer;
+                } else {
+                    flashcardDisplay.textContent = "No answer available in this set.";
+                }
+            });
+
+            // it will show the previous card
+            prevButton.addEventListener('click', () => {
+                if (currentFlashcardSet && currentFlashcardSet.cards && currentFlashcardSet.cards.length > 0) {
+                    currentCardIndex = (currentCardIndex - 1 + currentFlashcardSet.cards.length) % currentFlashcardSet.cards.length;
+                    displayCurrentFlashcard(); 
+                }
+            });
+
+            // it will show the next card
+            nextButton.addEventListener('click', () => {
+                if (currentFlashcardSet && currentFlashcardSet.cards && currentFlashcardSet.cards.length > 0) {
+                    currentCardIndex = (currentCardIndex + 1) % currentFlashcardSet.cards.length;
+                    displayCurrentFlashcard(); 
+                }
+            });
+        }); // End DOMContentLoaded
     </script>
 </body>
+
 </html>

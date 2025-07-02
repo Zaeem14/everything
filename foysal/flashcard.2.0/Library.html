@@ -185,7 +185,7 @@
                     ul.innerHTML = ""; // Clear any existing content
                     sets.forEach(function (set) {
                         let setLi = document.createElement("li");
-                        setLi.innerHTML = `<strong>${set.title}</strong> (${set.cards.length} cards)<ul>`;
+                        setLi.innerHTML = `<a href="flashcard-view.html?set=${encodeURIComponent(set.title)}"><strong>${set.title}</strong> (${set.cards.length} cards)</a><ul>`;
                         setLi.innerHTML += "</ul>";
                         ul.appendChild(setLi);
                     });
