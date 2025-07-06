@@ -211,6 +211,23 @@ footer a:hover {
     color: rgb(71,114,250);
 }
 
+.todo-date-container:hover {
+    cursor: pointer;
+    background-color: rgb(234, 234, 234);
+}
+.current-date {
+    background-color: rgb(194, 194, 194);
+}
+
+.current-date:hover {
+    background-color: rgb(194, 194, 194);
+}
+
+.current-folder-div {
+    cursor: pointer;
+    background-color: rgb(194, 194, 194);
+}
+
 .todo-date-input-container {
     opacity: 0;
     position: absolute;
@@ -327,7 +344,7 @@ footer a:hover {
     font-size: 16px;
 }
 
-.todo-list {
+.todo-list-container {
     overflow-y: scroll;
 }
 

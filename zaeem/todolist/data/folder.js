@@ -1,17 +1,23 @@
+import { setupFolderDivClicks } from "../scripts/menu.js";
+
 document.addEventListener("DOMContentLoaded", () => {
+    loadFoldersFromLocalStorage();
+
+
     const folderAddButton = document.querySelector(".add-folder-button");
 
-    if (folderAddButton) {
-        folderAddButton.addEventListener("click", () => {
-            addFolder();
-            closeModal();
-        });
-    } else {
-        console.warn("Add Folder button not found.");
-    }
+    folderAddButton.addEventListener("click", () => {
+        addFolder();
+        closeModal();
+        
+        setTimeout(() => {
+            clearFolderInput();
+        }, 200); // Give the modal a moment to close before clearing
+    });
 
-    renderFolderPickerMenu(); // ✅ render this before any event listener
-    loadFoldersFromLocalStorage();
+
+    
+
 
     const inputFolderIconContainer = document.querySelector(".todo-input-folder-icon-container");
     const inputFolderIcon = document.querySelector(".todo-input-folder-icon-js");
@@ -80,16 +86,10 @@ function addFolder() {
     };
 
     folders[folderId] = newFolder;
-    addFolderToThePage(folderIcon, folderName, folderColor, folderId);
     saveFoldersToLocalStorage();
     renderFolderPickerMenu();
+    renderAllFolders()
 
-    // Reset
-    document.querySelector(".folder-name-input").value = "";
-    document.getElementById("folderColorPicker").value = "#000000";
-    document.getElementById("folderIcon").textContent = "📁";
-
-    console.log(folders);
 }
 
 
@@ -99,6 +99,7 @@ function addFolderToThePage(folderIcon, folderName, folderColor, folderId) {
     const folderDiv = document.createElement("div");
     folderDiv.classList.add("folder-div");
     folderDiv.setAttribute("data-id", folderId);
+    folderDiv.setAttribute("data-folder", folderName);
 
     folderDiv.innerHTML = `
         <div class="folder-div-left">
@@ -178,12 +179,12 @@ function deleteFolder(folderId) {
 
 function renderAllFolders() {
     const folderContainer = document.querySelector(".folder-list");
-    folderContainer.innerHTML = ""; // Clear
-
+    folderContainer.innerHTML = ""; // Clear before rendering
     Object.values(folders).forEach(folder => {
         addFolderToThePage(folder.folderIcon, folder.folderName, folder.folderColor, folder.folderId);
     });
 
+    setupFolderDivClicks();
 }
 
 
@@ -228,4 +229,10 @@ function renderFolderPickerMenu() {
 
         dynamicMenu.appendChild(folderPicker);
     });
+}
+
+function clearFolderInput() {
+    document.querySelector(".folder-name-input").value = "";
+    document.getElementById("folderColorPicker").value = "#000000";
+    document.getElementById("folderIcon").textContent = "📁";
 }

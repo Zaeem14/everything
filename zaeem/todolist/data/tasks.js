@@ -3,12 +3,10 @@ import { folders } from "./folder.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     loadTasksFromLocalStorage(); // ✅ Restore saved tasks
-    setupTaskMoreMenus();
-    
-
+    hideEmptyTaskGroups();
 });
 
-let tasks = [];
+export let tasks = [];
 
 const addTaskButton = document.querySelector(".todo-input-icon-container"); 
 const deleteTaskButtons = document.querySelectorAll(".task-delete-icon-container");
@@ -24,7 +22,52 @@ deleteTaskButtons.forEach(deleteButton => {
         const taskId = deleteButton.getAttribute("data-id");
         deleteTask(taskId);
         saveTasksToLocalStorage();
+    });
+});
 
+const todoDateIcon = document.getElementById("todo-date-icon");
+const todoDateInput = document.getElementById("todo-date-input");
+const todoDateChosen = document.querySelector(".todo-date-chosen");
+
+document.getElementById("todo-date-input").addEventListener("change", (e) => {
+    handleDateChange(e.target.value);
+});
+
+const inputPriorityIcon = document.querySelector(".todo-input-priority-icon-js");
+const inputPriorityIconMenu = document.querySelector(".todo-priority-menu");
+const inputPriorityMenuOptions = document.querySelectorAll(".todo-priority-container");
+
+inputPriorityMenuOptions.forEach(option => {
+    option.addEventListener("click", () => {
+        // Remove 'current-priority' from all
+        inputPriorityMenuOptions.forEach(opt => opt.classList.remove("current-priority"));
+        option.classList.add("current-priority");
+
+        // Get the priority text inside the clicked option
+        const priorityText = option.querySelector(".priority-text").textContent.trim();
+
+        const priorityIcons = {
+            High: "images/todo-container/priorities-icon/red_flag.png",
+            Medium: "images/todo-container/priorities-icon/yellow_flag.png",
+            Low: "images/todo-container/priorities-icon/blue_flag.png",
+            None: "images/todo-container/priorities-icon/grey_flag.png"
+        };
+
+        const priorityIds = {
+            High: "high",
+            Medium: "medium",
+            Low: "low",
+            None: "none"
+        };
+
+        // Set icon
+        inputPriorityIcon.src = priorityIcons[priorityText] || priorityIcons["None"];
+
+        // ✅ Set data-id on the icon element
+        inputPriorityIcon.setAttribute("data-id", priorityIds[priorityText] || "none");
+
+        // Hide the menu
+        inputPriorityIconMenu.classList.add("hidden-element");
     });
 });
 
@@ -34,7 +77,7 @@ deleteTaskButtons.forEach(deleteButton => {
 function addTask() {
     const taskInput = document.getElementById("todo-input");
     const taskText = taskInput.value.trim();
-    if (!taskText) {
+    if (taskText == "") {
         alert("Task name is required.");
         return;
     }
@@ -72,7 +115,6 @@ function addTask() {
 
 
 function renderTasks(task) {
-    const tasksContainer = document.querySelector(".tasks");
 
     const folder = folders[task.folderId] || null;
 
@@ -87,9 +129,12 @@ function renderTasks(task) {
         ? `<div class="due-date">${task.formattedDueDate}</div>`
         : "";
 
+    // Assign the data-date values of "overdue", "today", "tomorrow", "week", "later", or "none" based on the task's due date to .task element.
+    const taskDate = assignTaskDataDate(task);
+
     const taskHTML = `
         <div class="task-more-container">
-            <div class="task">
+            <div class="task" data-date="${taskDate}" data-folder-id="${task.folderId}">
                 <div class="left-side-task">
                     <div class="folder-color-code-bar" style="background-color: ${folderBarColor};"></div>
                     <input type="checkbox" class="task-checkbox priority-${task.priority}-checkbox">
@@ -150,9 +195,12 @@ function renderTasks(task) {
         </div>
     `;
 
-    tasksContainer.insertAdjacentHTML("beforeend", taskHTML);
+    // Find the correct task container based on the task's due date
+    let taskContainer = displayTaskInCorrectGroup(task);
 
-    const lastTask = tasksContainer.lastElementChild;
+    taskContainer.insertAdjacentHTML("beforeend", taskHTML);
+
+    const lastTask = taskContainer.lastElementChild;
     const deleteButton = lastTask.querySelector(".task-delete-icon-container");
 
     if (deleteButton) {
@@ -164,52 +212,88 @@ function renderTasks(task) {
     }
 }
 
+function showTaskMoreMenus() {
+    const taskMoreIcons = document.querySelectorAll(".task-more-icon");
 
-const todoDateIcon = document.getElementById("todo-date-icon");
-const todoDateInput = document.getElementById("todo-date-input");
-const todoDateChosen = document.querySelector(".todo-date-chosen");
+    let currentlyOpenMenu = null;
 
-document.getElementById("todo-date-input").addEventListener("change", (e) => {
-    handleDateChange(e.target.value);
-});
+    taskMoreIcons.forEach(icon => {
+        icon.addEventListener("click", (e) => {
+            e.stopPropagation();
 
-const inputPriorityIcon = document.querySelector(".todo-input-priority-icon-js");
-const inputPriorityIconMenu = document.querySelector(".todo-priority-menu");
-const inputPriorityMenuOptions = document.querySelectorAll(".todo-priority-container");
+            const taskElement = icon.closest(".task-more-container");
+            const menu = taskElement.querySelector(".task-more-icon-menu-container");
 
-inputPriorityMenuOptions.forEach(option => {
-    option.addEventListener("click", () => {
-        // Remove 'current-priority' from all
-        inputPriorityMenuOptions.forEach(opt => opt.classList.remove("current-priority"));
-        option.classList.add("current-priority");
+            // Scroll task into view with some margin
+            taskElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
-        // Get the priority text inside the clicked option
-        const priorityText = option.querySelector(".priority-text").textContent.trim();
+            // Close old menu if open
+            if (menu === currentlyOpenMenu) {
+                menu.classList.add("hidden-element");
+                currentlyOpenMenu = null;
+            } else {
+                if (currentlyOpenMenu) {
+                    currentlyOpenMenu.classList.add("hidden-element");
+                }
 
-        const priorityIcons = {
-            High: "images/todo-container/priorities-icon/red_flag.png",
-            Medium: "images/todo-container/priorities-icon/yellow_flag.png",
-            Low: "images/todo-container/priorities-icon/blue_flag.png",
-            None: "images/todo-container/priorities-icon/grey_flag.png"
-        };
-
-        const priorityIds = {
-            High: "high",
-            Medium: "medium",
-            Low: "low",
-            None: "none"
-        };
-
-        // Set icon
-        inputPriorityIcon.src = priorityIcons[priorityText] || priorityIcons["None"];
-
-        // ✅ Set data-id on the icon element
-        inputPriorityIcon.setAttribute("data-id", priorityIds[priorityText] || "none");
-
-        // Hide the menu
-        inputPriorityIconMenu.classList.add("hidden-element");
+                menu.classList.remove("hidden-element");
+                currentlyOpenMenu = menu;
+            }
+        });
     });
-});
+
+    // Close any open menu when clicking outside
+    document.addEventListener("click", () => {
+        if (currentlyOpenMenu) {
+            currentlyOpenMenu.classList.add("hidden-element");
+            currentlyOpenMenu = null;
+        }
+    });
+}
+
+
+function displayTaskInCorrectGroup(task) {
+    let taskContainer = "";
+    const taskDate = assignTaskDataDate(task);
+    const taskGroup = document.querySelector(`.task-group[data-date="${taskDate}"]`);
+    incrementTaskGroupCount(taskGroup); // Increment task count in the group
+
+    if (taskGroup) {
+        taskContainer = taskGroup.querySelector(".tasks");
+    } 
+
+
+    return taskContainer
+}
+
+export function assignTaskDataDate(task) {
+    let taskDate = "none"; // default
+
+    if (task.dueDate) {
+        const [year, month, day] = task.dueDate.split("-");
+        const taskDueDate = new Date(year, month - 1, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        taskDueDate.setHours(0, 0, 0, 0);
+
+        const diffInDays = Math.round((taskDueDate - today) / (1000 * 60 * 60 * 24));
+
+        if (diffInDays < 0) {
+            taskDate = "overdue";
+        } else if (diffInDays === 0) {
+            taskDate = "today";
+        } else if (diffInDays === 1) {
+            taskDate = "tomorrow";
+        } else if (diffInDays <= 7) {
+            taskDate = "week";
+        } else {
+            taskDate = "later";
+        }
+    }
+
+    return taskDate;
+}
+
 
 function handleDateChange(dateValue) {
     if (!dateValue) return;
@@ -275,37 +359,21 @@ function loadTasksFromLocalStorage() {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
         tasks = JSON.parse(storedTasks);
-        tasks.forEach(task => renderTasks(task));
+
+        // 🧼 CLEAR all existing task containers before rendering again
+        const allTaskContainers = document.querySelectorAll(".tasks");
+        allTaskContainers.forEach(container => container.innerHTML = "");
+
+        // 🧼 RESET all number-of-tasks counts to 0
+        const allGroupCounters = document.querySelectorAll(".task-group .number-of-tasks");
+        allGroupCounters.forEach(counter => counter.textContent = "0");
+
+        tasks.forEach(renderTasks); // ✅ Now render clean
+        showTaskMoreMenus(); // ✅ Re-attach listeners
     }
 }
 
 
-
-function setupTaskMoreMenus() {
-  document.addEventListener("click", (e) => {
-    const clickedIcon = e.target.closest(".task-more-icon");
-    const allMenus = document.querySelectorAll(".task-more-icon-menu-container");
-
-    if (clickedIcon) {
-      const currentMenu = clickedIcon.nextElementSibling;
-
-      allMenus.forEach(menu => {
-        if (menu !== currentMenu) {
-          menu.classList.add("hidden-element");
-        }
-      });
-
-      if (currentMenu && currentMenu.classList.contains("task-more-icon-menu-container")) {
-        currentMenu.classList.toggle("hidden-element");
-      }
-
-      e.stopPropagation(); // Don't let the document click below close it immediately
-    } else {
-      // If clicked anywhere else, close all menus
-      allMenus.forEach(menu => menu.classList.add("hidden-element"));
-    }
-  });
-}
 
 function clearTaskInput() {
   const taskInput = document.getElementById("todo-input");
@@ -361,11 +429,27 @@ function clearTaskInputFolder() {
 }
 
 
-
-
-
-
 function deleteTask(taskId) {
   tasks = tasks.filter(task => task.taskId !== taskId);
   saveTasksToLocalStorage();
+}
+
+// Hide any group that has 0 tasks.
+export function hideEmptyTaskGroups() {
+    const taskGroups = document.querySelectorAll(".task-group");
+    taskGroups.forEach(taskGroup => {
+        const tasks = taskGroup.querySelectorAll(".task");
+        if (tasks.length === 0) {
+            taskGroup.style.display = "none"; // Hide the group if it has no tasks
+        } else {
+            taskGroup.style.display = "flex"; // Show the group if it has tasks
+        }
+    });
+}
+
+// Increment task-groups ".number-of-tasks" when a task is added.
+function incrementTaskGroupCount(taskGroup) {
+    const taskCountElement = taskGroup.querySelector(".number-of-tasks");
+    let currentCount = parseInt(taskCountElement.textContent, 10);
+    taskCountElement.textContent = currentCount + 1;
 }
