@@ -30,3 +30,37 @@ todayBtn.addEventListener('click', ()=> {
     updateDisplay();
 
 })
+document.addEventListener('DOMContentLoaded', () => {
+            const openMenuBtn = document.getElementById('openMenuBtn');
+            const featureMenu = document.getElementById('featureMenu');
+            const closeMenuBtn = document.getElementById('closeMenuBtn');
+            const overlay = document.getElementById('overlay');
+
+            // Open menu when hamburger icon is clicked
+            openMenuBtn.addEventListener('click', () => {
+                featureMenu.classList.remove('-translate-x-full'); // Slide in
+                featureMenu.classList.add('translate-x-0');
+                overlay.classList.remove('hidden'); // Show overlay
+            });
+
+            // Close menu when close button is clicked
+            closeMenuBtn.addEventListener('click', () => {
+                featureMenu.classList.remove('translate-x-0'); // Slide out
+                featureMenu.classList.add('-translate-x-full');
+                overlay.classList.add('hidden'); // Hide overlay
+            });
+
+            // Close menu when overlay is clicked
+            overlay.addEventListener('click', () => {
+                featureMenu.classList.remove('translate-x-0'); // Slide out
+                featureMenu.classList.add('-translate-x-full');
+                overlay.classList.add('hidden'); // Hide overlay
+            });
+
+            // Initialize Bootstrap dropdowns
+            // This ensures Bootstrap's JavaScript components are active
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            const dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
