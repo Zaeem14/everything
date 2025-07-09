@@ -1,7 +1,9 @@
 
-import { folders } from "./folder.js";
+import { folders, loadFoldersFromLocalStorage } from "./folder.js";
+import { reapplyCurrentFilter, getCurrentDateFilter } from "../scripts/menu.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadFoldersFromLocalStorage();
     loadTasksFromLocalStorage(); // ✅ Restore saved tasks
     hideEmptyTaskGroups();
 });
@@ -110,6 +112,7 @@ function addTask() {
     tasks.push(newTask);
     renderTasks(newTask);
     saveTasksToLocalStorage();
+    reapplyCurrentFilter(); // ✅ Reapply current filter after adding a task
 }
 
 
@@ -134,7 +137,7 @@ function renderTasks(task) {
 
     const taskHTML = `
         <div class="task-more-container">
-            <div class="task" data-date="${taskDate}" data-folder-id="${task.folderId}">
+            <div class="task" data-date="${taskDate}" data-folder-id="${task.folderId}" data-id="${task.taskId}">
                 <div class="left-side-task">
                     <div class="folder-color-code-bar" style="background-color: ${folderBarColor};"></div>
                     <input type="checkbox" class="task-checkbox priority-${task.priority}-checkbox">
@@ -207,7 +210,13 @@ function renderTasks(task) {
         deleteButton.addEventListener("click", () => {
             const taskId = deleteButton.getAttribute("data-id");
             deleteTask(Number(taskId));
-            lastTask.remove();
+            
+            const taskElement = deleteButton.closest(".task-more-container");
+            const taskGroup = taskElement.closest(".task-group");
+            
+            decrementTaskGroupCount(taskGroup); // ✅ Decrease count and maybe hide
+
+            taskElement.remove();
         });
     }
 }
@@ -452,4 +461,18 @@ function incrementTaskGroupCount(taskGroup) {
     const taskCountElement = taskGroup.querySelector(".number-of-tasks");
     let currentCount = parseInt(taskCountElement.textContent, 10);
     taskCountElement.textContent = currentCount + 1;
+}
+
+function decrementTaskGroupCount(taskGroup) {
+    const countElement = taskGroup.querySelector(".number-of-tasks");
+    let count = parseInt(countElement.textContent, 10);
+
+    if (count > 0) {
+        countElement.textContent = count - 1;
+    }
+
+    // If count now 0 and we're in "all", hide the group
+    if (count - 1 === 0 && getCurrentDateFilter() === "all") {
+        taskGroup.style.display = "none";
+    }
 }

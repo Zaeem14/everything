@@ -2,6 +2,8 @@ import { setupFolderDivClicks } from "../scripts/menu.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     loadFoldersFromLocalStorage();
+    renderFolderPickerMenu();
+
 
 
     const folderAddButton = document.querySelector(".add-folder-button");
@@ -66,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Hide menu
         inputFolderIconMenu.classList.add("hidden-element");
     });
+
+
 });
 
 
@@ -149,13 +153,12 @@ function saveFoldersToLocalStorage() {
     localStorage.setItem("folders", JSON.stringify(folders));
 }
 
-function loadFoldersFromLocalStorage() {
+export function loadFoldersFromLocalStorage() {
     const storedFolders = localStorage.getItem("folders");
     if (storedFolders) {
         const parsedFolders = JSON.parse(storedFolders);
         Object.assign(folders, parsedFolders); // ✅ merge into existing object
         renderAllFolders();
-        renderFolderPickerMenu();
     }
 }
 
@@ -175,6 +178,7 @@ function deleteFolder(folderId) {
 
     // Re-render folders
     renderAllFolders();
+    renderFolderPickerMenu();
 }
 
 function renderAllFolders() {
@@ -185,6 +189,7 @@ function renderAllFolders() {
     });
 
     setupFolderDivClicks();
+
 }
 
 
@@ -211,23 +216,26 @@ function closeModal() {
   addFolderIconModalOverlay.classList.add("hidden-element");
 }
 
-function renderFolderPickerMenu() {
-    const dynamicMenu = document.querySelector(".folder-menu-dynamic");
-    dynamicMenu.innerHTML = ""; // ✅ Only clears folder items
+export function renderFolderPickerMenu() {
+    const dynamicMenus = document.querySelectorAll(".folder-menu-dynamic");
 
-    Object.values(folders).forEach(folder => {
-        const folderPicker = document.createElement("div");
-        folderPicker.classList.add("folder-menu-container");
-        folderPicker.setAttribute("data-id", folder.folderId);
+    dynamicMenus.forEach(menu => {
+        menu.innerHTML = ""; // clear previous items
 
-        folderPicker.innerHTML = `
-            <div class="folder-menu-icon-container">
-                <div class="folder-icon">${folder.folderIcon}</div>
-            </div>
-            <div class="folder-menu-name">${folder.folderName}</div>
-        `;
+        Object.values(folders).forEach(folder => {
+            const folderPicker = document.createElement("div");
+            folderPicker.classList.add("folder-menu-container");
+            folderPicker.setAttribute("data-id", folder.folderId);
 
-        dynamicMenu.appendChild(folderPicker);
+            folderPicker.innerHTML = `
+                <div class="folder-menu-icon-container">
+                    <div class="folder-icon">${folder.folderIcon}</div>
+                </div>
+                <div class="folder-menu-name">${folder.folderName}</div>
+            `;
+
+            menu.appendChild(folderPicker); // ✅ now it's created fresh per menu
+        });
     });
 }
 

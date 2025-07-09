@@ -270,7 +270,8 @@ h2 {
 .task-more-icon-section-container:hover,
 .folder-more-icon-menu:hover,
 .todo-input-modifier-icons-container > div:hover,
-.task-due-date-container-stats:hover {
+.task-due-date-container-stats:hover,
+.task-folder-container-stats:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }

@@ -1,180 +1,144 @@
 import { hideEmptyTaskGroups, tasks } from "../data/tasks.js";
-import { folders } from "../data/folder.js";
 
+// Track the current filter state
+let currentDateFilter = "all";
+let currentFolderFilter = null;
 
-// TODO: When a data filter is clicked, filter task-groups and tasks based on the selected date (or non-selected date).
+// Date filter buttons
 const tasksFilterContainers = document.querySelectorAll(".todo-date-container");
-
 
 tasksFilterContainers.forEach(tasksFilterContainer => {
     tasksFilterContainer.addEventListener("click", () => {
-        // Get the selected date from the clicked data filter.
-        const selectedDate = tasksFilterContainer.dataset.date; // Assuming each filter has a data-date attribute.
-        
-        // update the page title based on the selected date.
-        const pageTitleElement = document.querySelector(".page-title");
+        const selectedDate = tasksFilterContainer.dataset.date;
+
+        currentDateFilter = selectedDate;
+        currentFolderFilter = null;
+
         updatePageTitleDate(selectedDate);
-
-
-        // If the selected date is "all", show all task groups.
-        if (selectedDate === "all") {
-            
-            handleDateFilterClick("all");
-            assignCurrentFilter(tasksFilterContainers, tasksFilterContainer);
-            return;
-        }
-
         assignCurrentFilter(tasksFilterContainers, tasksFilterContainer);
-
-        // Call the function to handle filtering based on the selected date.
         handleDateFilterClick(selectedDate);
     });
 });
 
+// Folder filter buttons
 const folderDivs = document.querySelectorAll(".folder-div");
 
 folderDivs.forEach(folderDiv => {
     folderDiv.addEventListener("click", () => {
-        // Get the folder ID from the clicked folder.
-        const folderId = folderDiv.dataset.id; // Assuming each folder has a data-id attribute.
-        const folderName = folderDiv.dataset.folder; // Assuming each folder has a data-folder attribute.
+        const folderId = folderDiv.dataset.id;
+        const folderName = folderDiv.dataset.folder;
 
-        // Update the page title based on the selected folder.
-        const pageTitleElement = document.querySelector(".page-title");
-        pageTitleElement.textContent = folderName;
+        currentFolderFilter = folderId;
+        currentDateFilter = null;
 
-        // Call the function to handle filtering based on the selected folder.
-        handleFolderClick(folderId);
-
-        // Assign current filter class to the clicked folder.
+        updatePageTitleFolder(folderName);
         assignCurrentFilter(folderDivs, folderDiv);
+        handleFolderClick(folderId);
     });
 });
 
-function handleDateFilterClick(selectedDate, pageTitle) {
+// Handle date-based filtering (all, today, tomorrow, week, overdue)
+function handleDateFilterClick(selectedDate) {
     const taskGroups = document.querySelectorAll(".task-group");
-    const tasks = document.querySelectorAll(".task");
+    const allTasks = document.querySelectorAll(".task");
 
     if (selectedDate === "all") {
-        // Show all groups and all tasks
-        taskGroups.forEach(taskGroup => {
-            taskGroup.style.display = "flex";
-        });
-        tasks.forEach(task => {
-            task.style.display = "flex";
-        });
-        hideEmptyTaskGroups(); // Ensure empty task groups are hidden
+        taskGroups.forEach(group => group.style.display = "flex");
+        allTasks.forEach(task => task.style.display = "flex");
+        hideEmptyTaskGroups();
         return;
     }
 
-    // Otherwise, filter by selected date
-    taskGroups.forEach(taskGroup => {
-        const groupDate = taskGroup.dataset.date;
-        if (groupDate === selectedDate) {
-            taskGroup.style.display = "flex";
-        } else {
-            taskGroup.style.display = "none";
-        }
+    // Show only the selected date group
+    taskGroups.forEach(group => {
+        group.style.display = (group.dataset.date === selectedDate) ? "flex" : "none";
     });
 
-    tasks.forEach(task => {
-        const taskDate = task.dataset.date;
-        if (taskDate === selectedDate) {
-            task.style.display = "flex";
-        } else {
-            task.style.display = "none";
-        }
+    // Show only tasks with that date
+    allTasks.forEach(task => {
+        task.style.display = (task.dataset.date === selectedDate) ? "flex" : "none";
     });
-
 }
 
-// TODO: When a folder is clicked, filter task-groups and tasks based on the selected folder (or non-selected folder).
+// Handle folder-based filtering
 function handleFolderClick(folderId) {
-    tasks.forEach(task => {
-        const taskFolderId = task.folderId; // Assuming each task has a data-folder attribute.
-        const taskGroup = task.closest(".task-group");
+    const taskGroups = document.querySelectorAll(".task-group");
+    const allTasks = document.querySelectorAll(".task");
+    let groupHasVisibleTasks = {};
 
-        if (taskFolderId === folderId) {
+    // Hide all tasks first
+    allTasks.forEach(task => {
+        const taskObj = tasks.find(t => t.taskName === task.querySelector(".task-text").textContent.trim());
+        const taskFolderId = taskObj?.folderId;
+
+        if (String(taskFolderId) === String(folderId)) {
             task.style.display = "flex";
-            taskGroup.style.display = "flex";
+            const group = task.closest(".task-group");
+            if (group) groupHasVisibleTasks[group.dataset.date] = true;
         } else {
             task.style.display = "none";
-            taskGroup.style.display = "none";
         }
     });
-}
 
-function assignCurrentFilter(tasksFilterContainers, tasksFilterContainer) {
-     // Remove the "current-date" class from all filters.
-    tasksFilterContainers.forEach(container => {
-        container.classList.remove("current-date");
+    // Show/hide task groups based on whether they contain matching tasks
+    taskGroups.forEach(group => {
+        const hasTasks = groupHasVisibleTasks[group.dataset.date];
+        group.style.display = hasTasks ? "flex" : "none";
     });
-
-    // Add the "current-date" class to the clicked filter.
-    tasksFilterContainer.classList.add("current-date");
 }
 
-
-
-function updatePageTitleDate(dataFilterName) {
-    const pageTitleElement = document.querySelector(".page-title");
-
-    if (dataFilterName === "all") {
-        pageTitleElement.textContent = "All";
-    } else if (dataFilterName === "today") {
-        pageTitleElement.textContent = "Today";
-    } else if (dataFilterName === "tomorrow") {
-        pageTitleElement.textContent = "Tomorrow";
-    } else if (dataFilterName === "week") {
-        pageTitleElement.textContent = "This Week";
-    } else if (dataFilterName === "overdue") {
-        pageTitleElement.textContent = "Overdue";
+// Reapply the current active filter (used after adding new task)
+export function reapplyCurrentFilter() {
+    if (currentFolderFilter !== null) {
+        handleFolderClick(currentFolderFilter);
     } else {
-        pageTitleElement.textContent = dataFilterName; // Fallback for custom dates
+        handleDateFilterClick(currentDateFilter || "all");
     }
 }
 
+// Assign "current-date" or "current-folder" style class
+function assignCurrentFilter(filterList, activeFilter) {
+    filterList.forEach(filter => filter.classList.remove("current-date"));
+    activeFilter.classList.add("current-date");
+}
+
+// Update title for date filters
+function updatePageTitleDate(filter) {
+    const pageTitleElement = document.querySelector(".page-title");
+
+    const titleMap = {
+        all: "All",
+        today: "Today",
+        tomorrow: "Tomorrow",
+        week: "This Week",
+        overdue: "Overdue"
+    };
+
+    pageTitleElement.textContent = titleMap[filter] || filter;
+}
+
+// Update title for folder filters
+function updatePageTitleFolder(folderName) {
+    const pageTitleElement = document.querySelector(".page-title");
+    pageTitleElement.textContent = folderName;
+}
+
+// Optional: Setup function for dynamically added folder divs
 export function setupFolderDivClicks() {
     const folderDivs = document.querySelectorAll(".folder-div");
     folderDivs.forEach(folderDiv => {
         folderDiv.onclick = () => {
             const folderId = folderDiv.dataset.id;
             const folderName = folderDiv.dataset.folder;
-            const pageTitleElement = document.querySelector(".page-title");
-            pageTitleElement.textContent = folderName;
-            filterTasksByFolder(folderId);
+            currentFolderFilter = folderId;
+            currentDateFilter = null;
+            updatePageTitleFolder(folderName);
             assignCurrentFilter(folderDivs, folderDiv);
+            handleFolderClick(folderId);
         };
     });
 }
 
-function filterTasksByFolder(folderId) {
-    // Show all groups first
-    const taskGroups = document.querySelectorAll(".task-group");
-    taskGroups.forEach(group => {
-        group.style.display = "flex";
-        // Hide all tasks in this group initially
-        group.querySelectorAll(".task").forEach(task => {
-            task.style.display = "none";
-        });
-    });
-
-    // Show only tasks with the selected folderId, and their groups
-    let groupHasTask = {};
-    document.querySelectorAll(".task").forEach(task => {
-        // You must store folderId on the .task element as data-folder-id!
-        const taskObj = tasks.find(t => t.taskName === task.querySelector('.task-text').textContent.trim());
-        if (taskObj && String(taskObj.folderId) === String(folderId)) {
-            task.style.display = "flex";
-            const group = task.closest(".task-group");
-            if (group) groupHasTask[group.dataset.date] = true;
-        }
-    });
-
-    // Hide groups that have no visible tasks
-    taskGroups.forEach(group => {
-        if (!groupHasTask[group.dataset.date]) {
-            group.style.display = "none";
-        }
-    });
+export function getCurrentDateFilter() {
+    return currentDateFilter;
 }
