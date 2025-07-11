@@ -645,6 +645,73 @@ input:checked::after {
     min-width: 200px;
 }
 
+div[contenteditable="true"] {
+    outline: none;
+    cursor: text;
+}
+
+.placeholder {
+  color: gray;
+}
+
+.sub-task-more-section {
+    border-top: none;
+}
+
+.sub-task-more-container {
+    position: relative;
+}
+
+.sub-task-more-menu {
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+    border-radius: 4px;
+    padding: 5px;
+    border: 1px solid gray;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    z-index: 9999;
+    background-color: white;
+}
+
+.sub-task-actions-container, 
+.sub-task-complete-sections {
+    display: flex;
+    flex-direction: column;
+}
+
+.sub-task-action-container, 
+.sub-task-wont-do-container, 
+.sub-task-delete-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    border-radius: 4px;
+    padding: 5px;
+    height: 20px;
+    font-size: 14px;
+}
+
+.sub-task-actions-section {
+    padding-top: 5px;
+}
+.sub-task-complete-section {
+    padding-top: 5px;
+    border-top: 1px solid gray;
+}
+
+.sub-task-action-container:hover,
+.sub-task-wont-do-container:hover,
+.sub-task-delete-container:hover {
+    background-color: rgb(234, 234, 234);
+    cursor: pointer;
+}
+
 .due-date-icon-container {
     padding: 5px;
     display: flex;
@@ -696,13 +763,16 @@ input:checked::after {
 
 
 .task-edit-container {
-    height: 40px;
-    padding: 5px;
-    justify-content: space-between;
     position: absolute;
+    left: 0;
     bottom: 0;
     right: 0;
-    left: 0;
+    height: 40px;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    background-color: white; /* Optional: to cover content behind it */
+    z-index: 1000; /* Optional: to keep it on top */
 }
 
 .task-edit-container-right {
@@ -715,14 +785,12 @@ input:checked::after {
     cursor: text;
 }
 
-.description:empty::before {
-    content: "Write something or type / for commands";
-    color: #999;
-    
-}
-
 .sub-task-list {
-    border-top: 1px solid black;
+    border-top: 1px solid gray;
+    overflow-y: auto;
+    /* Height: 100% minus the height of .task-edit-container (e.g. 60px) */
+    min-height: calc(100vh - 60px); /* 60px for .task-edit-container, 220px for other stats panel content above, adjust as needed */
+    /* Optional: add padding-bottom to avoid last item being hidden behind the sticky footer */
 }
 
 .sub-task-container,
@@ -744,6 +812,10 @@ input:checked::after {
     width: 100%;
     gap: 5px;
     margin-right: 10px;
+}
+
+#global-subtask-menu {
+    min-width: 180px;
 }
 
 .todo-more-header-icon-container,

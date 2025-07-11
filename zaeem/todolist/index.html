@@ -370,8 +370,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="task-description-icon-container">
-                        <img src="images/todo-container/list.png" alt="description" class="task-listing-icon">
+                    <div class="task-description-icon-container add-sub-task-icon-container">
+                        <img src="images/todo-container/list.png" alt="sub-task" class="task-listing-icon add-sub-task-icon">
                     </div>
                 </div>
                 
@@ -381,27 +381,10 @@
                 complete this project as soon as possible or else
             </div>
             <div class="task-description-container">
-                <div class="description" contenteditable="true"></div>
+                <div class="description" id="editable-description-stats"  contenteditable="true"></div>
             </div>
             <div class="sub-task-list">
-                <div class="sub-task-container">
-                    <div class="sub-task">
-                        <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                        <div class="task-text">complete this project </div>
-                    </div>
-                    <div class="task-more-container">
-                        <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                    </div>
-                </div>
-                <div class="sub-task-container">
-                    <div class="sub-task">
-                        <input type="checkbox" class="task-checkbox priority-low-checkbox">
-                        <div class="task-text">complete this project </div>
-                    </div>
-                    <div class="task-more-container">
-                        <img src="images/todo-container/more.png" class="task-more-icon" alt="more">
-                    </div>
-                </div>
+               <!--SubTasks dynamically go here-->
             </div>
             <div class="task-edit-container">
                 <div class="task-edit-container-left">
@@ -477,5 +460,6 @@
             <button class="add-folder-button">Add Folder</button>
         </div>
     </div>
+    <div id="global-subtask-menu" class="sub-task-more-menu hidden-element"></div>
 </body>
 </html>
