@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Close menu when overlay is clicked
             overlay.addEventListener('click', () => {
-                featureMenu.classList.remove('translate-x-0'); // Slide out
+                featureMenu.classList.remove('translate-x-0');
                 featureMenu.classList.add('-translate-x-full');
-                overlay.classList.add('hidden'); // Hide overlay
+                overlay.classList.add('hidden'); 
             });
 
             // Initialize Bootstrap dropdowns

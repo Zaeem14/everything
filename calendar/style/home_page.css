@@ -147,3 +147,10 @@ body {
     z-index: 999;
     display: none;
 }
+
+#main_view{
+    display: flex;
+    min-width: 100%;
+    min-height: fit-content;
+    background-color: aqua;
+}
