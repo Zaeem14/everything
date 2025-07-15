@@ -1,11 +1,15 @@
 body {
-    margin: 0;
     font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Allows header and main_view to stack vertically */
     min-height: 100vh;
-    background-color: #f0f2f5;
+    background-color: #f8f9fa; /* Light background */
+    color: #202124;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
+
 
 .header {
     display: flex;
