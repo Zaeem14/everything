@@ -154,3 +154,10 @@ body {
     min-height: fit-content;
     background-color: aqua;
 }
+.calendar-grid_month{
+    display: grid;
+    grid-template-columns: repeat(4, 40);
+    border: 1px solid black;
+    
+    
+}
