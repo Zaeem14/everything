@@ -6,5 +6,7 @@
     "liveServer.settings.port": 5502,
 
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 500  // optional, sets delay in ms
+    "files.autoSaveDelay": 500,  // optional, sets delay in ms
+
+    "chatgpt.advancedAppSupport": true
 }

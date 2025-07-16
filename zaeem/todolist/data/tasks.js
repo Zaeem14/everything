@@ -104,9 +104,6 @@ function addTask() {
         folderId: folderId || null, // allow null
         priority: priorityId,
         description: null,
-        subTask1: null,
-        subTask2: null,
-        subTask3: null
     };
 
     tasks.push(newTask);
@@ -136,8 +133,8 @@ function renderTasks(task) {
     const taskDate = assignTaskDataDate(task);
 
     const taskHTML = `
-        <div class="task-more-container">
-            <div class="task" data-date="${taskDate}" data-folder-id="${task.folderId}" data-id="${task.taskId}">
+        <div class="task-more-container" data-date="${taskDate}" data-due-date="${task.dueDate}" data-folder-id="${task.folderId}" data-id="${task.taskId}">
+            <div class="task">
                 <div class="left-side-task">
                     <div class="folder-color-code-bar" style="background-color: ${folderBarColor};"></div>
                     <input type="checkbox" class="task-checkbox priority-${task.priority}-checkbox">
@@ -203,22 +200,9 @@ function renderTasks(task) {
 
     taskContainer.insertAdjacentHTML("beforeend", taskHTML);
 
-    const lastTask = taskContainer.lastElementChild;
-    const deleteButton = lastTask.querySelector(".task-delete-icon-container");
+    deleteTaskFromThePage(task);
 
-    if (deleteButton) {
-        deleteButton.addEventListener("click", () => {
-            const taskId = deleteButton.getAttribute("data-id");
-            deleteTask(Number(taskId));
-            
-            const taskElement = deleteButton.closest(".task-more-container");
-            const taskGroup = taskElement.closest(".task-group");
-            
-            decrementTaskGroupCount(taskGroup); // ✅ Decrease count and maybe hide
-
-            taskElement.remove();
-        });
-    }
+    showTaskMoreMenus();
 }
 
 function showTaskMoreMenus() {
@@ -230,7 +214,7 @@ function showTaskMoreMenus() {
         icon.addEventListener("click", (e) => {
             e.stopPropagation();
 
-            const taskElement = icon.closest(".task-more-container");
+            const taskElement = icon.parentElement;
             const menu = taskElement.querySelector(".task-more-icon-menu-container");
 
             // Scroll task into view with some margin
@@ -261,7 +245,7 @@ function showTaskMoreMenus() {
 }
 
 
-function displayTaskInCorrectGroup(task) {
+export function displayTaskInCorrectGroup(task) {
     let taskContainer = "";
     const taskDate = assignTaskDataDate(task);
     const taskGroup = document.querySelector(`.task-group[data-date="${taskDate}"]`);
@@ -444,18 +428,25 @@ function deleteTask(taskId) {
 }
 
 // Hide any group that has 0 tasks.
+// Hide any group that has 0 visible tasks.
 export function hideEmptyTaskGroups() {
     const taskGroups = document.querySelectorAll(".task-group");
     taskGroups.forEach(taskGroup => {
-        const tasks = taskGroup.querySelectorAll(".task");
-        if (tasks.length === 0) {
-            taskGroup.style.display = "none"; // Hide the group if it has no tasks
+        const tasksContainer = taskGroup.querySelector('.tasks');
+        if (!tasksContainer) {
+            taskGroup.style.display = "none";
+            return;
+        }
+        const allTaskContainers = tasksContainer.querySelectorAll('.task-more-container');
+        const visibleTaskContainers = Array.from(allTaskContainers)
+            .filter(container => getComputedStyle(container).display !== "none");
+        if (allTaskContainers.length === 0 || visibleTaskContainers.length === 0) {
+            taskGroup.style.display = "none";
         } else {
-            taskGroup.style.display = "flex"; // Show the group if it has tasks
+            taskGroup.style.display = "flex";
         }
     });
 }
-
 // Increment task-groups ".number-of-tasks" when a task is added.
 function incrementTaskGroupCount(taskGroup) {
     const taskCountElement = taskGroup.querySelector(".number-of-tasks");
@@ -474,5 +465,46 @@ function decrementTaskGroupCount(taskGroup) {
     // If count now 0 and we're in "all", hide the group
     if (count - 1 === 0 && getCurrentDateFilter() === "all") {
         taskGroup.style.display = "none";
+    }
+}
+
+export function updateTaskGroupCount(taskGroup) {
+    const taskCountElement = taskGroup.querySelector(".number-of-tasks");
+    if (!taskCountElement) return;
+
+    const tasksContainer = taskGroup.querySelector('.tasks');
+    if (!tasksContainer) {
+        taskCountElement.textContent = "0";
+        return;
+    }
+
+    const allTasks = tasksContainer.querySelectorAll(".task-more-container");
+    let visibleCount = 0;
+    allTasks.forEach(task => {
+        if (getComputedStyle(task).display !== "none") {
+            visibleCount++;
+        }
+    });
+
+    taskCountElement.textContent = visibleCount;
+}
+
+export function deleteTaskFromThePage(task) {
+    const taskContainer = displayTaskInCorrectGroup(task);
+    const lastTask = taskContainer.lastElementChild;
+    const deleteButton = lastTask.querySelector(".task-delete-icon-container");
+
+    if (deleteButton) {
+        deleteButton.addEventListener("click", () => {
+            const taskId = deleteButton.getAttribute("data-id");
+            deleteTask(Number(taskId));
+            
+            const taskElement = deleteButton.closest(".task-more-container");
+            const taskGroup = taskElement.closest(".task-group");
+            
+            decrementTaskGroupCount(taskGroup); // ✅ Decrease count and maybe hide
+
+            taskElement.remove();
+        });
     }
 }

@@ -17,10 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 200); // Give the modal a moment to close before clearing
     });
 
-
-    
-
-
     const inputFolderIconContainer = document.querySelector(".todo-input-folder-icon-container");
     const inputFolderIcon = document.querySelector(".todo-input-folder-icon-js");
     const inputFolderIconMenu = document.querySelector(".todo-folder-menu");
@@ -69,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
         inputFolderIconMenu.classList.add("hidden-element");
     });
 
+    document.getElementById("folderColorPicker").addEventListener("input", changeFolderColorIndicator);
 
 });
 
@@ -81,6 +78,8 @@ function addFolder() {
     const folderName = document.querySelector(".folder-name-input").value;
     const folderColor = document.getElementById("folderColorPicker").value;
     const folderIcon = document.getElementById("folderIcon").textContent;
+
+    
 
     const newFolder = {
         folderId,
@@ -226,6 +225,8 @@ export function renderFolderPickerMenu() {
             const folderPicker = document.createElement("div");
             folderPicker.classList.add("folder-menu-container");
             folderPicker.setAttribute("data-id", folder.folderId);
+            folderPicker.setAttribute("data-folder", folder.folderName);
+            folderPicker.setAttribute("data-color", folder.folderColor);
 
             folderPicker.innerHTML = `
                 <div class="folder-menu-icon-container">
@@ -243,4 +244,25 @@ function clearFolderInput() {
     document.querySelector(".folder-name-input").value = "";
     document.getElementById("folderColorPicker").value = "#000000";
     document.getElementById("folderIcon").textContent = "📁";
+}
+
+function changeFolderColorIndicator() {
+    const selectedColor = document.getElementById("folderColorPicker").value;
+    const container = document.querySelector(".folder-color-picker-container");
+
+    // Remove any existing indicator circles
+    container.querySelectorAll(".color-indicator-circle").forEach(el => el.remove());
+
+    // Add the new indicator right after the color picker icon
+    const newColorPickerCircle = document.createElement("div");
+    newColorPickerCircle.classList.add("color-indicator-circle");
+    newColorPickerCircle.style.backgroundColor = selectedColor;
+
+    // Find the color picker icon to insert after
+    const colorPickerIcon = container.querySelector(".color-picker-icon");
+    if (colorPickerIcon && colorPickerIcon.nextSibling) {
+        container.insertBefore(newColorPickerCircle, colorPickerIcon.nextSibling);
+    } else {
+        container.appendChild(newColorPickerCircle);
+    }
 }

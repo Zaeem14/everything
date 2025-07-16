@@ -497,6 +497,10 @@ input:checked::after {
     border: 1.25px solid red;
 }
 
+.priority-medium-checkbox {
+    border: 1.25px solid rgb(255, 208, 0);
+}
+
 .priority-low-checkbox {
     border: 1.25px solid blue;
 }
@@ -507,9 +511,17 @@ input:checked::after {
 
 }
 
+.priority-medium-checkbox:checked {
+  background-color: rgba(255, 208, 0, 0.1);
+}
+
 .priority-low-checkbox:checked {
   background-color: rgba(0, 0, 255, 0.1);
   
+}
+
+.priority-none-checkbox:checked {
+  background-color: rgba(0, 0, 0, 0.1); 
 }
 
 .task-group.open > .task-group-header .arrow {
@@ -521,7 +533,8 @@ input:checked::after {
     right: -10px;
 }
 
-.task-more-icon {
+.task-more-icon,
+.sub-task-more-icon {
     width: 10px;
     height: 10px;
     border-radius: 50%;
