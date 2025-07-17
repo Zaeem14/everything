@@ -297,7 +297,8 @@ h2 {
 
 .due-date:hover,
 .task-folder:hover,
-.task-more-icon:hover {
+.task-more-icon:hover,
+.sub-task-more-icon:hover {
     cursor: pointer;
 }
 .task-folder:hover {
@@ -575,4 +576,10 @@ details[open] > summary .arrow {
 .folder-icon {
   font-size: 18px;
   cursor: pointer;
+}
+
+.color-indicator-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
 }

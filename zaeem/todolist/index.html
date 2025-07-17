@@ -34,7 +34,7 @@
     <script type="module" src="data/tasks.js" defer></script>
     <script type="module" src="scripts/script.js" defer></script>
     <script type="module" src="scripts/stats.js" defer></script>
-    <script type="module" src="scripts/menu.js" defer></script>
+    <script type="module" src="scripts/menu.js" async></script>
     
     
 
@@ -316,8 +316,7 @@
                             <div class="group-header">Won't Do</div>
                             <div class="number-of-tasks">0</div>
                         </div>
-                        <div class="tasks" id="wont-do-tasks">
-                            
+                        <div class="tasks" id="wont-do-tasks">  
                         </div>
                     </div>
                 </div>
@@ -344,25 +343,25 @@
                     <div class="task-priority-container-stats">
                         <img src="images/todo-container/priorities-icon/blue_flag.png" alt="priority" class="task-priority-icon">
                         <div class="todo-priority-menu-stats hidden-element">
-                            <div class="todo-high-priority-container">
+                            <div class="todo-high-priority-container todo-priority-container">
                                 <div class="priority-icon-container">
                                     <img src="images/todo-container/priorities-icon/red_flag.png" alt="red flag" class="priority-icon">
                                 </div>
                                 <div class="priority-text">High</div>
                             </div>
-                            <div class="todo-medium-priority-container">
+                            <div class="todo-medium-priority-container todo-priority-container">
                                 <div class="priority-icon-container">
                                     <img src="images/todo-container/priorities-icon/yellow_flag.png" alt="yellow flag flag" class="priority-icon">
                                 </div>
                                 <div class="priority-text">Medium</div>
                             </div>
-                            <div class="todo-low-priority-container">
+                            <div class="todo-low-priority-container todo-priority-container">
                                 <div class="priority-icon-container">
                                     <img src="images/todo-container/priorities-icon/blue_flag.png" alt="blue flag" class="priority-icon">
                                 </div>
                                 <div class="priority-text">Low</div>
                             </div>
-                            <div class="todo-none-priority-container">
+                            <div class="todo-none-priority-container todo-priority-container">
                                 <div class="priority-icon-container">
                                     <img src="images/todo-container/priorities-icon/grey_flag.png" alt="grey flag" class="priority-icon">
                                 </div>
@@ -409,7 +408,7 @@
                     <img src="images/todo-container/more.png" class="task-more-icon" alt="more" id="stats-task-more-icon">
                     <div class="task-more-icon-menu-container hidden-element" id="stats-task-more-icon-menu">
                         <section class="task-more-section" id="stats-task-more-section">
-                            <div class="task-more-icon-section-container">
+                            <div class="task-more-icon-section-container add-subtask-container-stats">
                                 <img src="images/todo-container/Subtask.png" alt="subtask" class="task-more-section-icon">
                                 <div class="task-more-action-name">Add Subtask</div>
                             </div>
@@ -426,7 +425,7 @@
                                 <img src="images/todo-container/icons8-remove-50.png" alt="edit" class="task-more-section-icon">
                                 <div class="task-more-action-name">Won't Do</div>
                             </div>
-                            <div class="task-more-icon-section-container task-delete-icon-container" data-id="${task.taskId}">
+                            <div class="task-more-icon-section-container task-delete-icon-container">
                                 <img src="images/todo-container/icons8-trash-can-50.png" alt="delete" class="task-more-section-icon">
                                 <div class="task-more-action-name">Delete</div>
                             </div>
