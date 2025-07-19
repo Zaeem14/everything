@@ -219,4 +219,8 @@ body {
     margin-bottom: 4px; 
 }
 
+.hidden {
+    display: none !important; 
+}
+
 

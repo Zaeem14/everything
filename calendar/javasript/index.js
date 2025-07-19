@@ -2,7 +2,9 @@ const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const currentDisplay = document.getElementById('currentDisplay');
 const todayBtn = document.querySelector('.today-button');
-const monthGrid = document.querySelector('.month-grid');
+const monthView = document.getElementById('monthView');
+const weekView = document.getElementById('weekView');
+const monthGrid = document.getElementById('monthGrid');
 const weekGrid = document.getElementById('weekGrid');
 
 
@@ -26,10 +28,15 @@ function formatDateToISO(date) {
 
 // for the month view function
 function renderMonthView(date) {
-    if (weekGrid) {
-        weekGrid.innerHTML = '';
-        monthGrid.style.display = 'grid';
-        weekGrid.style.display = 'none'; //so week view would not diplay
+    // Show month view, hide week view
+    if (monthView && weekView) {
+        monthView.style.display = 'block';
+        weekView.style.display = 'none';
+    }
+
+    // Clear the month grid
+    if (monthGrid) {
+        monthGrid.innerHTML = '';
     }
 
 
@@ -49,10 +56,10 @@ function renderMonthView(date) {
         dayDiv.classList.add('calendar-day', 'text-gray-400', 'py-2');
         dayDiv.textContent = prevMonthLastDay - i;
         dayDiv.classList.add('non-current-month');
-        monthGrid.appendChild(dayDiv);
+        if (monthGrid) monthGrid.appendChild(dayDiv);
     }
 
-    
+
     for (let i = 1; i <= daysInMonth; i++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('calendar-day', 'py-2', 'relative');
@@ -67,7 +74,7 @@ function renderMonthView(date) {
         } else {
             dayDiv.classList.add('text-gray-800');
         }
-        monthGrid.appendChild(dayDiv);
+        if (monthGrid) monthGrid.appendChild(dayDiv);
     }
 
     const totalDaysDisplayed = startDayIndex + daysInMonth;
@@ -77,14 +84,16 @@ function renderMonthView(date) {
         dayDiv.classList.add('calendar-day', 'text-gray-400', 'py-2');
         dayDiv.textContent = i;
         dayDiv.classList.add('non-current-month');
-        monthGrid.appendChild(dayDiv);
+        if (monthGrid) monthGrid.appendChild(dayDiv);
     }
 
-    monthGrid.querySelectorAll('.calendar-day:not(.non-current-month)').forEach(dayDiv => {
-        dayDiv.addEventListener('click', () => {
-            const selectedDate = dayDiv.dataset.date;
+    if (monthGrid) {
+        monthGrid.querySelectorAll('.calendar-day:not(.non-current-month)').forEach(dayDiv => {
+            dayDiv.addEventListener('click', () => {
+                const selectedDate = dayDiv.dataset.date;
+            });
         });
-    });
+    }
 }
 
 
@@ -92,11 +101,15 @@ function renderMonthView(date) {
 
 // for the week view 
 function renderWeekView(date) {
-    monthGrid.innerHTML = '';
+    // Show week view, hide month view
+    if (monthView && weekView) {
+        monthView.style.display = 'none';
+        weekView.style.display = 'block';
+    }
+
+    // Clear the week grid
     if (weekGrid) {
         weekGrid.innerHTML = '';
-        monthGrid.style.display = 'none';
-        weekGrid.style.display = 'grid';
     }
 
     const year = date.getFullYear();
@@ -120,7 +133,6 @@ function renderWeekView(date) {
         const dayOfWeekName = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(currentDay);
 
         dayDiv.innerHTML = `
-            <div class="text-sm text-gray-500">${dayOfWeekName}</div>
             <div class="text-lg font-semibold">${dayOfMonth}</div>
         `;
 
