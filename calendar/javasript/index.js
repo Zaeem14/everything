@@ -5,7 +5,7 @@ const todayBtn = document.querySelector('.today-button');
 const monthView = document.getElementById('monthView');
 const weekView = document.getElementById('weekView');
 const monthGrid = document.getElementById('monthGrid');
-const weekGrid = document.getElementById('weekGrid');
+const weekTimeGrid = document.getElementById('weekTimeGrid');
 
 
 //for the month and week view 
@@ -101,64 +101,104 @@ function renderMonthView(date) {
 
 // for the week view 
 function renderWeekView(date) {
+    // Set week date range above grid
+    const weekDateRangeElem = document.getElementById('weekDateRange');
+    if (weekDateRangeElem) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
+        const startOfWeek = new Date(year, month, day - date.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        const options = { month: 'short', day: 'numeric' };
+        let rangeStr = '';
+        if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
+            rangeStr = `${startOfWeek.toLocaleDateString('en-US', options)} – ${endOfWeek.toLocaleDateString('en-US', { day: 'numeric', year: 'numeric' })}`;
+            rangeStr = `${startOfWeek.toLocaleDateString('en-US', { month: 'short' })} ${startOfWeek.getDate()} – ${endOfWeek.getDate()}, ${endOfWeek.getFullYear()}`;
+        } else {
+            rangeStr = `${startOfWeek.toLocaleDateString('en-US', options)} – ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        }
+        weekDateRangeElem.textContent = rangeStr;
+    }
     // Show week view, hide month view
     if (monthView && weekView) {
         monthView.style.display = 'none';
         weekView.style.display = 'block';
     }
 
-    // Clear the week grid
-    if (weekGrid) {
-        weekGrid.innerHTML = '';
+    // Render week header with day names and dates
+    const weekDaysHeader = document.getElementById('weekDaysHeader');
+    if (weekDaysHeader) {
+        weekDaysHeader.innerHTML = '';
+        // First column empty for time labels
+        const emptyDiv = document.createElement('div');
+        weekDaysHeader.appendChild(emptyDiv);
+        // Calculate week days
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
+        const startOfWeek = new Date(year, month, day - date.getDay());
+        const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let d = 0; d < 7; d++) {
+            const dayDate = new Date(startOfWeek);
+            dayDate.setDate(startOfWeek.getDate() + d);
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'week-header-day';
+            // Highlight today
+            const today = new Date();
+            const isToday = dayDate.getFullYear() === today.getFullYear() &&
+                            dayDate.getMonth() === today.getMonth() &&
+                            dayDate.getDate() === today.getDate();
+            headerDiv.innerHTML = `<div>${weekdayNames[d]}</div><div class="text-sm text-gray-500${isToday ? ' today-highlight' : ''}">${dayDate.getDate()}</div>`;
+            weekDaysHeader.appendChild(headerDiv);
+        }
     }
 
+    // Clear the week time grid
+    if (weekTimeGrid) {
+        weekTimeGrid.innerHTML = '';
+    }
+
+    // Define time slots (e.g., 8:00 to 20:00)
+    const startHour = 1;
+    const endHour = 24;
+    const hours = [];
+    for (let h = startHour; h <= endHour; h++) {
+        hours.push(h);
+    }
+
+    // Get the start of the week (Sunday)
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-
     const startOfWeek = new Date(year, month, day - date.getDay());
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    currentDisplay.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(startOfWeek)} - ${new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(endOfWeek)}`;
 
-    for (let i = 0; i < 7; i++) {
-        const currentDay = new Date(startOfWeek);
-        currentDay.setDate(startOfWeek.getDate() + i);
+    // For each hour, create a row: first column is time label, next 7 columns are days
+    for (let i = 0; i < hours.length; i++) {
+        const rowHour = hours[i];
 
-        const dayDiv = document.createElement('div');
-        dayDiv.classList.add('calendar-day', 'py-2', 'relative');
-        dayDiv.dataset.date = formatDateToISO(currentDay);
+        // Time label cell
+        const timeCell = document.createElement('div');
+        timeCell.classList.add('time-label', 'border', 'border-gray-200', 'text-xs', 'text-right', 'pr-2', 'py-1', 'bg-gray-50');
+        const hourStr = rowHour < 12 ? `${rowHour} AM` : rowHour === 12 ? '12 PM' : rowHour === 24 ? '12 AM' : rowHour === 25 ? '1 AM' : `${rowHour - 12} PM`;
+        timeCell.textContent = hourStr;
+        weekTimeGrid.appendChild(timeCell);
 
-        const dayOfMonth = currentDay.getDate();
-        const dayOfWeekName = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(currentDay);
+        // 7 day cells
+        for (let d = 0; d < 7; d++) {
+            const dayCell = document.createElement('div');
+            dayCell.classList.add('week-cell', 'border', 'border-gray-200', 'relative', 'hover:bg-blue-50', 'h-12');
 
-        dayDiv.innerHTML = `
-            <div class="text-lg font-semibold">${dayOfMonth}</div>
-        `;
+            // For future event placement, store date and hour
+            const currentDay = new Date(startOfWeek);
+            currentDay.setDate(startOfWeek.getDate() + d);
+            dayCell.dataset.date = formatDateToISO(currentDay);
+            dayCell.dataset.hour = rowHour;
 
-        const today = new Date();
-        if (currentDay.getDate() === today.getDate() && currentDay.getMonth() === today.getMonth() && currentDay.getFullYear() === today.getFullYear()) {
-            dayDiv.classList.add('today-container');
-            dayDiv.querySelector('.text-lg').classList.add('today-highlight');
-        } else {
-            dayDiv.classList.add('text-gray-800');
+            weekTimeGrid.appendChild(dayCell);
         }
-        if (weekGrid) {
-            weekGrid.appendChild(dayDiv);
-        }
-    }
-
-    if (weekGrid) {
-        weekGrid.querySelectorAll('.calendar-day').forEach(dayDiv => {
-            dayDiv.addEventListener('click', () => {
-                const selectedDate = dayDiv.dataset.date;
-            });
-        });
     }
 }
-
-
-
 
 // checking what view user want
 prevBtn.addEventListener('click', () => {

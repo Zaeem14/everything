@@ -2,9 +2,11 @@ body {
     font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     display: flex;
-    flex-direction: column; /* Allows header and main_view to stack vertically */
-   min-height: 100vh;
-    background-color: #f8f9fa; /* Light background */
+    flex-direction: column;
+    /* Allows header and main_view to stack vertically */
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    /* Light background */
     color: #202124;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -19,7 +21,7 @@ body {
     height: 64px;
     background-color: #ffffff;
     border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
     z-index: 1000;
     position: sticky;
     top: 0;
@@ -94,7 +96,7 @@ body {
 
 .today-button:hover {
     background-color: #f8f9fa;
-    box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px rgba(60,64,67,0.15);
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px rgba(60, 64, 67, 0.15);
 }
 
 .today-button:active {
@@ -129,7 +131,7 @@ body {
     height: 100vh;
     width: 256px;
     background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     z-index: 1001;
@@ -152,14 +154,14 @@ body {
     display: none;
 }
 
-#main_view{
+#main_view {
     display: flex;
     min-width: 100%;
     min-height: fit-content;
     background-color: aqua;
 }
 
-.month_view-container{
+.month_view-container {
     display: flex;
     background-color: red;
     min-height: 1000px;
@@ -172,55 +174,69 @@ body {
 .month-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0; 
+    gap: 0;
 }
 
 .calendar-day {
-    min-height: 150px; 
+    min-height: 150px;
     text-align: center;
     border-right: 1px solid #e0e0e0;
     border-bottom: 1px solid #e0e0e0;
     padding-top: 8px;
     position: relative;
-    box-sizing: border-box; 
-    cursor: pointer; 
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+}
+
+.week-day {
+    min-height: 600px;
+    text-align: center;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-top: 8px;
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
 }
 
 
 .month-grid .calendar-day:nth-child(7n) {
     border-right: none;
 }
+
 .month-grid .calendar-day:nth-last-child(-n + 7) {
     border-bottom: none;
 }
 
-.calendar-day.text-gray-400 { 
+.calendar-day.text-gray-400 {
     background-color: #f9f9f9;
     cursor: default;
 }
+
 .today-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; 
-    color: #3c4043; 
+    justify-content: flex-start;
+    color: #3c4043;
 }
 
 .today-highlight {
-    background-color: #1a73e8; 
-    color: white;
+    background-color: #1a73e8;
+    color: #fff !important;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
-    margin-bottom: 4px; 
+    font-weight: bold;
+    margin: 0 auto;
+    box-shadow: 0 1px 4px rgba(26, 115, 232, 0.18);
 }
 
 .hidden {
-    display: none !important; 
+    display: none !important;
 }
-
-
