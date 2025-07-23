@@ -68,7 +68,7 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><button class="weekViewBtn" type="button">Week</button></li>
-                    <li><button class="dropdown-item" type="button">Day</button></li>
+                    <li><button class="dayViewBtn" type="button">Day</button></li>
                     <li><button class="monthViewBtn" type="button">Month</button></li>
                     <li><button class="dropdown-item" type="button">Year</button></li>
                 </ul>
@@ -110,23 +110,31 @@
                 <div id="weekDateRange" class="font-semibold text-lg text-center"></div>
             </div>
             <div class="week-grid">
-    <div id="weekDaysHeader" class="grid grid-cols-8 text-center font-medium text-gray-600 border-b border-gray-200 pb-2 mb-2">
-        <div></div> <!-- Empty for time labels -->
-        <div>Sun</div>
-        <div>Mon</div>
-        <div>Tue</div>
-        <div>Wed</div>
-        <div>Thu</div>
-        <div>Fri</div>
-        <div>Sat</div>
-    </div>
-    <div id="weekTimeGrid" class="grid grid-cols-8 gap-0 mt-2">
-        <!-- Time grid will be populated by JavaScript -->
-    </div>
-</div>
+        <div id="weekDaysHeader" class="grid [grid-template-columns:4rem_repeat(7,minmax(0,1fr))] text-center font-medium text-gray-600 border-b border-gray-200 pb-2 mb-2">
+            <div></div> <!-- Empty for time labels -->
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
         </div>
+        <div id="weekTimeGrid" class="grid [grid-template-columns:4rem_repeat(7,minmax(0,1fr))] gap-0 mt-2">
+            <!-- Time grid will be populated by JavaScript -->
+        </div>
+    </div> <!-- close week-grid -->
+</div> <!-- close weekView -->
+
+<!-- Day View Container: should be sibling, not nested inside weekView -->
+<div id="dayView" class="day-view" style="display:none;">
+    <!-- The day view header and grid will be dynamically added here by JS -->
+    <div id="dayTimeGrid"></div>
+</div>
+    </div>
         
     </div>
+
     
     <!-- Bootstrap JS Bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>

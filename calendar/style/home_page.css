@@ -161,6 +161,127 @@ body {
     background-color: aqua;
 }
 
+#dayTimeGrid {
+    display: grid !important;
+    grid-template-columns: 4rem 1fr !important;
+    gap: 0 !important;
+    background: #fff !important;
+    min-height: 200px !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(60, 64, 67, 0.06);
+    border: 1px solid #e0e0e0;
+}
+
+
+
+
+.day-view-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a73e8;
+    text-align: center;
+    margin: 24px 0 16px 0;
+    letter-spacing: 0.01em;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 0;
+    box-shadow: 0 2px 8px rgba(60, 64, 67, 0.04);
+    border: 1px solid #e0e0e0;
+}
+
+.day-header-date {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #222;
+}
+
+.today-highlight {
+    background: #1a73e8 !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.15) !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+
+.day-cell {
+    min-height: 40px !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
+    border: 1px solid #e0e0e0 !important;
+    transition: background 0.2s;
+    position: relative;
+    width: 100% !important;
+    margin: 0 !important;
+    display: flex;
+    align-items: stretch;
+}
+
+.day-header-today {
+    background: #1a73e8 !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    padding: 12px 0 !important;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.10);
+    border: 1.5px solid #1a73e8 !important;
+}
+.day-cell:hover {
+    background: #f1f8fe !important;
+}
+
+.today-highlight {
+    background: #fff !important;
+    color: inherit !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+.date-number-dayview {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222;
+    z-index: 2;
+    background: transparent;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.today-circle {
+    background: #1a73e8 !important;
+    color: #fff !important;
+    box-shadow: 0 1px 4px rgba(26, 115, 232, 0.18);
+    border: none !important;
+}
+
+
+
+
+.time-label {
+    background: #f8f9fa !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding-right: 8px !important;
+    font-size: 12px !important;
+    color: #888 !important;
+    min-height: 40px !important;
+    box-sizing: border-box !important;
+    border: none !important;
+    font-weight: 500;
+}
+
+
 .month_view-container {
     display: flex;
     background-color: red;

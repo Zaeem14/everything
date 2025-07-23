@@ -6,11 +6,13 @@ const monthView = document.getElementById('monthView');
 const weekView = document.getElementById('weekView');
 const monthGrid = document.getElementById('monthGrid');
 const weekTimeGrid = document.getElementById('weekTimeGrid');
+const dayTimeGrid = document.getElementById('dayTimeGrid');
 
 
 //for the month and week view 
 let monthViewBtn;
 let weekViewBtn;
+let dayViewBtn;
 
 let currentDate = new Date();
 let currentView = 'month';
@@ -200,6 +202,94 @@ function renderWeekView(date) {
     }
 }
 
+
+// for the day view
+
+function renderDayView(date) {
+    console.log('renderDayView called with date:', date);
+
+    const dayView = document.getElementById('dayView');
+    const weekView = document.getElementById('weekView');
+    const monthView = document.getElementById('monthView');
+    const currentDisplay = document.getElementById('currentDisplay');
+    const dayTimeGrid = document.getElementById('dayTimeGrid');
+
+    if (!dayView) {
+        console.error('dayView container not found');
+        return;
+    }
+    if (!dayTimeGrid) {
+        console.error('dayTimeGrid container not found');
+        return;
+    }   
+
+    // Hide other views, show day view
+    dayView.style.display = 'block';
+    if (weekView) weekView.style.display = 'none';
+    if (monthView) monthView.style.display = 'none';
+    if (currentDisplay) currentDisplay.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    // Remove any existing day view header
+    const oldHeader = dayView.querySelector('.day-view-header');
+    if (oldHeader) oldHeader.remove();
+
+    // Add day view header with full date
+    const dayViewHeader = document.createElement('div');
+    dayViewHeader.classList.add('day-view-header');
+    // Highlight header if today
+    const today = new Date();
+    if (
+        date.getFullYear() === today.getFullYear() &&
+        date.getMonth() === today.getMonth() &&
+        date.getDate() === today.getDate()
+    ) {
+        dayViewHeader.classList.add('day-header-today');
+    }
+    dayViewHeader.innerHTML = `<span class=\"day-header-date\">${date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>`;
+    dayView.insertBefore(dayViewHeader, dayTimeGrid);
+
+    // Clear grid
+    dayTimeGrid.innerHTML = '';
+    console.log('dayTimeGrid cleared, ready to populate');
+
+    // Define time slots (e.g., 1:00 to 24:00)
+    const startHour = 1;
+    const endHour = 24;
+    const hours = [];
+    for (let h = startHour; h <= endHour; h++) {
+        hours.push(h);
+    }
+
+    // For each hour, create a row: first column is time label, second column is the day cell for the current day
+    for (let i = 0; i < hours.length; i++) {
+        const rowHour = hours[i];
+
+        // Time label cell
+        const timeCell = document.createElement('div');
+        timeCell.classList.add('time-label', 'border', 'border-gray-200', 'text-xs', 'text-right', 'pr-2', 'py-1', 'bg-gray-50');
+        const hourStr = rowHour < 12 ? `${rowHour} AM` : rowHour === 12 ? '12 PM' : rowHour === 24 ? '12 AM' : rowHour === 25 ? '1 AM' : `${rowHour - 12} PM`;
+        timeCell.textContent = hourStr;
+        dayTimeGrid.appendChild(timeCell);
+
+        // Single day cell
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('day-cell', 'border', 'border-gray-200', 'relative', 'hover:bg-blue-50', 'h-12');
+
+        // Store date and hour for event placement
+        dayCell.dataset.date = formatDateToISO(date);
+        dayCell.dataset.hour = rowHour;
+
+        // No highlight for cell, just append
+        dayTimeGrid.appendChild(dayCell);
+    }
+
+    console.log('dayTimeGrid children after render:', dayTimeGrid.children.length);
+}
+
+
+
+
+
 // checking what view user want
 prevBtn.addEventListener('click', () => {
     if (currentView === 'month') {
@@ -208,6 +298,9 @@ prevBtn.addEventListener('click', () => {
     } else if (currentView === 'week') {
         currentDate.setDate(currentDate.getDate() - 7);
         renderWeekView(currentDate);
+    } else if (currentView === 'day') {
+        currentDate.setDate(currentDate.getDate() - 1);
+        renderDayView(currentDate);
     }
 });
 
@@ -220,7 +313,10 @@ nextBtn.addEventListener('click', () => {
     } else if (currentView === 'week') {
         currentDate.setDate(currentDate.getDate() + 7);
         renderWeekView(currentDate);
-    }
+    } else if (currentView === 'day') {
+        currentDate.setDate(currentDate.getDate() + 1);
+        renderDayView(currentDate);
+    }   
 });
 
 todayBtn.addEventListener('click', () => {
@@ -229,6 +325,8 @@ todayBtn.addEventListener('click', () => {
         renderMonthView(currentDate);
     } else if (currentView === 'week') {
         renderWeekView(currentDate);
+    } else if (currentView === 'day') {
+        renderDayView(currentDate);
     }
 });
 
@@ -240,6 +338,7 @@ todayBtn.addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
     monthViewBtn = document.querySelector('.monthViewBtn');
     weekViewBtn = document.querySelector('.weekViewBtn');
+    dayViewBtn = document.querySelector('.dayViewBtn');
 
     if (monthViewBtn) {
         monthViewBtn.addEventListener('click', () => {
@@ -254,6 +353,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentView = 'week';
             renderWeekView(currentDate);
             document.querySelector('.dropdown-toggle').textContent = 'Week';
+        });
+    }
+
+    if (dayViewBtn) {
+        dayViewBtn.addEventListener('click', () => {
+            currentView = 'day';
+            renderDayView(currentDate);
+            document.querySelector('.dropdown-toggle').textContent = 'Day';
         });
     }
 
@@ -292,5 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMonthView(currentDate);
     } else if (currentView === 'week') {
         renderWeekView(currentDate);
+    } else if (currentView === 'day') {
+        renderDayView(currentDate);
     }
 });
