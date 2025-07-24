@@ -14,6 +14,7 @@ h2 {
 
 #container {
     display: flex;
+    position: absolute;
     width: 100vw;  
     height: 100vh;
     flex-direction: row;
@@ -53,6 +54,28 @@ h2 {
     height: 100%;
     border-left: gray 1px solid;
     position: relative;
+}
+
+.stats-panel-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.97); /* nearly solid white, adjust alpha as needed */
+    z-index: 10;
+    border-radius: 12px; /* match your panel style */
+    box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    /* Optional: center a message */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #222;
+    font-size: 1.1em;
+    font-weight: 500;
+    pointer-events: auto;
+}
+#todo-stats {
+    position: relative; /* Ensure overlay is positioned relative to stats panel */
 }
 
 #todolist-menu, 
@@ -270,7 +293,8 @@ h2 {
 .folder-more-icon-menu:hover,
 .todo-input-modifier-icons-container > div:hover,
 .task-due-date-container-stats:hover,
-.task-folder-container-stats:hover {
+.task-folder-container-stats:hover,
+.close-stats-panel-icon:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }
@@ -296,6 +320,8 @@ h2 {
 }
 
 .due-date:hover,
+.due-date-overdue:hover,
+.due-date-future:hover,
 .task-folder:hover,
 .task-more-icon:hover,
 .sub-task-more-icon:hover {
@@ -479,6 +505,20 @@ details[open] > summary .arrow {
   align-items: center;
   z-index: 1000;
 }
+
+.modal-overlay-on-element {
+    position: relative !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.25);  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
 
 /* Modal Box */
 .modal {

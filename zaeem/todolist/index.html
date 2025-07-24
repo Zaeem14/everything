@@ -67,11 +67,6 @@
                     <img src="images/todo-dates-icons/week_icon.png" alt="week" class="todo-date-icon">
                     <div class="todo-date" id="week">This Week</div>
                 </div>
-                <div class="todo-date-container" data-date="task-queue">
-                    <img src="images/todo-dates-icons/planner.png" alt="month" class="todo-date-icon">
-                    <div class="todo-date" id="month">Task Queue</div>
-                </div>
-
             </div> 
             <div class="vertical-line-container">
                 <div class="vertical-line"></div>
@@ -111,7 +106,7 @@
             <div class="todo-container-header">
                 <div class="header-container">
                     <div class="todo-header">
-                        <img src="images/todo-container/collapse.png" alt="collapse" class="collapse-sidebar-icon">
+                        <img src="images/todo-container/collapse.png" alt="collapse" class="collapse-sidebar-icon" id="sidebar-icon">
                         <h2 class="todo-container-date page-title">All</h2>
                     </div>
                     <div class="todo-header-icons">
@@ -215,11 +210,6 @@
                                         <input type="text" placeholder="Search folders..." class="search-folder-input">
                                     </div>
                                     <div class="folder-menu-list-container">
-                                        <div class="task-queue-container folder-menu-container">
-                                            <img src="images/todo-dates-icons/planner.png" class="todo-date-icon folder-icon">
-                                            <div class="folder-menu-name">Task Queue</div>
-                                            <div class="folder-menu-additoinal-container"></div>
-                                        </div>
                                         <div class="folder-menu-dynamic"></div> <!-- ✅ Just folders go here -->
                                     </div> 
                                 </div>
@@ -331,17 +321,17 @@
         <div id="todo-stats">
             <div class="important-task-info-container">
                 <div class="important-task-info-container-left">
-                    <input type="checkbox" class="task-checkbox-stats priority-low-checkbox">
+                    <input type="checkbox" class="task-checkbox-stats priority-none-checkbox">
                     <div class="task-due-date-container-stats">
                         <div class="due-date-icon-container">
                             <input type="date" class="todo-date-input-stats">
                         </div>
-                        <div class="task-due-date-stats">3 days ago, May 30</div>
+                        <div class="task-due-date-stats"></div>
                     </div>
                 </div>
                 <div class="important-task-info-container-right">
                     <div class="task-priority-container-stats">
-                        <img src="images/todo-container/priorities-icon/blue_flag.png" alt="priority" class="task-priority-icon">
+                        <img src="images/todo-container/priorities-icon/grey_flag.png" alt="priority" class="task-priority-icon">
                         <div class="todo-priority-menu-stats hidden-element">
                             <div class="todo-high-priority-container todo-priority-container">
                                 <div class="priority-icon-container">
@@ -376,29 +366,26 @@
                 
                 
             </div>
-            <div class="task-title" contenteditable="true">
-                complete this project as soon as possible or else
+            <div class="task-title">
+                <div class="placeholder">Choose a task to edit</div>
             </div>
             <div class="task-description-container">
-                <div class="description" id="editable-description-stats"  contenteditable="true"></div>
+                <div class="description placeholder" id="editable-description-stats" >
+                    Write description for the task...
+                </div>
             </div>
             <div class="sub-task-list">
                <!--SubTasks dynamically go here-->
             </div>
             <div class="task-edit-container">
                 <div class="task-edit-container-left">
-                    <div class="task-folder-container-stats">Personal</div>
+                    <div class="task-folder-container-stats"></div>
                     <div class="todo-folder-menu hidden-element" id="stats-todo-folder-menu">
                         <div class="search-folder-container">
                             <img src="images/todo-container/icons8-search-16.png" alt="search icon" class="search-folder-icon">
                             <input type="text" placeholder="Search folders..." class="search-folder-input">
                         </div>
                         <div class="folder-menu-list-container">
-                            <div class="task-queue-container folder-menu-container">
-                                <img src="images/todo-dates-icons/planner.png" class="todo-date-icon folder-icon">
-                                <div class="folder-menu-name">Task Queue</div>
-                                <div class="folder-menu-additoinal-container"></div>
-                            </div>
                             <div class="folder-menu-dynamic"></div> <!-- ✅ Just folders go here -->
                         </div> 
                     </div>
@@ -431,7 +418,6 @@
                             </div>
                         </section>
                     </div>
-                    
                 </div>
             </div>
         </div>

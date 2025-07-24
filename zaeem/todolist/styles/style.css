@@ -48,6 +48,31 @@ footer a:hover {
     height: 100vh;
 }
 
+.pop-up-stats-panel {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1); /* left shadow */
+}
+
+.pop-up-menu {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 45px !important;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1); /* right shadow */
+}
+
+.close-stats-panel-icon {
+    padding: 5px;
+    border-radius: 4px;
+}
+
 .header-container {
     justify-content: space-between;
     padding: 10px;
@@ -443,6 +468,8 @@ footer a:hover {
 .group-header,
 .task-folder,
 .due-date,
+.due-date-overdue,
+.due-date-future,
 .number-of-tasks {
     font-family: 'Inter', sans-serif;
     font-size: 14px;
@@ -453,15 +480,44 @@ footer a:hover {
 }
 
 .due-date {
+    color: gray;
+}
+
+.due-date-overdue,
+.due-date-overdue-stats {
     color: red;
+}
+    
+
+.due-date-future, 
+.due-date-future-stats {
+    color: rgb(71,114,250);
 }
 
 .folder-color-code-circle {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: rgb(0, 132, 255);
 }
+
+.task-more-folder-menu {
+    position: relative;
+    top: 50px;
+    left: -230px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid gray;
+    border-radius: 4px;
+    background-color: white;
+    padding: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 350px;
+}
+
+
 
 input{
   -webkit-appearance: none; /* Remove default style */
@@ -624,7 +680,7 @@ input:checked::after {
 .important-task-info-container-left,
 .task-due-date-container-stats,
 .task-input-container-stats {
-    gap: 10px;
+    gap: 5px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -989,7 +1045,7 @@ div[contenteditable="true"] {
 
 @media (max-width: 1094px) {
     #todo-stats {
-        display: none !important;
+        display: none;
     }
 }
 
@@ -1009,4 +1065,11 @@ div[contenteditable="true"] {
 
 .folder-menu-dynamic {
     width: 100%;
+}
+
+.completed-task {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+    text-decoration: line-through !important;
 }

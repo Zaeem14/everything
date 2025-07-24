@@ -1,5 +1,5 @@
 import { hideEmptyTaskGroups, tasks, updateTaskGroupCount} from "../data/tasks.js";
-
+import { clearStatsPanel } from "./stats.js";
 
 // Track the current filter state
 let currentDateFilter = "all";
@@ -8,44 +8,62 @@ let currentFolderFilter = null;
 setupDateFilterClicks();
 setupFolderDivClicks();
 
+
+
 // Handle date-based filtering (all, today, tomorrow, week, overdue)
 // Handle date-based filtering (all, today, tomorrow, week, overdue)
 function handleDateFilterClick(selectedDate) {
     const taskGroups = document.querySelectorAll(".task-group");
     const allTaskContainers = document.querySelectorAll(".task-more-container");
+    let groupHasVisibleTasks = {};
 
-    // Show/hide tasks based on date
+    // Show/hide tasks based on date or folder
     allTaskContainers.forEach(container => {
         const task = container.querySelector('.task');
         if (!task) {
             container.style.display = "none";
             return;
         }
+
         const taskDate = container.getAttribute("data-date") || task.getAttribute("data-date");
-        console.log("Task Date filtered:", taskDate);
-        container.style.display = (selectedDate === "all" || taskDate === selectedDate) ? "flex" : "none";
+        const folderId = container.getAttribute("data-folder-id");
+        const isCompleted = container.classList.contains("completed-task");
+        const group = container.closest(".task-group");
+
+        // For completed tasks, show them in the completed group if they match the selected date
+        if (isCompleted) {
+            if (selectedDate === "all" || taskDate === selectedDate) {
+                container.style.display = "flex";
+                if (group) {
+                    groupHasVisibleTasks[group.dataset.date] = true;
+                }
+            } else {
+                container.style.display = "none";
+            }
+        } else {
+            // For non-completed tasks, show based on date filter
+            if (selectedDate === "all") {
+                container.style.display = "flex";
+            } else if (selectedDate === "task-queue") {
+                container.style.display = folderId === "1" || folderId === "none" ? "flex" : "none";
+            } else {
+                container.style.display = (taskDate === selectedDate) ? "flex" : "none";
+            }
+            if (container.style.display === "flex" && group) {
+                groupHasVisibleTasks[group.dataset.date] = true;
+            }
+        }
     });
 
     // Show/hide task groups based on filter
     taskGroups.forEach(group => {
-        if (selectedDate === "all") {
-            // Show group if it has any visible tasks
-            const visibleTasks = Array.from(group.querySelectorAll('.task-more-container'))
-                .filter(container => getComputedStyle(container).display !== "none");
-            group.style.display = visibleTasks.length > 0 ? "flex" : "none";
-        } else {
-            // Show only the group matching the selected date, and only if it has visible tasks
-            if (group.dataset.date === selectedDate) {
-                const visibleTasks = Array.from(group.querySelectorAll('.task-more-container'))
-                    .filter(container => getComputedStyle(container).display !== "none");
-                group.style.display = visibleTasks.length > 0 ? "flex" : "none";
-            } else {
-                group.style.display = "none";
-            }
-        }
         updateTaskGroupCount(group);
+        const hasTasks = groupHasVisibleTasks[group.dataset.date];
+        group.style.display = hasTasks ? "flex" : "none";
+        
     });
 }
+
 // Handle folder-based filtering
 function handleFolderClick(folderId) {
     const taskGroups = document.querySelectorAll(".task-group");
@@ -70,8 +88,6 @@ function handleFolderClick(folderId) {
         updateTaskGroupCount(group);
         const hasTasks = groupHasVisibleTasks[group.dataset.date];
         group.style.display = hasTasks ? "flex" : "none";
-
-        
     });
 }
 
@@ -99,14 +115,15 @@ function updatePageTitleDate(filter) {
         today: "Today",
         tomorrow: "Tomorrow",
         week: "This Week",
-        overdue: "Overdue"
+        overdue: "Overdue",
+        "task-queue": "Task Queue"
     };
 
     pageTitleElement.textContent = titleMap[filter] || filter;
 }
 
 // Update title for folder filters
-function updatePageTitleFolder(folderName) {
+export function updatePageTitleFolder(folderName) {
     const pageTitleElement = document.querySelector(".page-title");
     pageTitleElement.textContent = folderName;
 }
@@ -128,10 +145,11 @@ export function setupFolderDivClicks() {
 
         updatePageTitleFolder(folderName);
 
-        // Remove current highlight from all, add to clicked
-        folderList.querySelectorAll(".folder-div").forEach(div => div.classList.remove("current-date"));
+        document.querySelectorAll(".folder-div, .todo-date-container").forEach(el => el.classList.remove("current-date"));
         folderDiv.classList.add("current-date");
 
+        clearStatsPanel();
+        closePopUpMenuWhenClickedFilter();
         handleFolderClick(folderId);
     };
 }
@@ -149,12 +167,12 @@ export function setupDateFilterClicks() {
 
             updatePageTitleDate(selectedDate);
 
-            // Remove highlight from all, add to clicked
-            dateFilterList.forEach(filter => filter.classList.remove("current-date"));
+            document.querySelectorAll(".folder-div, .todo-date-container").forEach(el => el.classList.remove("current-date"));
             dateFilter.classList.add("current-date");
 
             handleDateFilterClick(selectedDate);
-            hideEmptyTaskGroups();
+            clearStatsPanel();
+            closePopUpMenuWhenClickedFilter();
         };
     });
 }
@@ -163,3 +181,26 @@ export function setupDateFilterClicks() {
 export function getCurrentDateFilter() {
     return currentDateFilter;
 }
+
+
+export function popUpMenuInSmallScreen() {
+    const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+    const menu = document.querySelector("#todolist-menu");
+    const statsPanel = document.querySelector("#todo-stats");
+
+    if (isSmallScreen) {
+        statsPanel.classList.remove("pop-up-stats-panel");
+        menu.classList.add("pop-up-menu");
+    } else {
+        menu.classList.remove("pop-up-menu");
+    }
+}
+
+function closePopUpMenuWhenClickedFilter() {
+    const menu = document.querySelector("#todolist-menu");
+
+    if (menu.classList.contains("pop-up-menu")) {
+        menu.classList.remove("pop-up-menu");
+    }
+}
+    

@@ -1,12 +1,15 @@
 import { renderFolderPickerMenu, folders } from "../data/folder.js"
-import { tasks, updateTaskGroupCount, hideEmptyTaskGroups, assignTaskDataDate } from "../data/tasks.js";
+import { tasks, updateTaskGroupCount, hideEmptyTaskGroups, assignTaskDataDate, handleDateChange } from "../data/tasks.js";
 import { reapplyCurrentFilter } from "./menu.js";
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
     renderFolderPickerMenu();
     applyPlaceholder();
-    setupFolderMenuListeners();
     reapplyCurrentFilter();
+    setupTaskClickListeners();
 });
 
 const taskStatsSection = document.querySelector("#todo-stats");
@@ -19,6 +22,16 @@ const statsTaskMoreIconContainer = document.querySelector(".task-edit-container-
 const editable = document.getElementById('editable-description-stats');
 const placeholderText = "Write description for the task...";
 
+
+window.addEventListener("resize", () => {
+    if (window.innerWidth > 1094) {
+        taskStatsSection.classList.remove("pop-up-stats-panel");
+        const statsPanelCloseButton = taskStatsSection.querySelector(".close-stats-panel-icon");
+        if (statsPanelCloseButton) {
+            statsPanelCloseButton.remove();
+        }
+    }
+});
 
 const addSubtaskStatsMoreIconAction = taskStatsSection.querySelector(".add-subtask-container-stats");
 addSubtaskStatsMoreIconAction.addEventListener("click", () => {
@@ -59,6 +72,93 @@ if (statsDateInput) {
     });
 }
 
+function setupTaskClickListeners() {
+    document.addEventListener("click", (e) => {
+        const taskElement = e.target.closest(".task-more-container");
+        if (!taskElement) return;
+
+        // Get task ID and find task
+        const taskId = taskElement.getAttribute("data-id");
+        const foundTask = tasks.find(t => t.taskId === Number(taskId));
+        console.log("Task ID:", taskId, "Found Task:", foundTask);
+        
+        if (!foundTask) {
+            console.error("Task not found in tasks array:", taskId);
+            return;
+        }
+
+        taskStatsSection.setAttribute("data-id", taskId);
+
+        // Get folder info safely
+        const folderId = foundTask.folderId;
+        const folder = folders[folderId];
+        
+        if (!folder) {
+            console.error("Folder not found for task:", foundTask);
+            // Use a default folder name or handle the case where folder is missing
+            updateStatsFolderDisplay("No Folder");
+        } else {
+            console.log("Folder:", folder);
+            updateStatsFolderDisplay(folder.folderName);
+        }
+
+        updateEditableTaskName(taskElement);
+
+        const statsTaskDueDateDisplay = document.querySelector(".task-due-date-stats");
+        if (!statsTaskDueDateDisplay) {
+            console.error("Element with class 'task-due-date-stats' not found.");
+            return;
+        }
+        statsTaskDueDateDisplay.textContent = statsTaskDueDateFormatter(foundTask.dueDate);
+        updateStatsTaskDueDateDisplayColor(foundTask);
+        const priority = foundTask.priority;
+        updateStatsPriorityIcon(priority);
+        updateStatsPriorityIconColor(priority);
+        
+
+        displayTaskDescription(taskId);
+        setupTaskDescriptionInput(taskId);
+        renderUpdatedTaskPriority(taskId);
+
+        updateCheckBoxColor(priority);
+
+        renderSubtasksForTask(foundTask); // Show only this task's subtasks
+
+        inputTaskDateOnStatsDatePicker(foundTask.dueDate);
+
+        // Update task name in stats panel in real time using the contenteditable functionality
+        const taskTitle = taskStatsSection.querySelector(".task-title");
+        taskTitle.addEventListener("input", () => {
+            const taskId = taskStatsSection.getAttribute("data-id");
+            const task = tasks.find(t => t.taskId === Number(taskId));
+            const taskOnThePage = document.querySelector(`.task-more-container[data-id="${taskId}"]`)
+            const nameEl = taskOnThePage.querySelector(".task-text");
+            if (task) {
+                task.taskName = taskTitle.textContent.trim();
+                nameEl.textContent = taskTitle.textContent.trim();
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+            }
+        });
+
+        const checkbox = taskElement.querySelector(".task-checkbox");
+        const statsCheckbox = taskStatsSection.querySelector(".task-checkbox-stats");
+        statsCheckbox.name = checkbox.name;
+        
+    });
+}
+
+document.addEventListener("click", function(event) {
+    // Handle clicks on folder options inside task-more-folder-menu
+    const folderItem = event.target.closest(".folder-menu-container");
+    if (folderItem) {
+        const folderId = folderItem.getAttribute("data-id");
+        const folderColor = folderItem.getAttribute("data-color");
+        const folderName = folderItem.querySelector(".folder-menu-name").textContent;
+        const taskId = taskStatsSection.getAttribute("data-id");
+        updatePageForNewSelectedFolder(taskId, folderName, folderColor, folderId);
+    }
+});
+
 // --- Folder menu toggle ---
 document.addEventListener("click", (e) => {
     if (!statsTaskFolderContainer.contains(e.target) && !statsTodoFolderMenu.contains(e.target)) {
@@ -92,53 +192,26 @@ addSubTaskIconContainer.addEventListener("click", () => {
     addSubtask(taskId);
 });
 
+document.querySelector(".folder-menu-dynamic").addEventListener("click", (e) => {
+    const folderMenuItem = e.target.closest(".folder-menu-container");
+    if (!folderMenuItem) return;
 
+    const taskId = taskStatsSection.getAttribute("data-id");
+    const folderName = folderMenuItem.querySelector(".folder-menu-name").textContent;
+    const folderId = folderMenuItem.dataset.id; 
+    const folderColor = folderMenuItem.dataset.color;
 
-// --- Task click: update stats panel and show subtasks ---
-document.addEventListener("click", (e) => {
-    const taskElement = e.target.closest(".task-more-container");
-    if (!taskElement) return;
-
-    const taskId = taskElement.getAttribute("data-id");
-    const foundTask = tasks.find(t => t.taskId === Number(taskId));
-    if (!foundTask) return;
-
-    const folderId = foundTask.folderId;
-    const folderName = folders[folderId]?.folderName;
-    updateStatsFolderDisplay(folderName);
-
-
-
-    taskStatsSection.setAttribute("data-id", taskId);
-
-    updateEditableTaskName(taskElement);
-
-    const statsTaskDueDateDisplay = document.querySelector(".task-due-date-stats");
-    if (!statsTaskDueDateDisplay) {
-        console.error("Element with class 'task-due-date-stats' not found.");
-        return;
-    }
-    statsTaskDueDateDisplay.textContent = statsTaskDueDateFormatter(foundTask.dueDate);
-
-    const priority = foundTask.priority;
-    updateStatsPriorityIcon(priority);
-    updateStatsPriorityIconColor(priority);
-    
-
-    displayTaskDescription(taskId);
-    setupTaskDescriptionInput(taskId);
-    renderUpdatedTaskPriority(taskId);
-
-    updateCheckBoxColor(priority);
-
-    renderSubtasksForTask(foundTask); // Show only this task's subtasks
-
-    inputTaskDateOnStatsDatePicker(foundTask.dueDate);
+    updatePageForNewSelectedFolder(taskId, folderName, folderColor, folderId);
 });
+
 
 // --- Editable task name ---
 function updateEditableTaskName(taskElement) {
     const taskTitle = taskStatsSection.querySelector(".task-title");
+    taskTitle.classList.remove("placeholder");
+    const taskDescription = taskStatsSection.querySelector(".description");
+    taskTitle.contentEditable = "true";
+    taskDescription.contentEditable = "true";
     const nameEl = taskElement.querySelector(".task-text");
     if (taskTitle) {
         taskTitle.textContent = nameEl ? nameEl.textContent : "";
@@ -147,7 +220,7 @@ function updateEditableTaskName(taskElement) {
 }
 
 // --- Due date formatting ---
-function statsTaskDueDateFormatter(inputDateStr) {
+export function statsTaskDueDateFormatter(inputDateStr) {
     if (!inputDateStr) return "";
     const [year, month, day] = inputDateStr.split("-").map(Number);
     const inputDate = new Date(year, month - 1, day);
@@ -187,11 +260,31 @@ function updateTaskDueDateOnStatsDatePicker(task) {
 
     // Update the task's dueDate and formattedDueDate
     task.dueDate = statsDateInput.value;
-    task.formattedDueDate = statsDateInput.value;
+    task.formattedDueDate = handleDateChange(statsDateInput.value);
+
+    // Update the task's dueDate and formattedDueDate in the DOM
+    
+
+    
 
     // Move the task DOM element to the correct group
     const taskElement = document.querySelector(`.task-more-container[data-id="${task.taskId}"]`);
+    const taskDate = assignTaskDataDate(task);
+    console.log(taskDate);
+    const taskDateDisplay = taskElement.querySelector(".task-due-date");
+    updateStatsTaskDueDateDisplayColor(task);
     if (taskElement) {
+        if (taskDate === "overdue") {
+            taskDateDisplay.classList.add("due-date-overdue-stats");
+            taskDateDisplay.classList.remove("due-date-future-stats");
+        } else if (taskDate === "none") {
+            taskDateDisplay.classList.remove("due-date-overdue-stats");
+            taskDateDisplay.classList.remove("due-date-future-stats");
+        } else {
+            taskDateDisplay.classList.remove("due-date-overdue-stats");
+            taskDateDisplay.classList.add("due-date-future-stats");
+        }
+        taskDateDisplay.textContent = task.formattedDueDate;
         // Update the data-date attribute to match the new due date
         const newTaskDate = assignTaskDataDate(task);
         taskElement.setAttribute("data-date", newTaskDate); // <-- ADD THIS LINE
@@ -277,108 +370,104 @@ function setupTaskDescriptionInput(taskId) {
 }
 
 // --- Subtasks ---
-function getNextSubtaskKey(task) {
-    let i = 1;
-    while (task[`subTask${i}`] !== undefined) i++;
-    return `subTask${i}`;
-}
+
 function renderSubtasksForTask(task) {
     const subTaskList = taskStatsSection.querySelector(".sub-task-list");
     subTaskList.innerHTML = ""; // Clear previous subtasks
 
-    Object.keys(task)
-        .filter(key => key.startsWith("subTask") && task[key] !== undefined)
-        .forEach((key) => {
-            const subtaskText = task[key];
-            const newSubtask = document.createElement("div");
-            newSubtask.classList.add("sub-task-container");
-            newSubtask.setAttribute("data-task-id", task.taskId);
-            newSubtask.setAttribute("data-subtask-key", key);
+    if (!Array.isArray(task.subtasks)) return;
 
-            newSubtask.innerHTML = `
-                <div class="sub-task">
-                    <input type="checkbox" class="task-checkbox priority-none-checkbox">
-                    <div class="task-text" contenteditable="true">${subtaskText}</div>
+    task.subtasks.forEach((subtask, idx) => {
+        const newSubtask = document.createElement("div");
+        newSubtask.classList.add("sub-task-container");
+        newSubtask.setAttribute("data-task-id", task.taskId);
+        newSubtask.setAttribute("data-subtask-idx", idx);
+
+        newSubtask.innerHTML = `
+            <div class="sub-task">
+                <input type="checkbox" class="task-checkbox priority-none-checkbox" ${subtask.completed ? "checked" : ""}>
+                <div class="task-text" contenteditable="true">${subtask.text}</div>
+            </div>
+            <div class="sub-task-more-container task-more-container">
+                <img src="images/todo-container/more.png" class="sub-task-more-icon" alt="more">
+                <div class="sub-task-more-menu hidden-element">
+                    <section class="sub-task-actions-section">
+                        <div class="sub-task-action-container add-subtask-container">
+                            <img src="images/todo-container/Subtask.png" alt="subtask" class="task-more-section-icon">
+                            <div class="sub-task-action add-subtask">Add Subtask</div>
+                        </div>
+                    </section>
+                    <section class="sub-task-complete-section">
+                        <div class="sub-task-wont-do-container">
+                            <img src="images/todo-container/icons8-remove-50.png" alt="wont do" class="task-more-section-icon">
+                            <div class="sub-task-action wont-do">Won't Do</div>
+                        </div>
+                        <div class="sub-task-delete-container">
+                            <img src="images/todo-container/icons8-trash-can-50.png" alt="complete" class="task-more-section-icon">
+                            <div class="sub-task-action complete">Delete</div>
+                        </div>
+                    </section>
                 </div>
-                <div class="sub-task-more-container task-more-container">
-                    <img src="images/todo-container/more.png" class="sub-task-more-icon" alt="more">
-                    <div class="sub-task-more-menu hidden-element">
-                        <section class="sub-task-actions-section">
-                            <div class="sub-task-action-container add-subtask-container">
-                                <img src="images/todo-container/Subtask.png" alt="subtask" class="task-more-section-icon">
-                                <div class="sub-task-action add-subtask">Add Subtask</div>
-                            </div>
-                        </section>
-                        <section class="sub-task-complete-section">
-                            <div class="sub-task-wont-do-container">
-                                <img src="images/todo-container/icons8-remove-50.png" alt="wont do" class="task-more-section-icon">
-                                <div class="sub-task-action wont-do">Won't Do</div>
-                            </div>
-                            <div class="sub-task-delete-container">
-                                <img src="images/todo-container/icons8-trash-can-50.png" alt="complete" class="task-more-section-icon">
-                                <div class="sub-task-action complete">Delete</div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            `;
-            subTaskList.appendChild(newSubtask);
+            </div>
+        `;
+        subTaskList.appendChild(newSubtask);
 
-            const addSubTaskMenuActions = newSubtask.querySelectorAll(".add-subtask-container");
-            addSubTaskMenuActions.forEach(action => {
-                action.addEventListener("click", () => {
-                    const taskId = taskStatsSection.getAttribute("data-id");
-                    addSubtask(taskId);
-                });
-            });
-
-            
-
-            // Menu toggle logic
-            const moreIcon = newSubtask.querySelector('.sub-task-more-icon');
-            const moreMenu = newSubtask.querySelector('.sub-task-more-menu');
-            moreIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.sub-task-more-menu').forEach(menu => {
-                    if (menu !== moreMenu) menu.classList.add('hidden-element');
-                });
-                moreMenu.classList.toggle('hidden-element');
-            });
-
-            // Real-time update of subtask text
-            const subtaskTextDiv = newSubtask.querySelector('.task-text');
-            subtaskTextDiv.addEventListener('input', () => {
-                task[key] = subtaskTextDiv.textContent;
-                localStorage.setItem("tasks", JSON.stringify(tasks));
-            });
-
-            // --- Subtask delete functionality ---
-            const deleteBtn = newSubtask.querySelector('.sub-task-delete-container');
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Remove the subtask from the task object
-                delete task[key];
-                // Save and re-render
-                localStorage.setItem("tasks", JSON.stringify(tasks));
-                renderSubtasksForTask(task);
-            });
+        // Add subtask event handlers
+        newSubtask.querySelector(".add-subtask").addEventListener("click", (e) => {
+            e.stopPropagation();
+            addSubtask(task.taskId);
         });
+
+        // Checkbox handler
+        newSubtask.querySelector(".task-checkbox").addEventListener("change", (e) => {
+            subtask.completed = e.target.checked;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        });
+
+        // Text edit handler
+        newSubtask.querySelector(".task-text").addEventListener("input", (e) => {
+            subtask.text = e.target.textContent;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        });
+
+        // Delete handler
+        newSubtask.querySelector(".sub-task-delete-container").addEventListener("click", (e) => {
+            e.stopPropagation();
+            task.subtasks.splice(idx, 1);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            renderSubtasksForTask(task);
+        });
+
+        // Menu toggle logic (as before)
+        const moreIcon = newSubtask.querySelector('.sub-task-more-icon');
+        const moreMenu = newSubtask.querySelector('.sub-task-more-menu');
+        moreIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.sub-task-more-menu').forEach(menu => {
+                if (menu !== moreMenu) menu.classList.add('hidden-element');
+            });
+            moreMenu.classList.toggle('hidden-element');
+        });
+    });
 }
 // Hide all subtask menus when clicking outside
 document.addEventListener('click', (e) => {
-    document.querySelectorAll('.sub-task-more-menu').forEach(menu => {
-        if (!menu.classList.contains('hidden-element')) {
-            menu.classList.add('hidden-element');
-        }
-    });
+    // Only close menus if the click is outside any .sub-task-more-menu
+    if (!e.target.closest('.sub-task-more-menu')) {
+        document.querySelectorAll('.sub-task-more-menu').forEach(menu => {
+            if (!menu.classList.contains('hidden-element')) {
+                menu.classList.add('hidden-element');
+            }
+        });
+    }
 });
 
 // Add a subtask to the currently selected task in stats panel
-function addSubtask(taskId) {
+export function addSubtask(taskId) {
     const task = tasks.find(t => t.taskId === Number(taskId));
     if (!task) return;
-    const nextKey = getNextSubtaskKey(task);
-    task[nextKey] = ""; // Start with empty text
+    if (!Array.isArray(task.subtasks)) task.subtasks = [];
+    task.subtasks.push({ text: "", completed: false });
     localStorage.setItem("tasks", JSON.stringify(tasks));
     renderSubtasksForTask(task);
 }
@@ -460,10 +549,13 @@ function updatePageForNewSelectedFolder(taskId, folderName, folderColor, folderI
         return;
     };
 
+    if (folderId === "1") {
+        folderName = "Task Queue";
+    }
+
     
     const taskOnThePage = document.querySelector(`.task-more-container[data-id="${taskId}"]`);
     if (taskOnThePage) {
-        console.log(taskOnThePage)
         const statsFolderDisplayContainer = taskStatsSection.querySelector(".task-folder-container-stats");
         statsFolderDisplayContainer.textContent = folderName;
 
@@ -479,35 +571,40 @@ function updatePageForNewSelectedFolder(taskId, folderName, folderColor, folderI
     }
 
     task.folderId = folderId;
+    tasks.find(t => t.taskId === Number(taskId)).folderId = folderId;
     taskOnThePage.dataset.folderId = folderId;
 
     reapplyCurrentFilter(); // <--- Add this line
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("tasks", JSON.stringify(tasks));   
 
     // Update task group counters after filter and visibility change
     document.querySelectorAll(".task-group").forEach(group => {
-        hideEmptyTaskGroups();
+        hideEmptyTaskGroups()
         updateTaskGroupCount(group);  // or updateTaskGroupCount depending on your function name
     });
 }
 
-function setupFolderMenuListeners() {
-    const statsFolderSelectorMenu = taskStatsSection.querySelector(".folder-menu-list-container");
+export function setupFolderMenuListeners() {
+    const statsFolderSelectorMenu = document.querySelector(".folder-menu-dynamic");
     const statsFolderSelectorMenuItems = statsFolderSelectorMenu.querySelectorAll(".folder-menu-container");
 
-    statsFolderSelectorMenuItems.forEach(menuItem => {
-        menuItem.addEventListener("click", () => {
+    statsFolderSelectorMenuItems.forEach(folderMenuItem => {
+        folderMenuItem.addEventListener("click", () => {
             const taskId = taskStatsSection.getAttribute("data-id");
-            const folderName = menuItem.querySelector(".folder-menu-name").textContent;
-            const folderId = menuItem.dataset.id;
-            const folderColor = menuItem.dataset.color;
+            const folderName = folderMenuItem.querySelector(".folder-menu-name").textContent;
+            const folderId = folderMenuItem.dataset.id; 
+            const folderColor = folderMenuItem.dataset.color;
+            console.log("Folder name: " + folderName);
+            console.log("Folder ID: " + folderId);
+            console.log("Folder color: " + folderColor);
+            console.log("folder Id: " + folderId);
 
             updatePageForNewSelectedFolder(taskId, folderName, folderColor, folderId);
         });
     });
 }
 
-function updateStatsFolderDisplay(folderName) {
+export function updateStatsFolderDisplay(folderName) {
     const statsFolderDisplayContainer = taskStatsSection.querySelector(".task-folder-container-stats");
 
     if (statsFolderDisplayContainer) {
@@ -537,5 +634,91 @@ function deleteTaskFromStats(taskId) {
         localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 
-    console.log(tasks);
+    clearStatsPanel();
+}
+
+
+function updateStatsTaskDueDateDisplayColor(task) {
+    const statsTaskDueDateDisplay = document.querySelector(".task-due-date-stats");
+    if (statsTaskDueDateDisplay) {
+        statsTaskDueDateDisplay.classList.remove("due-date-overdue-stats");
+        statsTaskDueDateDisplay.classList.remove("due-date-future-stats");
+    }
+    const taskDate = assignTaskDataDate(task);
+    if (taskDate === "overdue") {
+        statsTaskDueDateDisplay.classList.add("due-date-overdue-stats");
+        statsTaskDueDateDisplay.classList.remove("due-date-future-stats");
+    } else if (taskDate === "none") {
+        statsTaskDueDateDisplay.classList.remove("due-date-overdue-stats");
+        statsTaskDueDateDisplay.classList.remove("due-date-future-stats");
+    } else {
+        statsTaskDueDateDisplay.classList.remove("due-date-overdue-stats");
+        statsTaskDueDateDisplay.classList.add("due-date-future-stats");
+    }
+}
+
+export function clearStatsPanel() {
+    const statsPanel = document.querySelector("#todo-stats");
+    
+    const statsCheckbox = statsPanel.querySelector(".task-checkbox-stats");
+    const statsDueDateDisplay = statsPanel.querySelector(".task-due-date-stats");
+    const statsPriorityIcon = statsPanel.querySelector(".task-priority-icon");
+    const taskTitle = statsPanel.querySelector(".task-title");
+    const taskDescription = statsPanel.querySelector(".description");
+    const subTaskList = statsPanel.querySelector(".sub-task-list");
+    const taskFolderDisplayContainer = statsPanel.querySelector(".task-folder-container-stats");
+
+    statsCheckbox.checked = false;
+    statsCheckbox.classList.remove("priority-high-checkbox", "priority-medium-checkbox", "priority-low-checkbox", "priority-none-checkbox");
+    statsCheckbox.classList.add("priority-none-checkbox");
+
+    statsDueDateDisplay.textContent = "";
+    statsPriorityIcon.src = "images/todo-container/priorities-icon/grey_flag.png";
+
+    taskTitle.innerHTML = "Choose a task to edit";
+    taskTitle.classList.add("placeholder");
+    taskTitle.contentEditable = "false";
+    taskDescription.innerHTML = "Write description for the task...";
+    taskDescription.classList.add("placeholder");
+    taskDescription.contentEditable = "false";
+
+    subTaskList.innerHTML = "";
+    taskFolderDisplayContainer.innerHTML = "(No Folder)";
+
+    statsPanel.removeAttribute("data-id");
+    statsPanel.classList.remove("pop-up-stats-panel");
+}
+
+function popUpStatsPanelInSmallScreen() {
+    const statsPanel = document.querySelector("#todo-stats");
+    const isSmallScreen = window.matchMedia("(max-width: 1094px)").matches;
+    const menu = document.querySelector("#todolist-menu");
+
+    if (isSmallScreen) {
+        statsPanel.classList.add("pop-up-stats-panel");
+        addCloseStatsPanelButtonInSmallScreen();
+        menu.classList.remove("pop-up-menu");
+    } else {
+        statsPanel.classList.remove("pop-up-stats-panel");
+    }
+}
+
+function addCloseStatsPanelButtonInSmallScreen() {
+    const statsPanel = document.querySelector("#todo-stats");
+    const statsHeaderLeft = document.querySelector(".important-task-info-container-left");
+
+    const closeStatsPanelButton = statsHeaderLeft.querySelector(".close-stats-panel-icon");
+    if (closeStatsPanelButton) {
+        closeStatsPanelButton.remove();
+    }
+
+    const closeButton = document.createElement("img");
+    closeButton.src = "images/todo-container/icons8-close-16.png";
+    closeButton.classList.add("close-stats-panel-icon");
+    statsHeaderLeft.prepend(closeButton);
+
+    closeButton.addEventListener("click", () => {
+        statsPanel.classList.remove("pop-up-stats-panel");
+        console.log("Stats panel closed in small screen");
+    });
 }

@@ -1,3 +1,5 @@
+import { popUpMenuInSmallScreen } from "./menu.js";
+
 const taskInputContainer = document.querySelector('.todo-input-container');
 const hiddenElements = document.querySelectorAll('.hidden');
 const taskInputBox = document.querySelector('.input-plus-add-icon-container');
@@ -140,34 +142,79 @@ const menuBar = document.getElementById("todolist-menu");
 const todoContainer = document.getElementById("todo-container");
 
 sidebarIcon.addEventListener("click", () => {
-  if (sidebarIcon.classList.contains("collapse-sidebar-icon")) {
-    // Collapse sidebar
-    menuBar.classList.add("hidden-menu");
-    todoContainer.style.width = "67%";
-    sidebarIcon.src = "images/todo-container/expand.png";
-    sidebarIcon.classList.remove("collapse-sidebar-icon");
-    sidebarIcon.classList.add("expand-sidebar-icon");
+  const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+
+  if (isSmallScreen) {
+    // Just show the menu, do not toggle icon
+    menuBar.classList.add("pop-up-menu");
+    const statsPanel = document.querySelector("#todo-stats");
+
+    // ✅ If on small screen and stats panel is active, remove it
+    if (window.innerWidth < 769 && statsPanel.classList.contains("pop-up-stats-panel")) {
+      statsPanel.classList.remove("pop-up-stats-panel");
+    }
+
+    // Hide on outside click
+    document.addEventListener("click", function handleOutsideClick(e) {
+      if (!menuBar.contains(e.target) && !sidebarIcon.contains(e.target)) {
+        menuBar.classList.remove("pop-up-menu");
+        document.removeEventListener("click", handleOutsideClick);
+      }
+    });
   } else {
-    // Expand sidebar
-    menuBar.classList.remove("hidden-menu");
-    todoContainer.style.width = "50%";
-    sidebarIcon.src = "images/todo-container/collapse.png";
-    sidebarIcon.classList.remove("expand-sidebar-icon");
-    sidebarIcon.classList.add("collapse-sidebar-icon");
+    // Toggle expand/collapse logic
+    const isCollapsed = sidebarIcon.classList.contains("collapse-sidebar-icon");
+
+    if (isCollapsed) {
+      // Collapse
+      menuBar.classList.add("hidden-menu");
+      todoContainer.style.width = "67%";
+      sidebarIcon.src = "images/todo-container/expand.png";
+      sidebarIcon.classList.remove("collapse-sidebar-icon");
+      sidebarIcon.classList.add("expand-sidebar-icon");
+    } else {
+      // Expand
+      menuBar.classList.remove("hidden-menu");
+      todoContainer.style.width = "50%";
+      sidebarIcon.src = "images/todo-container/collapse.png";
+      sidebarIcon.classList.remove("expand-sidebar-icon");
+      sidebarIcon.classList.add("collapse-sidebar-icon");
+    }
   }
 });
+
+
 
 function updateExpandSideBarIconSrc(e) {
   if (e.matches) {
     sidebarIcon.src = "images/todo-container/expand.png";
-  } 
+    sidebarIcon.classList.remove("collapse-sidebar-icon");
+    sidebarIcon.classList.add("expand-sidebar-icon");
+  }
 }
 
 function updateCollapseSideBarIconSrc(e) {
   if (e.matches) {
-    sidebarIcon.src = "images/todo-container/collapse.png";
+    // Clean mobile classes
+    menuBar.classList.remove("pop-up-menu");
+
+    if (menuBar.classList.contains("hidden-menu")) {
+      // ✅ Sidebar is collapsed — update icon to expand
+      sidebarIcon.src = "images/todo-container/expand.png";
+      sidebarIcon.classList.remove("collapse-sidebar-icon");
+      sidebarIcon.classList.add("expand-sidebar-icon");
+    } else {
+      // Sidebar is expanded — show collapse icon
+      sidebarIcon.src = "images/todo-container/collapse.png";
+      sidebarIcon.classList.remove("expand-sidebar-icon");
+      sidebarIcon.classList.add("collapse-sidebar-icon");
+    }
   }
 }
+
+
+
+
 
 // Create a media query list
 const mq = window.matchMedia('(max-width: 768px)');
