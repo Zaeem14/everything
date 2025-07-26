@@ -118,6 +118,12 @@ function renderMonthView(date) {
 // for the week view 
 function renderWeekView(date) {
     // Set week date range above grid
+    // Hide other views, show week view
+    if (monthView) monthView.style.display = 'none';
+    if (weekView) weekView.style.display = 'block';
+    if (yearGrid) yearGrid.style.display = 'none';
+    if (dayView) dayView.style.display = 'none';
+
     // Set header to week range, e.g., 'Jul 20 – Jul 26, 2025'
     if (currentDisplay) {
         const year = date.getFullYear();
