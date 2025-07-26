@@ -991,10 +991,7 @@ div[contenteditable="true"] {
     justify-content: space-between;
 }
 
-.hidden-element {
-    opacity: 0;
-    pointer-events: none;
-}
+
 
 .hidden-menu {
     position: absolute;
@@ -1006,21 +1003,7 @@ div[contenteditable="true"] {
     filter: grayscale(100%) brightness(0%);
 }
 
-.add-folder-button {
-    background-color: rgb(34, 171, 245);
-    color: white;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    border: none;
-    font-size: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease-in-out;
-}
 
-.add-folder-button:hover {
-    background-color: rgb(47, 164, 248);
-}
 
 #stats-todo-folder-menu {
     bottom: 100%;

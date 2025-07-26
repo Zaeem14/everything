@@ -40,7 +40,7 @@ h2 {
 
 #todo-container, 
 #habits-container{
-    min-width: 50%;
+    min-width: 52.6%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -264,7 +264,9 @@ h2 {
 .task-more-section-icon,
 .expand-sidebar-icon,
 #folder-edit-icon,
-.delete-folder-icon{
+.delete-folder-icon,
+.habit-more-delete-icon,
+.habit-folder-item-icon{
     width: 20px;
     height: 20px;
 }
@@ -294,7 +296,16 @@ h2 {
 .todo-input-modifier-icons-container > div:hover,
 .task-due-date-container-stats:hover,
 .task-folder-container-stats:hover,
-.close-stats-panel-icon:hover {
+.close-stats-panel-icon:hover, 
+.habit-more-menu-item-container:hover,
+.times-menu-item:hover,
+.per-menu-item:hover,
+.habit-repeat-menu-item:hover, 
+.habit-repeat-daily-item-container:hover, 
+.habit-repeat-monthly-item-calendar-row-item:hover,
+.habit-repeat-interval-item-container:hover,
+.habit-time-item-container:hover,
+.habit-folder-item-container:hover {
     background-color: rgb(234, 234, 234);
     cursor: pointer;
 }
@@ -534,7 +545,8 @@ details[open] > summary .arrow {
   font-size: 14px;
 }
 
-.modal-box {
+.modal-box, 
+.folder-add-modal {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -622,4 +634,30 @@ details[open] > summary .arrow {
     width: 12px;
     height: 12px;
     border-radius: 50%;
+}
+
+
+.add-folder-button {
+    background-color: rgb(34, 171, 245);
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.add-folder-button:hover {
+    background-color: rgb(47, 164, 248);
+}
+
+.habit-add-button {
+    height: 30px;
+}
+
+.hidden-element {
+    opacity: 0;
+    pointer-events: none;
 }

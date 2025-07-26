@@ -7,28 +7,8 @@
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/mix.css">
     <script type="module">
-        import { EmojiButton } from 'https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js';
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const folderIcon = document.getElementById("folderIcon");
-
-            const picker = new EmojiButton({
-            position: 'bottom-start',
-            zIndex: 9999,
-            autoHide: true,
-            showPreview: false,
-            showRecents: true,
-            theme: 'light'
-            });
-
-            picker.on('emoji', emoji => {
-                folderIcon.textContent = emoji.emoji;
-            });
-
-            folderIcon.addEventListener('click', () => {
-                picker.togglePicker(folderIcon);
-            });
-        });
+       import { SetEmojiPicker } from "../general_zaeem/script.js";
+       SetEmojiPicker();
     </script>
     <script type="module" src="data/folder.js" defer></script>
     <script type="module" src="data/tasks.js" defer></script>
