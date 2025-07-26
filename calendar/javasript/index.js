@@ -1,3 +1,6 @@
+
+// defining all the elements
+
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const currentDisplay = document.getElementById('currentDisplay');
@@ -7,12 +10,16 @@ const weekView = document.getElementById('weekView');
 const monthGrid = document.getElementById('monthGrid');
 const weekTimeGrid = document.getElementById('weekTimeGrid');
 const dayTimeGrid = document.getElementById('dayTimeGrid');
+const yearGrid = document.getElementById('yearGrid');
+const yearView = document.getElementById('yearView'); // <-- added assignment for yearView
 
 
 //for the month and week view 
-let monthViewBtn;
-let weekViewBtn;
-let dayViewBtn;
+// Assign view buttons after DOM is loaded
+weekViewBtn = document.querySelector('.weekViewBtn');
+dayViewBtn = document.querySelector('.dayViewBtn');
+monthViewBtn = document.querySelector('.monthViewBtn');
+yearViewBtn = document.querySelector('.yearViewBtn');
 
 let currentDate = new Date();
 let currentView = 'month';
@@ -34,6 +41,7 @@ function renderMonthView(date) {
     if (monthView && weekView) {
         monthView.style.display = 'block';
         weekView.style.display = 'none';
+        yearGrid.style.display = 'none';
     }
 
     // Clear the month grid
@@ -45,7 +53,10 @@ function renderMonthView(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
 
-    currentDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+    // Set header to 'Month Year', e.g., 'July 2025'
+    if (currentDisplay) {
+        currentDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+    }
 
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
@@ -61,7 +72,7 @@ function renderMonthView(date) {
         if (monthGrid) monthGrid.appendChild(dayDiv);
     }
 
-
+    // creating the days of the month
     for (let i = 1; i <= daysInMonth; i++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('calendar-day', 'py-2', 'relative');
@@ -69,9 +80,10 @@ function renderMonthView(date) {
         const fullDate = new Date(year, month, i);
         dayDiv.dataset.date = formatDateToISO(fullDate);
 
+        // highlighting the today's date
         const today = new Date();
         if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-            dayDiv.innerHTML = `<span class="today-highlight">${i}</span>`;
+            dayDiv.innerHTML = `<span class="today-highlight_for_month_week">${i}</span>`;
             dayDiv.classList.add('today-container');
         } else {
             dayDiv.classList.add('text-gray-800');
@@ -79,6 +91,7 @@ function renderMonthView(date) {
         if (monthGrid) monthGrid.appendChild(dayDiv);
     }
 
+    // creating the remaining days of the month
     const totalDaysDisplayed = startDayIndex + daysInMonth;
     const remainingCells = 42 - totalDaysDisplayed;
     for (let i = 1; i <= remainingCells; i++) {
@@ -89,6 +102,7 @@ function renderMonthView(date) {
         if (monthGrid) monthGrid.appendChild(dayDiv);
     }
 
+    // adding the click event to the days of the month
     if (monthGrid) {
         monthGrid.querySelectorAll('.calendar-day:not(.non-current-month)').forEach(dayDiv => {
             dayDiv.addEventListener('click', () => {
@@ -104,8 +118,8 @@ function renderMonthView(date) {
 // for the week view 
 function renderWeekView(date) {
     // Set week date range above grid
-    const weekDateRangeElem = document.getElementById('weekDateRange');
-    if (weekDateRangeElem) {
+    // Set header to week range, e.g., 'Jul 20 – Jul 26, 2025'
+    if (currentDisplay) {
         const year = date.getFullYear();
         const month = date.getMonth();
         const day = date.getDate();
@@ -116,16 +130,16 @@ function renderWeekView(date) {
         let rangeStr = '';
         if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
             rangeStr = `${startOfWeek.toLocaleDateString('en-US', options)} – ${endOfWeek.toLocaleDateString('en-US', { day: 'numeric', year: 'numeric' })}`;
-            rangeStr = `${startOfWeek.toLocaleDateString('en-US', { month: 'short' })} ${startOfWeek.getDate()} – ${endOfWeek.getDate()}, ${endOfWeek.getFullYear()}`;
         } else {
-            rangeStr = `${startOfWeek.toLocaleDateString('en-US', options)} – ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            rangeStr = `${startOfWeek.toLocaleDateString('en-US', options)} – ${endOfWeek.toLocaleDateString('en-US', options)}, ${endOfWeek.getFullYear()}`;
         }
-        weekDateRangeElem.textContent = rangeStr;
+        currentDisplay.textContent = rangeStr;
     }
     // Show week view, hide month view
-    if (monthView && weekView) {
+    if (monthView && weekView && yearGrid) {
         monthView.style.display = 'none';
         weekView.style.display = 'block';
+        yearGrid.style.display = 'none';
     }
 
     // Render week header with day names and dates
@@ -149,9 +163,9 @@ function renderWeekView(date) {
             // Highlight today
             const today = new Date();
             const isToday = dayDate.getFullYear() === today.getFullYear() &&
-                            dayDate.getMonth() === today.getMonth() &&
-                            dayDate.getDate() === today.getDate();
-            headerDiv.innerHTML = `<div>${weekdayNames[d]}</div><div class="text-sm text-gray-500${isToday ? ' today-highlight' : ''}">${dayDate.getDate()}</div>`;
+                dayDate.getMonth() === today.getMonth() &&
+                dayDate.getDate() === today.getDate();
+            headerDiv.innerHTML = `<div>${weekdayNames[d]}</div><div class="text-sm text-gray-500${isToday ? ' today-highlight_for_month_week' : ''}">${dayDate.getDate()}</div>`;
             weekDaysHeader.appendChild(headerDiv);
         }
     }
@@ -221,13 +235,17 @@ function renderDayView(date) {
     if (!dayTimeGrid) {
         console.error('dayTimeGrid container not found');
         return;
-    }   
+    }
 
     // Hide other views, show day view
     dayView.style.display = 'block';
     if (weekView) weekView.style.display = 'none';
     if (monthView) monthView.style.display = 'none';
-    if (currentDisplay) currentDisplay.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    if (yearGrid) yearGrid.style.display = 'none';
+    // Set header to 'Day, Month Date, Year', e.g., 'Saturday, July 26, 2025'
+    if (currentDisplay) {
+        currentDisplay.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(date);
+    }
 
     // Remove any existing day view header
     const oldHeader = dayView.querySelector('.day-view-header');
@@ -287,6 +305,98 @@ function renderDayView(date) {
 }
 
 
+//for the year view function
+function renderYearView(date) {
+    // Show year view, hide others
+    if (monthView && weekView && yearView && dayView) {
+        monthView.style.display = 'none';
+        weekView.style.display = 'none';
+        yearView.style.display = 'block';
+        dayView.style.display = 'none';
+    }
+
+    // Clear the year grid
+    yearGrid.innerHTML = '';
+
+    // Get the year from provided date
+    const year = date.getFullYear();
+
+    // Set header to current year
+    if (currentDisplay) {
+        currentDisplay.textContent = year;
+    }
+    const today = new Date();
+
+    // Set up year grid as 4 columns, 3 rows
+    yearGrid.style.display = 'grid';
+    yearGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    yearGrid.style.gap = '1rem';
+
+    for (let month = 0; month < 12; month++) {
+        // Month container
+        const monthCell = document.createElement('div');
+        monthCell.classList.add('month-cell', 'border', 'border-gray-200', 'bg-white', 'rounded-lg', 'shadow-sm', 'p-2');
+        monthCell.style.minWidth = '160px';
+
+        // Month name
+        const monthName = document.createElement('div');
+        monthName.classList.add('font-semibold', 'text-center', 'mb-1');
+        monthName.textContent = new Date(year, month, 1).toLocaleString('en-US', { month: 'long' });
+        monthCell.appendChild(monthName);
+
+        // Mini month grid
+        const miniGrid = document.createElement('div');
+        miniGrid.classList.add('mini-month-grid');
+        miniGrid.style.display = 'grid';
+        miniGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+        miniGrid.style.gap = '2px';
+
+        // Days of week header
+        const daysShort = ['S','M','T','W','T','F','S'];
+        for (let d = 0; d < 7; d++) {
+            const dow = document.createElement('div');
+            dow.classList.add('mini-day-cell', 'text-xs', 'font-bold', 'text-center', 'text-gray-500');
+            dow.textContent = daysShort[d];
+            miniGrid.appendChild(dow);
+        }
+
+        // Find first day of month and number of days
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Fill in blanks for days before the 1st
+        for (let i = 0; i < firstDay; i++) {
+            const blank = document.createElement('div');
+            blank.classList.add('mini-day-cell');
+            miniGrid.appendChild(blank);
+        }
+
+        // Fill in days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayCell = document.createElement('div');
+            dayCell.classList.add('mini-day-cell', 'text-xs', 'text-center', 'rounded', 'cursor-pointer', 'hover:bg-blue-100');
+            dayCell.textContent = day;
+            dayCell.style.width = '20px';
+            dayCell.style.height = '20px';
+            dayCell.style.margin = 'auto';
+
+            // Highlight today
+            if (
+                year === today.getFullYear() &&
+                month === today.getMonth() &&
+                day === today.getDate()
+            ) {
+                dayCell.classList.add('bg-blue-500', 'text-white', 'font-bold');
+            }
+
+            miniGrid.appendChild(dayCell);
+        }
+
+        monthCell.appendChild(miniGrid);
+        yearGrid.appendChild(monthCell);
+    }
+}
+
 
 
 
@@ -301,6 +411,9 @@ prevBtn.addEventListener('click', () => {
     } else if (currentView === 'day') {
         currentDate.setDate(currentDate.getDate() - 1);
         renderDayView(currentDate);
+    } else if (currentView === 'year') {
+        currentDate.setFullYear(currentDate.getFullYear() - 1);
+        renderYearView(currentDate);
     }
 });
 
@@ -316,7 +429,10 @@ nextBtn.addEventListener('click', () => {
     } else if (currentView === 'day') {
         currentDate.setDate(currentDate.getDate() + 1);
         renderDayView(currentDate);
-    }   
+    } else if (currentView === 'year') {
+        currentDate.setFullYear(currentDate.getFullYear() + 1);
+        renderYearView(currentDate);
+    }
 });
 
 todayBtn.addEventListener('click', () => {
@@ -327,6 +443,8 @@ todayBtn.addEventListener('click', () => {
         renderWeekView(currentDate);
     } else if (currentView === 'day') {
         renderDayView(currentDate);
+    } else if (currentView === 'year') {
+        renderYearView(currentDate);
     }
 });
 
@@ -361,6 +479,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentView = 'day';
             renderDayView(currentDate);
             document.querySelector('.dropdown-toggle').textContent = 'Day';
+        });
+    }
+
+    if (yearViewBtn) {
+        yearViewBtn.addEventListener('click', () => {
+            currentView = 'year';
+            renderYearView(currentDate);
+            document.querySelector('.dropdown-toggle').textContent = 'Year';
         });
     }
 
@@ -401,5 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderWeekView(currentDate);
     } else if (currentView === 'day') {
         renderDayView(currentDate);
+    } else if (currentView === 'year') {
+        renderYearView(currentDate);
     }
 });

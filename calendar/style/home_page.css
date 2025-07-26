@@ -344,9 +344,24 @@ body {
     color: #3c4043;
 }
 
+
+.today-highlight_for_month_week {
+    background-color: #1a73e8;
+    color: #ffffff !important;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin: 0 auto;
+    box-shadow: 0 1px 4px rgba(26, 115, 232, 0.18);
+}
+
 .today-highlight {
     background-color: #1a73e8;
-    color: #fff !important;
+    color: #ffffff !important;
     border-radius: 50%;
     width: 28px;
     height: 28px;
