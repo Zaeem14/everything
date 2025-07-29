@@ -14,16 +14,7 @@ const yearGrid = document.getElementById('yearGrid');
 const currentDisplay = document.getElementById('currentDisplay');
 const todayBtn = document.querySelector('.today-button');
 
-console.log('monthView:', monthView);
-console.log('weekView:', weekView);
-console.log('dayView:', dayView);
-console.log('yearView:', yearView);
-console.log('monthGrid:', monthGrid);
-console.log('weekTimeGrid:', weekTimeGrid);
-console.log('dayTimeGrid:', dayTimeGrid);
-console.log('yearGrid:', yearGrid);
-console.log('currentDisplay:', currentDisplay);
-console.log('todayBtn:', todayBtn);
+
 
 // View buttons
 const weekViewBtn = document.querySelector('.weekViewBtn');
@@ -35,28 +26,24 @@ const yearViewBtn = document.querySelector('.yearViewBtn');
 if (weekViewBtn) {
     weekViewBtn.addEventListener('click', () => {
         currentView = 'week';
-        console.log('Switch to week view');
         renderWeekView(currentDate);
     });
 }
 if (dayViewBtn) {
     dayViewBtn.addEventListener('click', () => {
         currentView = 'day';
-        console.log('Switch to day view');
         renderDayView(currentDate);
     });
 }
 if (monthViewBtn) {
     monthViewBtn.addEventListener('click', () => {
         currentView = 'month';
-        console.log('Switch to month view');
         renderMonthView(currentDate);
     });
 }
 if (yearViewBtn) {
     yearViewBtn.addEventListener('click', () => {
         currentView = 'year';
-        console.log('Switch to year view');
         renderYearView(currentDate);
     });
 }
