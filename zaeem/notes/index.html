@@ -4,7 +4,18 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Notes</title>
+        <link rel="stylesheet" href="style.css">
+
+        
+
         <script src="https://cdn.tailwindcss.com"></script>
+        <script type="module">
+            import { SetEmojiPicker } from "../general_zaeem/script.js";
+            SetEmojiPicker();
+        </script>
+        <script src="scripts/scripts.js" defer></script>
+
+        
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,15 +25,199 @@
         <div id="container" class="flex h-screen w-screen">
             <div id="feature-menu" class="w-[45px] bg-[#00ffff]">
             </div>
-            <div id="notes-menu" class="w-[255px] flex flex-col">
-                <div class="w-full h-[45px] bg-green-500"></div>
-                <div class="w-full h-[125px] bg-green-700"></div>
-                <div class="w-full h-[100px] bg-green-900"></div>
-                <div class="w-full h-[100px] bg-green-300"></div>
+            <div id="notes-menu" class="w-[255px] flex flex-col p-2 relative bg-gray-100 text-[0.9rem] font-medium">
+                <div class="flex justify-center items-center w-full h-[2.4rem] gap-2 px-2 hover:bg-gray-200 rounded">
+                    <div class="w-[1.2rem] h-[1.2rem] bg-gray-200 rounded-sm p-[2px]">
+                        <img src="images/menu/icons8-z-16.png" class="w-full h-full object-contain" alt="profile picture">
+                    </div>
+                    <div class="flex items-center w-full h-full">
+                        Zaeem's School Notion
+                    </div>
+                </div>
+                <div class="w-full h-auto">
+                    <div class="page-container w-full h-[2rem] flex items-center justify-between hover:bg-gray-200 rounded px-2">
+                        <div class="">Pages</div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm hidden cursor-pointer p-[2px]">
+                                <img src="images/menu/icons8-more-16.png" class="w-full h-full object-contain" alt="more icon">
+                            </div>
+                            <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm hidden cursor-pointer p-[2px]">
+                                <img src="images/menu/icons8-add-16.png" class="w-full h-full object-contain" alt="add icon">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pages-container w-full h-auto flex flex-col">
+                        <div class="flex flex-col items-center">
+                            <div class="page-container flex items-center gap-2 justify-between w-full h-[2rem] rounded hover:bg-gray-200 pr-2">
+                                <div class="flex items-center gap-1">
+                                    <div class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px]">
+                                        <img src="images/menu/icons8-page-16.png" class="w-full h-full object-contain" alt="page icon">
+                                    </div>
+                                    <div>Page 1</div>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] cursor-pointer hidden"> 
+                                        <img src="images/menu/icons8-more-16.png" class="w-full h-full object-contain" alt="more icon">
+                                    </div>
+                                    <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] cursor-pointer hidden">
+                                        <img src="images/menu/icons8-add-16.png" class="w-full h-full object-contain" alt="add icon">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-container w-full h-[2rem] flex flex-col pl-[1rem] hover:bg-gray-200 rounded pr-2 hidden">
+                                <div class="flex items-center gap-1 h-[2rem] justify-between">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px]">
+                                            <img src="images/menu/icons8-page-16.png" class="w-full h-full object-contain" alt="page icon">
+                                        </div>
+                                        <div>Page 2</div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] hidden cursor-pointer"> 
+                                            <img src="images/menu/icons8-more-16.png" class="w-full h-full object-contain" alt="more icon">
+                                        </div>
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] hidden cursor-pointer">
+                                            <img src="images/menu/icons8-add-16.png" class="w-full h-full object-contain" alt="add icon">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-container w-full h-[2rem] flex flex-col pl-[2rem] hover:bg-gray-200 rounded pr-2 hidden">
+                                <div class="flex items-center gap-1 h-[2rem] justify-between">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px]">
+                                            <img src="images/menu/icons8-page-16.png" class="w-full h-full object-contain" alt="page icon">
+                                        </div>
+                                        <div>Page 3</div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm cursor-pointer p-[2px] hidden"> 
+                                            <img src="images/menu/icons8-more-16.png" class="w-full h-full object-contain" alt="more icon">
+                                        </div>
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm cursor-pointer p-[2px] hidden">
+                                            <img src="images/menu/icons8-add-16.png" class="w-full h-full object-contain" alt="add icon">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-container w-full h-[2rem] flex flex-col pl-[1rem] hover:bg-gray-200 rounded pr-2 hidden">
+                                <div class="flex items-center gap-1 h-[2rem] justify-between">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px]">
+                                            <img src="images/menu/icons8-page-16.png" class="w-full h-full object-contain" alt="page icon">
+                                        </div>
+                                        <div>Page 2</div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] cursor-pointer hidden"> 
+                                            <img src="images/menu/icons8-more-16.png" class="w-full h-full object-contain" alt="more icon">
+                                        </div>
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] cursor-pointer hidden">
+                                            <img src="images/menu/icons8-add-16.png" class="w-full h-full object-contain" alt="add icon">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-container w-full h-[2rem] flex flex-col pl-[2rem] hover:bg-gray-200 rounded pr-2 hidden">
+                                <div class="flex items-center gap-1 h-[2rem] justify-between">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px]">
+                                            <img src="images/menu/icons8-page-16.png" class="w-full h-full object-contain" alt="page icon">
+                                        </div>
+                                        <div>Page 3</div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] cursor-pointer hidden"> 
+                                            <img src="images/menu/icons8-more-16.png" class="w-full h-full object-contain" alt="more icon">
+                                        </div>
+                                        <div class="w-[1.2rem] h-[1.2rem] hover:bg-gray-300 rounded-sm p-[2px] cursor-pointer hidden">
+                                            <img src="images/menu/icons8-add-16.png" class="w-full h-full object-contain" alt="add icon">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="h-[100px] bg-green-900 absolute bottom-0 left-0 right-0 bottom-0 p-2 flex items-center">
+                    <div class="flex items-center gap-2 h-[2rem] w-full relative bottom-2 cursor-pointer hover:bg-gray-200 rounded-sm">
+                        <div class="w-[1.2rem] h-[1.2rem] p-[2px]">
+                            <img src="images/menu/icons8-settings-16.png" class="w-full h-full object-contain" alt="settings icon">
+                        </div>
+                        <div class=""> 
+                            Settings
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="notes-container" class="w-[calc(100%-300px)] flex flex-col">
-                <div class="w-full h-[45px] bg-orange-500"></div>
-                <div class="w-full h-[calc(100%-45px)] bg-orange-700"></div>
+                <div class="w-full h-[45px] flex items-center p-1">
+                    <div class="flex items-center gap-2 w-[50%] h-full">
+                        <div>
+                            <img src="images/container-header/collapse.png" alt="collapse icon" class="w-[1.5rem] h-[1.5rem] rounded p-[2px] hover:bg-gray-200 cursor-pointer">
+                        </div>
+                        <div class="flex items-center">
+                            <span class="hover:bg-gray-200 cursor-pointer rounded px-2">Page 1</span>
+                            <span class="text-gray-500">/</span>
+                            <span class="hover:bg-gray-200 cursor-pointer rounded px-2">Page 2</span>
+                            <span class="text-gray-500">/</span>
+                            <span class="hover:bg-gray-200 cursor-pointer rounded px-2">Page 3</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 w-[50%] h-full justify-end">
+                        <div class="relative">
+                            <img src="images/container-header/icons8-more-16.png" alt="more icon" class="w-[1.5rem] h-[1.5rem] rounded p-[2px] hover:bg-gray-200 cursor-pointer">
+                            <div class="flex flex-col border-black-[1px] rounded-sm absolute right-0 min-w-[10rem] bg-white border border-black box-shadow-normal p-2 hidden">
+                                <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-200 h-[2rem] rounded-sm p-2">
+                                    <img src="images/container-header/icons8-arrow-16.png" class="w-[1.2rem] h-[1.2rem]">
+                                    <div>Move To</div>
+                                </div>
+                                <div class="flex items-center gap-2 cursor-pointer hover:bg-gray-200 h-[2rem] rounded-sm p-2">
+                                    <img src="images/container-header/icons8-trash-can-50.png" class="w-[1.2rem] h-[1.2rem]">
+                                    <div>Delete</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full h-[calc(100%-45px)] p-6 overflow-y-auto">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <div class="folder-icon hover:bg-gray-200 cursor-pointer rounded px-2">😀 Add Icon</div>
+                        </div>
+                        <div  class="page-title font-bold text-5xl bg-blue-500 px-2 outline-none" contenteditable="true">Page 3</div>
+                    </div>
+                    <div class="content-container h-[calc(100%-60px)] outline-none bg-blue-300 p-4">
+                        <div class="content-container space-y-2 p-2 bg-white">
+                            <div class="line flex items-start h-auto relative gap-2 line-hover-zone relative">
+                                <div class="icons flex gap-1 pt-1 absolute left-[-3rem]">
+                                    <img src="images/main/icons8-add-16.png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="add block icon"/>
+                                    <img src="images/main/icons8-menu-16 (1).png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="move block icon"/>
+                                </div>
+                                <div class="content w-full outline-none" contenteditable="true"></div>
+                                <div class="content-menu w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded" contenteditable="true">
+                                    <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                                        <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
+                                        <div>Text</div>
+                                    </div>
+                                    <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                                        <img src="images/main/icons8-1-16.png" class="w-[1.2rem] h-[1.2rem]">
+                                        <div>Heading 1</div>
+                                    </div>
+                                    <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                                        <img src="images/main/icons8-2-16.png" class="w-[1.2rem] h-[1.2rem]">
+                                        <div>Heading 2</div>
+                                    </div>
+                                    <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                                        <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
+                                        <div>Heading 3</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
