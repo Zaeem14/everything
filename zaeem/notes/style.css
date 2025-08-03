@@ -1,0 +1,22 @@
+*, body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.line-hover-zone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -3rem;
+    width: 3rem;
+    pointer-events: auto; /* allows icons to be clickable */
+}
+
+.box-shadow-normal {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+  
