@@ -678,19 +678,6 @@ if (window.todayBtn) {
 // Add Event Button & Modal Logic
 
 document.addEventListener('DOMContentLoaded', () => {
-    function renderMonthView(date) {
-       
-    }
-    function renderWeekView(date) {
-       
-    }
-    function renderDayView(date) {
-       
-    }
-    function renderYearView(date) {
-       
-    }
-
     // DOM assignments
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
