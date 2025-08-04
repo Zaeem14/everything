@@ -155,7 +155,6 @@ function addTask() {
 
 
 function renderTasks(task) {
-
     const folder = folders[task.folderId];
 
     const folderBarColor = folder ? folder.folderColor : "transparent";

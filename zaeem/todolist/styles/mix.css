@@ -302,11 +302,16 @@ h2 {
 .per-menu-item:hover,
 .habit-repeat-menu-item:hover, 
 .habit-repeat-daily-item-container:hover, 
-.habit-repeat-monthly-item-calendar-row-item:hover,
 .habit-repeat-interval-item-container:hover,
 .habit-time-item-container:hover,
 .habit-folder-item-container:hover {
     background-color: rgb(234, 234, 234);
+    cursor: pointer;
+}
+
+.habit-repeat-monthly-item-calendar-row-item:hover {
+    background-color: rgb(4, 91, 221);
+    color: white;
     cursor: pointer;
 }
 
@@ -431,7 +436,6 @@ details[open] > summary .arrow {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-items: center;
     justify-content: center;
     gap: 5px;
 }
@@ -637,7 +641,8 @@ details[open] > summary .arrow {
 }
 
 
-.add-folder-button {
+.add-folder-button,
+.edit-folder-button {
     background-color: rgb(34, 171, 245);
     color: white;
     border-radius: 4px;
@@ -660,4 +665,8 @@ details[open] > summary .arrow {
 .hidden-element {
     opacity: 0;
     pointer-events: none;
+}
+
+.hidden {
+    display: none !important;
 }

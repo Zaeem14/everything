@@ -9,6 +9,32 @@ input {
 
 }
 
+.arrow {
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid #333;
+    transition: transform 0.3s ease;
+}
+
+.habits-group-header.open .arrow {
+    transform: rotate(90deg);
+}
+
+
+.folder-div-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-div-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+}
+
 .habits-header-container,
 .habits-actions-container,
 .habits-header-container-left {
@@ -48,6 +74,12 @@ input {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     color: white;
     font-size: 15px;
+}
+
+.habits-date-picker {
+    max-width: 17px;
+    background-color: transparent;
+    border: none;
 }
 
 .add-habits-container {
@@ -335,7 +367,10 @@ input {
 }
 
 .habit-repeat-text {
-    width: 80px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .input-arrow-container {
@@ -390,6 +425,9 @@ input {
 
 .habit-time-text {
     width: 7.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .new-habit-description-container {
@@ -448,6 +486,7 @@ input {
     flex-direction: column;
     justify-content: flex-start;
     gap: 5px;
+    color: black;
     background-color: white;
     border-radius: 4px;
     padding: 5px;
@@ -504,25 +543,27 @@ input {
 .times-menu-container,
 .per-menu-container {
     padding: 5px;
-    min-width: 90.5px;
     border-radius: 4px;
 }
 
+.times-menu-container {
+    width: 80.5px !important;
+}
+
+
 .times-menu-item,
 .per-menu-item {
-    width: 100%;
     padding: 5px;
     border-radius: 4px;
 }   
 
 .habit-repeat-menu-container {
-    width: 125px;
+    width: 138px;
     padding: 5px;
     border-radius: 4px;
 }
 
 .habit-repeat-menu-item {
-    width: 100%;
     padding: 5px;
     border-radius: 4px;
     align-items: center;
@@ -548,6 +589,7 @@ input {
     border: 1px solid black;
     right: -125px;
     top: 5%;
+    min-width: 110px;
 }
 
 .habit-repeat-daily-item-container,
@@ -571,22 +613,34 @@ input {
     position: absolute;
     padding: 5px;
     top: 36%;
-    right: -227px;
+    right: -256px;
 }
 
 .habit-repeat-monthly-item-calendar-row {
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
 }
 
 .habit-repeat-monthly-item-calendar-row-item {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     border-radius: 4px;
     padding: 5px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.selected {
+    background-color: rgb(4, 91, 221);
+    color: white;
+}
+
+
 
 .habit-repeat-daily-item-check-container, 
 .habit-repeat-interval-item-check-container,
@@ -599,19 +653,30 @@ input {
 .habit-repeat-interval-item-menu {
     top: 68%;
     right: -149px;
+    min-width: 132px;
 }
 
 .habit-time-item-container,
 .habit-folder-item-container {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: 5px;
+    align-items: center;
     border-radius: 4px;
     padding: 5px;
 }
+
+.habit-folder-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.habit-folder-item-container {
+    justify-content: space-between;
+}
     
-/* Hide all the menus*/
+/* Hide all the menus
 .times-menu-container,
 .per-menu-container, 
 .habit-repeat-menu-container,
@@ -621,11 +686,11 @@ input {
 .habit-time-menu-container,
 .habit-folder-menu-container {
     display: none;
-}
+} */
 
 .habit-time-menu-container {
     padding: 5px;
-    width: 147px;
+    width: 137px;
 }
 
 .habit-folder-menu-container {
@@ -645,10 +710,11 @@ input {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     border: 1px solid black;
     padding: 2px 4px;
+    width: 138px;
 }
 
 .habit-date-text {
-    width: 80px;
+    width: 100%;
 }
 
 #habit-date {
@@ -656,5 +722,10 @@ input {
     height: 20px;
     border: none;
     background-color: transparent;
+}
+
+.habit-repeat {
+    gap: 5px;
+    width: 140px;
 }
     

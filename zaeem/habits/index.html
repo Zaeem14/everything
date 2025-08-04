@@ -10,7 +10,10 @@
         import { SetEmojiPicker } from "../general_zaeem/script.js";
         SetEmojiPicker();
     </script>           
-    <script src="script.js" defer></script>
+    <script src="scripts/script.js" type="module" defer></script>
+    <script src="data/folder.js" type="module" defer></script>
+    <script src="data/habit.js" type="module" defer></script>
+    
 
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,7 +97,10 @@
                     <h2 class="habits-time-title">All</h2>
                 </div>
                 <div class="habits-actions-container">
-                    <input type="date" class="habits-date-display habits-action">
+                    <div class="habits-action">
+                        <div class="habits-date-text">Today</div>
+                        <input type="date" class="habits-date-picker ">
+                    </div>
                     <div class="habits-order habits-action">
                         <div class="habits-order-icon-container">
                             <img src="images/habits-container-icons/icons8-sort-32.png">
@@ -117,153 +123,75 @@
             </header>
             <div class="habits-list-container">
                 <div class="habits-list">
-                    <section class="habits-group">
-                        <div class="habits-group-header">
+                    <section class="habits-group" data-time="morning">
+                        <div class="habits-group-header open">
                             <div class="arrow"></div>
-                            <div class="group-header">Anytime</div>
-                            <div class="number-of-habits">2</div>
+                            <div class="group-header">Morning</div>
+                            <div class="number-of-habits">0</div>
                         </div>
-                        <div class="habits hidden">
-                            <div class="habits-more-container">
-                                <div class="habit">
-                                    <div class="habit-icon-container">
-                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
-                                    </div>
-                                    <div class="habit-content-container">
-                                        <div class="left-side-habit">
-                                            <div class="habit-text">Fajr Prayer</div>
-                                            <div class="habit-times-number">0 / 1 times</div>
-                                        </div>
-                                        <div class="right-side-habit">
-                                            <div class="habit-folder-container habit-editor">Islam</div>
-                                            <div class="habit-done-container habit-editor">
-                                                <div class="habit-done-icon-container">
-                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
-                                                </div>
-                                                <div class="habit-done-text">Done</div>
-                                            </div>
-                                            <div class="habit-more-container habit-editor">
-                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
-                                                <div class="habit-more-menu-container" style="display: none;">
-                                                    <div class="habit-more-menu-item-container">
-                                                        <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-more-menu-item-icon">
-                                                        <div class="habit-more-menu-item">Check In</div>
-                                                    </div>
-                                                    <div class="habit-more-menu-item-container">
-                                                        <img src="images/habits-container-icons/icons8-right-arrow-16.png" class="habit-more-menu-item-icon">
-                                                        <div class="habit-more-menu-item">Skip</div>
-                                                    </div>
-                                                    <div class="habit-more-menu-item-container">
-                                                        <img src="images/habits-container-icons/icons8-wrong-16.png" class="habit-more-menu-item-icon">
-                                                        <div class="habit-more-menu-item">Fail</div>
-                                                    </div>
-                                                    <div class="habit-more-menu-item-container">
-                                                        <img src="images/habits-container-icons/icons8-edit-30.png" class="habit-more-menu-item-icon">
-                                                        <div class="habit-more-menu-item">Edit</div>
-                                                    </div>
-                                                    <div class="habit-more-menu-item-container">
-                                                        <img src="images/habits-container-icons/icons8-trash-can-50.png" class="habit-more-menu-item-icon habit-more-delete-icon">
-                                                        <div class="habit-more-menu-item">Delete</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="habits">
 
-                            <div class="habits-more-container">
-                                <div class="habit">
-                                    <div class="habit-icon-container">
-                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
-                                    </div>
-                                    <div class="habit-content-container">
-                                        <div class="left-side-habit">
-                                            <div class="habit-text">Asr Prayer</div>
-                                            <div class="habit-times-number">0 / 1 times</div>
-                                        </div>
-                                        <div class="right-side-habit">
-                                            <div class="habit-folder-container habit-editor">Islam</div>
-                                            <div class="habit-done-container habit-editor">
-                                                <div class="habit-done-icon-container">
-                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
-                                                </div>
-                                                <div class="habit-done-text">Done</div>
-                                            </div>
-                                            <div class="habit-more-container habit-editor">
-                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </section>
 
-                    <section class="habits-group">
-                        <div class="habits-group-header">
+                    <section class="habits-group" data-time="afternoon">
+                        <div class="habits-group-header open">
+                            <div class="arrow"></div>
+                            <div class="group-header">Afternoon</div>
+                            <div class="number-of-habits">0</div>
+                        </div>
+                        <div class="habits">
+                            
+                        </div>
+                    </section>
+
+                    <section class="habits-group" data-time="evening">
+                        <div class="habits-group-header open">
+                            <div class="arrow"></div>
+                            <div class="group-header">Evening</div>
+                            <div class="number-of-habits">0</div>
+                        </div>
+                        <div class="habits">
+                            
+                        </div>
+                    </section>
+
+                    <section class="habits-group" data-time="night">
+                        <div class="habits-group-header open">
+                            <div class="arrow"></div>
+                            <div class="group-header">Night</div>
+                            <div class="number-of-habits">0</div>
+                        </div>
+                        <div class="habits">
+                            
+                        </div>
+                    </section>
+
+                    <section class="habits-group" data-time="anytime">
+                        <div class="habits-group-header open">
                             <div class="arrow"></div>
                             <div class="group-header">Anytime</div>
-                            <div class="number-of-habits">2</div>
+                            <div class="number-of-habits">0</div>
                         </div>
-                        <div class="habits hidden">
-                            <div class="habits-more-container">
-                                <div class="habit">
-                                    <div class="habit-icon-container">
-                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
-                                    </div>
-                                    <div class="habit-content-container">
-                                        <div class="left-side-habit">
-                                            <div class="habit-text">Fajr Prayer</div>
-                                            <div class="habit-times-number">0 / 1 times</div>
-                                        </div>
-                                        <div class="right-side-habit">
-                                            <div class="habit-folder-container habit-editor">Islam</div>
-                                            <div class="habit-done-container habit-editor">
-                                                <div class="habit-done-icon-container">
-                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
-                                                </div>
-                                                <div class="habit-done-text">Done</div>
-                                            </div>
-                                            <div class="habit-more-container habit-editor">
-                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="habits">
+                            
+                        </div>
+                    </section>
 
-                            <div class="habits-more-container">
-                                <div class="habit">
-                                    <div class="habit-icon-container">
-                                        <img src="images/habits-container-icons/praying.png" alt="habit icon" class="habit-icon">
-                                    </div>
-                                    <div class="habit-content-container">
-                                        <div class="left-side-habit">
-                                            <div class="habit-text">Asr Prayer</div>
-                                            <div class="habit-times-number">0 / 1 times</div>
-                                        </div>
-                                        <div class="right-side-habit">
-                                            <div class="habit-folder-container habit-editor">Islam</div>
-                                            <div class="habit-done-container habit-editor">
-                                                <div class="habit-done-icon-container">
-                                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
-                                                </div>
-                                                <div class="habit-done-text">Done</div>
-                                            </div>
-                                            <div class="habit-more-container habit-editor">
-                                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <section class="habits-group" data-time="completed">
+                        <div class="habits-group-header open">
+                            <div class="arrow"></div>
+                            <div class="group-header">Completed</div>
+                            <div class="number-of-habits">0</div>
+                        </div>
+                        <div class="habits">
+                            
                         </div>
                     </section>
                 </div>
             </div>
         </div>
-        <div id="habits-stats-container" class="strip">
+        <div id="habits-stats-container" class="strip" >
             <div class="habits-stats-header">
                 <div class="habits-stats-header-left">
                     <div class="habits-stats-title">Fajr Prayer</div>
@@ -318,10 +246,10 @@
             </div>
         </div>
     </div>
-    <div id="modal-overlay" style="display: none;">
-        <div class="modal habit-add-modal">
+    <div id="modal-overlay" class="hidden">
+        <div class="modal habit-add-modal hidden">
             <div class="modal-header">
-                <h2>New Habit</h2>
+                <h2>ADD A HABIT</h2>
                 <div class="close-modal-icon-container">
                     <img src="../todolist/images/todo-container/icons8-close-16.png" class="close-modal-icon" alt="close">
                 </div>
@@ -332,7 +260,7 @@
                     <input type="text" id="new-habit-name" class="add-habit-input">
                 </div>
                 <div class="new-habit-icon-container add-habit-input">
-                    <img src="images/habits-container-icons/icons8-question-mark-16.png" class="new-habit-icon folder-icon"  alt="new habit icon">
+                    <div class="new-habit-icon folder-icon">❓</div>
                 </div>
             </div>
             <div class="habit-occurrence-container">
@@ -346,7 +274,7 @@
                                 <img src="images/habits-container-icons/icons8-sort-up-16.png" class="input-arrow-up">
                                 <img src="images/habits-container-icons/icons8-sort-down-16.png" class="input-arrow-down">
                             </div>
-                            <div class="times-menu-container add-habit-menu-container">
+                            <div class="times-menu-container add-habit-menu-container hidden">
                                 <div class="times-menu-item">Times</div>
                                 <div class="times-menu-item">Mins</div>
                             </div>
@@ -357,7 +285,7 @@
                                 <img src="images/habits-container-icons/icons8-sort-up-16.png" class="input-arrow-up">
                                 <img src="images/habits-container-icons/icons8-sort-down-16.png" class="input-arrow-down">
                             </div>
-                            <div class="per-menu-container add-habit-menu-container">
+                            <div class="per-menu-container add-habit-menu-container hidden">
                                 <div class="per-menu-item">Per Day</div>
                                 <div class="per-menu-item">Per Week</div>
                                 <div class="per-menu-item">Per Month</div>
@@ -373,10 +301,10 @@
                             <img src="images/habits-container-icons/icons8-sort-up-16.png" class="input-arrow-up">
                             <img src="images/habits-container-icons/icons8-sort-down-16.png" class="input-arrow-down">
                         </div>
-                        <div class="habit-repeat-menu-container add-habit-menu-container">
+                        <div class="habit-repeat-menu-container add-habit-menu-container hidden">
                             <div class="habit-repeat-menu-item-container">
-                                <div class="habit-repeat-menu-item">Daily</div>
-                                <div class="habit-repeat-daily-item-menu">
+                                <div class="habit-repeat-menu-item habit-repeat-menu-item-text-js">Daily</div>
+                                <div class="habit-repeat-daily-item-menu habit-repeat-item-menu-container hidden">
                                     <div class="habit-repeat-daily-item-container">
                                         <div class="habit-repeat-daily-item-check-container">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-daily-item-check">
@@ -423,9 +351,9 @@
                                 
                             </div>
                             <div class="habit-repeat-menu-item-container">
-                                <div class="habit-repeat-menu-item">Monthly</div>
+                                <div class="habit-repeat-menu-item habit-repeat-menu-item-text-js">Monthly</div>
                                 <!--30 day calendar-->
-                                <div class="habit-repeat-monthly-item-menu">
+                                <div class="habit-repeat-monthly-item-menu habit-repeat-item-menu-container hidden">
                                     <div class="habit-repeat-monthly-item-calendar-row">
                                         <div class="habit-repeat-monthly-item-calendar-row-item">1</div>
                                         <div class="habit-repeat-monthly-item-calendar-row-item">2</div>
@@ -471,41 +399,41 @@
                                 </div>
                             </div>
                             <div class="habit-repeat-menu-item-container">
-                                <div class="habit-repeat-menu-item">Interval</div>
+                                <div class="habit-repeat-menu-item habit-repeat-menu-item-text-js">Interval</div>
                                 <!--Interval Menu-->
-                                <div class="habit-repeat-interval-item-menu">
+                                <div class="habit-repeat-interval-item-menu habit-repeat-item-menu-container hidden">
                                     <div class="habit-repeat-interval-item-container">
-                                        <div class="habit-repeat-interval-item-check-container">
+                                        <div class="habit-repeat-interval-item-check-container hidden">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-interval-item-check">
                                         </div>
                                         <div class="habit-repeat-interval-item-text-container">Repeat Every 2</div>
                                     </div>
                                     <div class="habit-repeat-interval-item-container">
-                                        <div class="habit-repeat-interval-item-check-container">
+                                        <div class="habit-repeat-interval-item-check-container hidden">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-interval-item-check">
                                         </div>
                                         <div class="habit-repeat-interval-item-text-container">Repeat Every 3</div>
                                     </div>
                                     <div class="habit-repeat-interval-item-container">
-                                        <div class="habit-repeat-interval-item-check-container">
+                                        <div class="habit-repeat-interval-item-check-container hidden">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-interval-item-check">
                                         </div>
                                         <div class="habit-repeat-interval-item-text-container">Repeat Every 4</div>
                                     </div>
                                     <div class="habit-repeat-interval-item-container">
-                                        <div class="habit-repeat-interval-item-check-container">
+                                        <div class="habit-repeat-interval-item-check-container hidden">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-interval-item-check">
                                         </div>
                                         <div class="habit-repeat-interval-item-text-container">Repeat Every 5</div>
                                     </div>
                                     <div class="habit-repeat-interval-item-container">
-                                        <div class="habit-repeat-interval-item-check-container">
+                                        <div class="habit-repeat-interval-item-check-container hidden">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-interval-item-check">
                                         </div>
                                         <div class="habit-repeat-interval-item-text-container">Repeat Every 6</div>
                                     </div>
                                     <div class="habit-repeat-interval-item-container">
-                                        <div class="habit-repeat-interval-item-check-container">
+                                        <div class="habit-repeat-interval-item-check-container hidden">
                                             <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-repeat-interval-item-check">
                                         </div>
                                         <div class="habit-repeat-interval-item-text-container">Repeat Every 7</div>
@@ -526,7 +454,7 @@
                                 <img src="images/habits-container-icons/icons8-sort-up-16.png" class="input-arrow-up">
                                 <img src="images/habits-container-icons/icons8-sort-down-16.png" class="input-arrow-down">
                             </div>
-                            <div class="habit-time-menu-container add-habit-menu-container">
+                            <div class="habit-time-menu-container add-habit-menu-container hidden">
                                 <div class="habit-time-item-container">
                                     <div class="habit-time-item-check-container">
                                         <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-time-item-check">
@@ -557,42 +485,13 @@
                     <div class="habit-folder-container">
                         <label for="habit-folder">Folder</label>
                         <div class="habit-folder-input-box add-habit-input">
-                            <div class="habit-folder-text">General</div>
+                            <div class="habit-folder-text" data-folder-id="1">Habit Queue</div>
                             <div class="input-arrow-container">
                                 <img src="images/habits-container-icons/icons8-sort-up-16.png" class="input-arrow-up">
                                 <img src="images/habits-container-icons/icons8-sort-down-16.png" class="input-arrow-down">
                             </div>
-                            <div class="habit-folder-menu-container add-habit-menu-container">
-                                <div class="habit-folder-item-container">
-                                    <div class="habit-folder-item-icon-container">
-                                        <img src="images/habits-folder-icons/dollar.png" class="habit-folder-item-icon">
-                                    </div>
-                                    <div class="habit-folder-item-text-container">Business</div>
-                                </div>
-                                <div class="habit-folder-item-container">
-                                    <div class="habit-folder-item-icon-container">
-                                        <img src="images/habits-folder-icons/family.png" class="habit-folder-item-icon">
-                                    </div>
-                                    <div class="habit-folder-item-text-container">Family</div>
-                                </div>
-                                <div class="habit-folder-item-container">
-                                    <div class="habit-folder-item-icon-container">
-                                        <img src="images/habits-folder-icons/kaaba.png" class="habit-folder-item-icon">
-                                    </div>
-                                    <div class="habit-folder-item-text-container">Islam</div>
-                                </div>
-                                <div class="habit-folder-item-container"> 
-                                    <div class="habit-folder-item-icon-container">
-                                        <img src="images/habits-folder-icons/personal_icon.png" class="habit-folder-item-icon">
-                                    </div>
-                                    <div class="habit-folder-item-text-container">Personal</div>
-                                </div>
-                                <div class="habit-folder-item-container"> 
-                                    <div class="habit-folder-item-icon-container">
-                                        <img src="images/habits-folder-icons/school.png" class="habit-folder-item-icon">
-                                    </div>
-                                    <div class="habit-folder-item-text-container">School</div>
-                                </div>
+                            <div class="habit-folder-menu-container add-habit-menu-container hidden">
+                                
                             </div>
                         </div>
                     </div>
@@ -601,7 +500,7 @@
                     <label for="habit-date">Start Date</label>
                     <div class="habit-date-input-box add-habit-input">
                         <div class="habit-date-text">Today</div>
-                        <input type="date" id="habit-date">
+                        <input type="date" id="habit-date" min="2025-08-02" max="2025-09-02">
                     </div>
                 </div>
             </div>
@@ -611,7 +510,7 @@
             </div>
             <button class="add-folder-button habit-add-button">Add Habit</button>
         </div>
-        <div class="folder-add-modal">
+        <div class="folder-add-modal hidden">
             <div class="folder-add-modal-header">
                 <h4>ADD A FOLDER</h4>
                 <div class="close-modal-icon-container">
@@ -630,7 +529,7 @@
                 <img src="images/habits-container-icons/icons8-color-mode-16.png" class="color-picker-icon" id="colorPickerIcon">
                 <input type="color" id="folderColorPicker" class="hidden-color-picker">
             </div>
-            <button class="add-folder-button">Add Folder</button>
+            <button id="addFolderButton" class="add-folder-button">Add Folder</button>
         </div>
     </div>
 </body>
