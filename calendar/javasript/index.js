@@ -3,61 +3,136 @@ let currentDate = new Date();
 let currentView = 'month';
 let calendarEvents = [];
 
-const monthView = document.getElementById('monthView');
-const weekView = document.getElementById('weekView');
-const dayView = document.getElementById('dayView');
-const yearView = document.getElementById('yearView');
-const monthGrid = document.getElementById('monthGrid');
-const weekTimeGrid = document.getElementById('weekTimeGrid');
-const dayTimeGrid = document.getElementById('dayTimeGrid');
-const yearGrid = document.getElementById('yearGrid');
-const currentDisplay = document.getElementById('currentDisplay');
-const todayBtn = document.querySelector('.today-button');
+// DOM elements will be initialized after DOM is loaded
+let monthView, weekView, dayView, yearView, monthGrid, weekTimeGrid, dayTimeGrid, yearGrid, currentDisplay, todayBtn;
+let weekViewBtn, dayViewBtn, monthViewBtn, yearViewBtn;
 
+// Initialize the calendar when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DOM elements
+    monthView = document.getElementById('monthView');
+    weekView = document.getElementById('weekView');
+    dayView = document.getElementById('dayView');
+    yearView = document.getElementById('yearView');
+    monthGrid = document.getElementById('monthGrid');
+    weekTimeGrid = document.getElementById('weekTimeGrid');
+    dayTimeGrid = document.getElementById('dayTimeGrid');
+    yearGrid = document.getElementById('yearGrid');
+    currentDisplay = document.getElementById('currentDisplay');
+    todayBtn = document.querySelector('.today-button');
 
+    // Initialize view buttons
+    weekViewBtn = document.querySelector('.weekViewBtn');
+    dayViewBtn = document.querySelector('.dayViewBtn');
+    monthViewBtn = document.querySelector('.monthViewBtn');
+    yearViewBtn = document.querySelector('.yearViewBtn');
 
-// View buttons
-const weekViewBtn = document.querySelector('.weekViewBtn');
-const dayViewBtn = document.querySelector('.dayViewBtn');
-const monthViewBtn = document.querySelector('.monthViewBtn');
-const yearViewBtn = document.querySelector('.yearViewBtn');
+    // Set up view switch event listeners
+    if (weekViewBtn) {
+        weekViewBtn.addEventListener('click', () => {
+            currentView = 'week';
+            renderWeekView(currentDate);
+            updateDropdownText();
+        });
+    }
+    if (dayViewBtn) {
+        dayViewBtn.addEventListener('click', () => {
+            currentView = 'day';
+            renderDayView(currentDate);
+            updateDropdownText();
+        });
+    }
+    if (monthViewBtn) {
+        monthViewBtn.addEventListener('click', () => {
+            currentView = 'month';
+            renderMonthView(currentDate);
+            updateDropdownText();
+        });
+    }
+    if (yearViewBtn) {
+        yearViewBtn.addEventListener('click', () => {
+            currentView = 'year';
+            renderYearView(currentDate);
+            updateDropdownText();
+        });
+    }
 
-// View switch event listeners
-if (weekViewBtn) {
-    weekViewBtn.addEventListener('click', () => {
-        currentView = 'week';
-        renderWeekView(currentDate);
-    });
-}
-if (dayViewBtn) {
-    dayViewBtn.addEventListener('click', () => {
-        currentView = 'day';
-        renderDayView(currentDate);
-    });
-}
-if (monthViewBtn) {
-    monthViewBtn.addEventListener('click', () => {
-        currentView = 'month';
+    // Initial render
+    if (currentView === 'month') {
         renderMonthView(currentDate);
-    });
-}
-if (yearViewBtn) {
-    yearViewBtn.addEventListener('click', () => {
-        currentView = 'year';
+    } else if (currentView === 'week') {
+        renderWeekView(currentDate);
+    } else if (currentView === 'day') {
+        renderDayView(currentDate);
+    } else if (currentView === 'year') {
         renderYearView(currentDate);
-    });
-}
+    }
+    updateDropdownText();
 
-// Initial render
-if (currentView === 'month') {
-    renderMonthView(currentDate);
-} else if (currentView === 'week') {
-    renderWeekView(currentDate);
-} else if (currentView === 'day') {
-    renderDayView(currentDate);
-} else if (currentView === 'year') {
-    renderYearView(currentDate);
-}
+    // Initialize color pickers
+    setupColorPickers();
+
+    // Set up event listeners for the calendar navigation
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const todayBtn = document.getElementById('todayBtn');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderMonthView(currentDate);
+            } else if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() - 7);
+                renderWeekView(currentDate);
+            } else if (currentView === 'day') {
+                currentDate.setDate(currentDate.getDate() - 1);
+                renderDayView(currentDate);
+            } else if (currentView === 'year') {
+                currentDate.setFullYear(currentDate.getFullYear() - 1);
+                renderYearView(currentDate);
+            }
+            updateDropdownText();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderMonthView(currentDate);
+            } else if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() + 7);
+                renderWeekView(currentDate);
+            } else if (currentView === 'day') {
+                currentDate.setDate(currentDate.getDate() + 1);
+                renderDayView(currentDate);
+            } else if (currentView === 'year') {
+                currentDate.setFullYear(currentDate.getFullYear() + 1);
+                renderYearView(currentDate);
+            }
+            updateDropdownText();
+        });
+    }
+
+    if (todayBtn) {
+        todayBtn.addEventListener('click', () => {
+            currentDate = new Date();
+            if (currentView === 'month') {
+                renderMonthView(currentDate);
+            } else if (currentView === 'week') {
+                renderWeekView(currentDate);
+            } else if (currentView === 'day') {
+                renderDayView(currentDate);
+            } else if (currentView === 'year') {
+                renderYearView(currentDate);
+            }
+            updateDropdownText();
+        });
+    }
+});
+
+
 
 // Today button event listener
 if (todayBtn) {
@@ -170,9 +245,11 @@ function renderMonthView(date) {
             eventsList.className = 'month-events-list';
             eventsForDay.forEach(ev => {
                 const evDiv = document.createElement('div');
-                evDiv.className = 'month-event px-1 py-0.5 rounded mb-1 bg-blue-100 text-xs text-blue-900 truncate';
+                evDiv.className = 'month-event px-1 py-0.5 rounded mb-1 text-xs truncate';
                 evDiv.style.cursor = 'pointer';
-                evDiv.addEventListener('click', function(e) {
+                evDiv.style.backgroundColor = ev.color ? `${ev.color}20` : '#e3f2fd';
+                evDiv.style.color = ev.color || '#0d47a1';
+                evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
                     openEditEventModal(ev.id);
                 });
@@ -216,10 +293,6 @@ function renderMonthView(date) {
     }
 }
 
-
-
-
-// for the week view 
 function renderWeekView(date) {
     // Set week date range above grid
     // Hide other views, show week view
@@ -227,6 +300,53 @@ function renderWeekView(date) {
     if (weekView) weekView.style.display = 'block';
     if (yearGrid) yearGrid.style.display = 'none';
     if (dayView) dayView.style.display = 'none';
+
+    // Clear all-day events row
+    const weekAllDayEvents = document.getElementById('weekAllDayEvents');
+    if (weekAllDayEvents) {
+        weekAllDayEvents.innerHTML = '';
+        
+        // Create a cell for each day of the week
+        for (let d = 0; d < 7; d++) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell p-1 min-h-[2rem]';
+            dayCell.dataset.date = formatDateToISO(new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + d));
+            
+            // Find all-day events for this day
+            const allDayEvents = calendarEvents.filter(ev => 
+                ev.date === dayCell.dataset.date && ev.allDay
+            );
+            
+            // Add each all-day event
+            allDayEvents.forEach(ev => {
+                const evDiv = document.createElement('div');
+                evDiv.className = 'all-day-event px-2 py-1 rounded text-xs truncate mb-1';
+                evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
+                evDiv.style.color = ev.color || '#0d47a1';
+                evDiv.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+                evDiv.style.cursor = 'pointer';
+                evDiv.textContent = ev.title;
+                
+                evDiv.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openEditEventModal(ev.id);
+                });
+                
+                dayCell.appendChild(evDiv);
+            });
+            
+            // Make empty cells clickable to add new all-day events
+            if (allDayEvents.length === 0) {
+                dayCell.style.minHeight = '2rem';
+                dayCell.style.cursor = 'pointer';
+                dayCell.addEventListener('click', function() {
+                    openAddEventModal(dayCell.dataset.date, 0, true);
+                });
+            }
+            
+            weekAllDayEvents.appendChild(dayCell);
+        }
+    }
 
     // Set header to week range, e.g., 'Jul 20 – Jul 26, 2025'
     if (currentDisplay) {
@@ -285,7 +405,7 @@ function renderWeekView(date) {
         weekTimeGrid.innerHTML = '';
     }
 
-    // Define time slots (e.g., 8:00 to 20:00)
+    // Define time slots (e.g., 1:00 to 24:00)
     const startHour = 1;
     const endHour = 24;
     const hours = [];
@@ -322,35 +442,59 @@ function renderWeekView(date) {
             dayCell.dataset.date = cellDateStr;
             dayCell.dataset.hour = rowHour;
 
-            // Render events for this date and hour
-            const eventsForCell = calendarEvents.filter(ev => {
-                if (ev.date !== cellDateStr) return false;
-                if (ev.allDay) return false;
-                // Place event if startTime matches this hour
-                if (ev.startTime) {
-                    const [h, m] = ev.startTime.split(":").map(Number);
-                    return h === rowHour;
-                }
-                return false;
-            });
-            eventsForCell.forEach(ev => {
-                const evDiv = document.createElement('div');
-                evDiv.className = 'week-event px-1 py-0.5 rounded mb-1 bg-green-100 text-xs text-green-900 truncate';
-                evDiv.style.cursor = 'pointer';
-                evDiv.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    openEditEventModal(ev.id);
-                });
+            // Check if any event spans this hour for this day
+            const eventsForCell = [];
+            calendarEvents.forEach(ev => {
+                if (ev.date !== cellDateStr || ev.allDay) return;
+                
+                const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
+                let endH = 23, endM = 59; // Default to end of day if no end time
+                
                 if (ev.endTime) {
-                    evDiv.textContent = `${ev.title} (${ev.startTime} - ${ev.endTime})`;
-                } else {
-                    evDiv.textContent = `${ev.title} (${ev.startTime})`;
+                    [endH, endM] = ev.endTime.split(":").map(Number);
+                    // If end time is on the hour, include the previous hour
+                    if (endM === 0) endH--;
                 }
-                dayCell.appendChild(evDiv);
+                
+                // Check if current hour is within event's time range
+                if (rowHour >= startH && rowHour <= endH) {
+                    eventsForCell.push(ev);
+                    
+                    // Color the entire cell for this hour
+                    dayCell.style.backgroundColor = ev.color ? `${ev.color}15` : '#e3f2fd';
+                    dayCell.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+                }
+            });
+            
+            // Only show event details in the starting hour cell
+            eventsForCell.forEach(ev => {
+                const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
+                if (rowHour === startH) {
+                    const evDiv = document.createElement('div');
+                    evDiv.className = 'week-event px-1 py-0.5 rounded mb-1 text-xs truncate';
+                    evDiv.style.cursor = 'pointer';
+                    evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
+                    evDiv.style.color = ev.color || '#0d47a1';
+                    evDiv.style.borderLeft = `2px solid ${ev.color || '#4285F4'}`;
+                    evDiv.style.margin = '2px';
+                    evDiv.style.padding = '2px 4px';
+                    
+                    evDiv.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        openEditEventModal(ev.id);
+                    });
+                    
+                    let timeText = ev.startTime || '';
+                    if (ev.endTime) {
+                        timeText += ` - ${ev.endTime}`;
+                    }
+                    evDiv.textContent = `${ev.title}${timeText ? ` (${timeText})` : ''}`;
+                    dayCell.appendChild(evDiv);
+                }
             });
             // Add event by clicking empty week cell
-            dayCell.addEventListener('click', function(e) {
-                console.log('Week cell clicked:', {target: e.target, classList: e.target.classList, cellDateStr, rowHour});
+            dayCell.addEventListener('click', function (e) {
+                console.log('Week cell clicked:', { target: e.target, classList: e.target.classList, cellDateStr, rowHour });
                 if (!e.target.classList.contains('week-event')) {
                     console.log('Opening Add Event modal for', cellDateStr, rowHour);
                     openAddEventModal(cellDateStr, rowHour);
@@ -358,28 +502,11 @@ function renderWeekView(date) {
                     console.log('Click was on an event, not opening Add Event modal.');
                 }
             });
-            // All-day events: show at top row (hour==1)
-            if (rowHour === 1) {
-                const allDayEvents = calendarEvents.filter(ev => ev.date === cellDateStr && ev.allDay);
-                allDayEvents.forEach(ev => {
-                    const evDiv = document.createElement('div');
-                    evDiv.className = 'week-event px-1 py-0.5 rounded mb-1 bg-blue-200 text-xs text-blue-900 truncate';
-                    evDiv.style.cursor = 'pointer';
-                    evDiv.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        openEditEventModal(ev.id);
-                    });
-                    evDiv.textContent = `${ev.title} (All Day)`;
-                    dayCell.appendChild(evDiv);
-                });
-            }
+            // All-day events are now handled in the dedicated all-day row above
             weekTimeGrid.appendChild(dayCell);
         }
     }
 }
-
-
-
 
 // for the day view
 
@@ -391,6 +518,7 @@ function renderDayView(date) {
     const monthView = document.getElementById('monthView');
     const currentDisplay = document.getElementById('currentDisplay');
     const dayTimeGrid = document.getElementById('dayTimeGrid');
+    const dayViewContent = dayView.querySelector('.day-view-content');
 
     if (!dayView) {
         console.error('dayView container not found');
@@ -402,37 +530,94 @@ function renderDayView(date) {
     }
 
     // Hide other views, show day view
-    dayView.style.display = 'block';
+    dayView.style.display = 'flex';
     if (weekView) weekView.style.display = 'none';
     if (monthView) monthView.style.display = 'none';
     if (yearGrid) yearGrid.style.display = 'none';
-    // Set header to 'Day, Month Date, Year', e.g., 'Saturday, July 26, 2025'
+    
+    // Set the main header (if needed)
     if (currentDisplay) {
-        currentDisplay.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(date);
+        currentDisplay.textContent = new Intl.DateTimeFormat('en-US', { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric' 
+        }).format(date);
     }
 
-    // Remove any existing day view header
-    const oldHeader = dayView.querySelector('.day-view-header');
-    if (oldHeader) oldHeader.remove();
+    // Update or create day view header
+    let dayViewHeader = dayView.querySelector('.day-view-header');
+    if (!dayViewHeader) {
+        dayViewHeader = document.createElement('div');
+        dayViewHeader.classList.add('day-view-header');
+        dayView.insertBefore(dayViewHeader, dayViewContent);
+    } else {
+        dayViewHeader.innerHTML = '';
+    }
 
-    // Add day view header with full date
-    const dayViewHeader = document.createElement('div');
-    dayViewHeader.classList.add('day-view-header');
     // Highlight header if today
     const today = new Date();
-    if (
-        date.getFullYear() === today.getFullYear() &&
-        date.getMonth() === today.getMonth() &&
-        date.getDate() === today.getDate()
-    ) {
+    const isToday = date.getFullYear() === today.getFullYear() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getDate() === today.getDate();
+    
+    if (isToday) {
         dayViewHeader.classList.add('day-header-today');
+    } else {
+        dayViewHeader.classList.remove('day-header-today');
     }
-    dayViewHeader.innerHTML = `<span class=\"day-header-date\">${date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>`;
-    dayView.insertBefore(dayViewHeader, dayTimeGrid);
 
-    // Clear grid
+    // Set the header content
+    dayViewHeader.textContent = date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+    });
+
+    // Clear the time grid
     dayTimeGrid.innerHTML = '';
     console.log('dayTimeGrid cleared, ready to populate');
+
+    // Clear all-day events row
+    const dayAllDayEvents = document.getElementById('dayAllDayEvents');
+    if (dayAllDayEvents) {
+        dayAllDayEvents.innerHTML = '';
+        
+        // Find all-day events for this day
+        const allDayEvents = calendarEvents.filter(ev => 
+            ev.date === formatDateToISO(date) && ev.allDay
+        );
+        
+        // Add each all-day event
+        allDayEvents.forEach(ev => {
+            const evDiv = document.createElement('div');
+            evDiv.className = 'all-day-event px-3 py-2 rounded text-sm mb-1 inline-block mr-2';
+            evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
+            evDiv.style.color = ev.color || '#0d47a1';
+            evDiv.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+            evDiv.style.cursor = 'pointer';
+            evDiv.textContent = ev.title;
+            
+            evDiv.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openEditEventModal(ev.id);
+            });
+            
+            dayAllDayEvents.appendChild(evDiv);
+        });
+        
+        // Add "+ Add" button if no all-day events
+        if (allDayEvents.length === 0) {
+            const addButton = document.createElement('button');
+            addButton.className = 'text-xs text-gray-500 hover:text-blue-500';
+            addButton.innerHTML = '+ Add';
+            addButton.addEventListener('click', function() {
+                openAddEventModal(formatDateToISO(date), 0, true);
+            });
+            dayAllDayEvents.appendChild(addButton);
+        }
+    }
 
     // Define time slots (e.g., 1:00 to 24:00)
     const startHour = 1;
@@ -449,9 +634,11 @@ function renderDayView(date) {
         allDayRow.className = 'day-all-day-events mb-2';
         allDayEvents.forEach(ev => {
             const evDiv = document.createElement('div');
-            evDiv.className = 'day-event px-1 py-0.5 rounded mb-1 bg-blue-200 text-xs text-blue-900 truncate';
+            evDiv.className = 'day-event px-1 py-0.5 rounded mb-1 text-xs truncate';
             evDiv.style.cursor = 'pointer';
-            evDiv.addEventListener('click', function(e) {
+            evDiv.style.backgroundColor = ev.color ? `${ev.color}20` : '#e3f2fd';
+            evDiv.style.color = ev.color || '#0d47a1';
+            evDiv.addEventListener('click', function (e) {
                 e.stopPropagation();
                 openEditEventModal(ev.id);
             });
@@ -479,30 +666,55 @@ function renderDayView(date) {
         dayCell.dataset.date = formatDateToISO(date);
         dayCell.dataset.hour = rowHour;
 
-        // Render events for this hour
-        const eventsForHour = calendarEvents.filter(ev => {
-            if (ev.date !== formatDateToISO(date)) return false;
-            if (ev.allDay) return false;
-            if (ev.startTime) {
-                const [h, m] = ev.startTime.split(":").map(Number);
-                return h === rowHour;
-            }
-            return false;
-        });
-        eventsForHour.forEach(ev => {
-            const evDiv = document.createElement('div');
-            evDiv.className = 'day-event px-1 py-0.5 rounded mb-1 bg-green-100 text-xs text-green-900 truncate';
-            evDiv.style.cursor = 'pointer';
-            evDiv.addEventListener('click', function(e) {
-                e.stopPropagation();
-                openEditEventModal(ev.id);
-            });
+        // Check if any event spans this hour
+        const eventsForHour = [];
+        calendarEvents.forEach(ev => {
+            if (ev.date !== formatDateToISO(date) || ev.allDay) return;
+            
+            const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
+            let endH = 23, endM = 59; // Default to end of day if no end time
+            
             if (ev.endTime) {
-                evDiv.textContent = `${ev.title} (${ev.startTime} - ${ev.endTime})`;
-            } else {
-                evDiv.textContent = `${ev.title} (${ev.startTime})`;
+                [endH, endM] = ev.endTime.split(":").map(Number);
+                // If end time is on the hour, include the previous hour
+                if (endM === 0) endH--;
             }
-            dayCell.appendChild(evDiv);
+            
+            // Check if current hour is within event's time range
+            if (rowHour >= startH && rowHour <= endH) {
+                eventsForHour.push(ev);
+                
+                // Color the entire cell for this hour
+                dayCell.style.backgroundColor = ev.color ? `${ev.color}15` : '#e3f2fd';
+                dayCell.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+            }
+        });
+        
+        // Only show event details in the starting hour cell
+        eventsForHour.forEach(ev => {
+            const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
+            if (rowHour === startH) {
+                const evDiv = document.createElement('div');
+                evDiv.className = 'day-event px-1 py-0.5 rounded mb-1 text-xs truncate';
+                evDiv.style.cursor = 'pointer';
+                evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
+                evDiv.style.color = ev.color || '#0d47a1';
+                evDiv.style.borderLeft = `2px solid ${ev.color || '#4285F4'}`;
+                evDiv.style.margin = '2px';
+                evDiv.style.padding = '2px 4px';
+                
+                evDiv.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    openEditEventModal(ev.id);
+                });
+                
+                let timeText = ev.startTime || '';
+                if (ev.endTime) {
+                    timeText += ` - ${ev.endTime}`;
+                }
+                evDiv.textContent = `${ev.title}${timeText ? ` (${timeText})` : ''}`;
+                dayCell.appendChild(evDiv);
+            }
         });
 
         // Add event on cell click
@@ -517,236 +729,134 @@ function renderDayView(date) {
     console.log('dayTimeGrid:', dayTimeGrid, 'children:', dayTimeGrid.children.length, 'dayView.style.display:', dayView.style.display, 'computed display:', getComputedStyle(dayView).display);
 }
 
-
-
-
-
-//for the year view function
-function renderYearView(date) {
-    // Show year view, hide others
-    if (monthView && weekView && yearView && dayView) {
-        monthView.style.display = 'none';
-        weekView.style.display = 'none';
-        yearView.style.display = 'block';
-        dayView.style.display = 'none';
-    }
-
-    // Clear the year grid
-    yearGrid.innerHTML = '';
-
-    // Get the year from provided date
-    const year = date.getFullYear();
-
-    // Set header to current year
-    if (currentDisplay) {
-        currentDisplay.textContent = year;
-    }
-    const today = new Date();
-
-    // Set up year grid as 4 columns, 3 rows
-    yearGrid.style.display = 'grid';
-    yearGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-    yearGrid.style.gap = '1rem';
-
-    for (let month = 0; month < 12; month++) {
-        // Month container
-        const monthCell = document.createElement('div');
-        monthCell.classList.add('month-cell', 'border', 'border-gray-200', 'bg-white', 'rounded-lg', 'shadow-sm', 'p-2');
-        monthCell.style.minWidth = '160px';
-
-        // Month name
-        const monthName = document.createElement('div');
-        monthName.classList.add('font-semibold', 'text-center', 'mb-1');
-        monthName.textContent = new Date(year, month, 1).toLocaleString('en-US', { month: 'long' });
-        monthCell.appendChild(monthName);
-
-        // Mini month grid
-        const miniGrid = document.createElement('div');
-        miniGrid.classList.add('mini-month-grid');
-        miniGrid.style.display = 'grid';
-        miniGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
-        miniGrid.style.gap = '2px';
-
-        // Days of week header
-        const daysShort = ['S','M','T','W','T','F','S'];
-        for (let d = 0; d < 7; d++) {
-            const dow = document.createElement('div');
-            dow.classList.add('mini-day-cell', 'text-xs', 'font-bold', 'text-center', 'text-gray-500');
-            dow.textContent = daysShort[d];
-            miniGrid.appendChild(dow);
-        }
-
-        // Find first day of month and number of days
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        // Fill in blanks for days before the 1st
-        for (let i = 0; i < firstDay; i++) {
-            const blank = document.createElement('div');
-            blank.classList.add('mini-day-cell');
-            miniGrid.appendChild(blank);
-        }
-
-        // Fill in days of the month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dayCell = document.createElement('div');
-            dayCell.classList.add('mini-day-cell', 'text-xs', 'text-center', 'rounded', 'cursor-pointer', 'hover:bg-blue-100');
-            dayCell.textContent = day;
-            dayCell.style.width = '20px';
-            dayCell.style.height = '20px';
-            dayCell.style.margin = 'auto';
-
-            // Highlight today
-            if (
-                year === today.getFullYear() &&
-                month === today.getMonth() &&
-                day === today.getDate()
-            ) {
-                dayCell.classList.add('bg-blue-500', 'text-white', 'font-bold');
-            }
-
-            miniGrid.appendChild(dayCell);
-        }
-
-        monthCell.appendChild(miniGrid);
-        yearGrid.appendChild(monthCell);
-    }
-}
-
-
-
-
-// checking what view user want
-prevBtn.addEventListener('click', () => {
-    if (currentView === 'month') {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        renderMonthView(currentDate);
-    } else if (currentView === 'week') {
-        currentDate.setDate(currentDate.getDate() - 7);
-        renderWeekView(currentDate);
-    } else if (currentView === 'day') {
-        currentDate.setDate(currentDate.getDate() - 1);
-        renderDayView(currentDate);
-    } else if (currentView === 'year') {
-        currentDate.setFullYear(currentDate.getFullYear() - 1);
-        renderYearView(currentDate);
-    }
-});
-
-
-
-
-
-// button for seeing month
-nextBtn.addEventListener('click', () => {
-    if (currentView === 'month') {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderMonthView(currentDate);
-    } else if (currentView === 'week') {
-        currentDate.setDate(currentDate.getDate() + 7);
-        renderWeekView(currentDate);
-    } else if (currentView === 'day') {
-        currentDate.setDate(currentDate.getDate() + 1);
-        renderDayView(currentDate);
-    } else if (currentView === 'year') {
-        currentDate.setFullYear(currentDate.getFullYear() + 1);
-        renderYearView(currentDate);
-    }
-});
-
-
-
-// button for today
-if (window.todayBtn) {
-    window.todayBtn.addEventListener('click', () => {
-        currentDate = new Date();
-        if (currentView === 'month') {
-            renderMonthView(currentDate);
-        } else if (currentView === 'week') {
-            renderWeekView(currentDate);
-        } else if (currentView === 'day') {
-            renderDayView(currentDate);
-        } else if (currentView === 'year') {
-            renderYearView(currentDate);
-        }
-    });
-}
-
-
-
-
-// Add Event Button & Modal Logic
-
-document.addEventListener('DOMContentLoaded', () => {
-    // DOM assignments
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const currentDisplay = document.getElementById('currentDisplay');
-    const todayBtn = document.querySelector('.today-button');
-    const monthView = document.getElementById('monthView');
-    const weekView = document.getElementById('weekView');
-    const monthGrid = document.getElementById('monthGrid');
-    const weekTimeGrid = document.getElementById('weekTimeGrid');
-    const dayTimeGrid = document.getElementById('dayTimeGrid');
-    const yearGrid = document.getElementById('yearGrid');
-    const yearView = document.getElementById('yearView');
+// Utility: open Add Event modal with date/time prefilled
+function openAddEventModal(date, hour, isAllDay = false) {
+    const eventDateInput = document.getElementById('eventDate');
+    const eventStartTime = document.getElementById('startTime');
+    const eventEndTime = document.getElementById('endTime');
+    const eventAllDay = document.getElementById('allDay');
+    const timeFields = document.getElementById('timeFields');
     
-    // View buttons
+    if (eventDateInput && date) eventDateInput.value = date;
+    
+    if (isAllDay) {
+        if (eventAllDay) eventAllDay.checked = true;
+        if (timeFields) timeFields.style.display = 'none';
+        if (eventStartTime) eventStartTime.value = '00:00';
+        if (eventEndTime) eventEndTime.value = '23:59';
+    } else {
+        if (eventAllDay) eventAllDay.checked = false;
+        if (timeFields) timeFields.style.display = 'block';
+        if (hour) {
+            if (eventStartTime) eventStartTime.value = `${String(hour).padStart(2, '0')}:00`;
+            if (eventEndTime) eventEndTime.value = `${String(hour + 1).padStart(2, '0')}:00`;
+        }
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+    modal.show();
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up event listeners for view buttons
     const weekViewBtn = document.querySelector('.weekViewBtn');
     const dayViewBtn = document.querySelector('.dayViewBtn');
     const monthViewBtn = document.querySelector('.monthViewBtn');
     const yearViewBtn = document.querySelector('.yearViewBtn');
-
-
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const todayBtn = document.querySelector('.today-button');
+    const addEventBtn = document.getElementById('addEventBtn');
+    
     // View switch event listeners
     if (weekViewBtn) {
         weekViewBtn.addEventListener('click', () => {
             currentView = 'week';
             renderWeekView(currentDate);
+            updateDropdownText();
         });
     }
+    
     if (dayViewBtn) {
         dayViewBtn.addEventListener('click', () => {
             currentView = 'day';
             renderDayView(currentDate);
+            updateDropdownText();
         });
     }
+    
     if (monthViewBtn) {
         monthViewBtn.addEventListener('click', () => {
             currentView = 'month';
             renderMonthView(currentDate);
+            updateDropdownText();
         });
     }
+    
     if (yearViewBtn) {
         yearViewBtn.addEventListener('click', () => {
             currentView = 'year';
             renderYearView(currentDate);
+            updateDropdownText();
         });
     }
-
-
-
-    // Add Event button opens modal
-    const addEventBtn = document.getElementById('addEventBtn');
-    const addEventModal = document.getElementById('addEventModal');
-    const addEventForm = document.getElementById('addEventForm');
-
-    // Utility: open Add Event modal with date/time prefilled
-    function openAddEventModal(date, hour) {
-        const eventDateInput = document.getElementById('eventDate');
-        const eventStartTime = document.getElementById('eventStartTime');
-        const eventEndTime = document.getElementById('eventEndTime');
-        const eventAllDay = document.getElementById('eventAllDay');
-        if (eventDateInput && date) eventDateInput.value = date;
-        if (eventStartTime && hour) eventStartTime.value = String(hour).padStart(2, '0') + ':00';
-        if (eventEndTime && hour) eventEndTime.value = '';
-        if (eventAllDay) eventAllDay.checked = false;
-        if (eventAllDay) eventAllDay.dispatchEvent(new Event('change'));
-        const modal = new bootstrap.Modal(addEventModal);
-        modal.show();
+    
+    // Navigation buttons
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderMonthView(currentDate);
+            } else if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() - 7);
+                renderWeekView(currentDate);
+            } else if (currentView === 'day') {
+                currentDate.setDate(currentDate.getDate() - 1);
+                renderDayView(currentDate);
+            } else if (currentView === 'year') {
+                currentDate.setFullYear(currentDate.getFullYear() - 1);
+                renderYearView(currentDate);
+            }
+        });
     }
-
-    if (addEventBtn && addEventModal) {
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderMonthView(currentDate);
+            } else if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() + 7);
+                renderWeekView(currentDate);
+            } else if (currentView === 'day') {
+                currentDate.setDate(currentDate.getDate() + 1);
+                renderDayView(currentDate);
+            } else if (currentView === 'year') {
+                currentDate.setFullYear(currentDate.getFullYear() + 1);
+                renderYearView(currentDate);
+            }
+        });
+    }
+    
+    // Today button
+    if (todayBtn) {
+        todayBtn.addEventListener('click', () => {
+            currentDate = new Date();
+            if (currentView === 'month') {
+                renderMonthView(currentDate);
+            } else if (currentView === 'week') {
+                renderWeekView(currentDate);
+            } else if (currentView === 'day') {
+                renderDayView(currentDate);
+            } else if (currentView === 'year') {
+                renderYearView(currentDate);
+            }
+        });
+    }
+    
+    // Add event button
+    if (addEventBtn) {
         addEventBtn.addEventListener('click', () => {
             // Set default date to today
             const today = new Date();
@@ -776,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (eventAllDay && eventTimeFields && eventStartTime && eventEndTime) {
-        eventAllDay.addEventListener('change', function() {
+        eventAllDay.addEventListener('change', function () {
             if (eventAllDay.checked) {
                 eventStartTime.value = '';
                 eventEndTime.value = '';
@@ -805,12 +915,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const editEventStartTime = document.getElementById('editEventStartTime');
     const editEventEndTime = document.getElementById('editEventEndTime');
     const editEventDescription = document.getElementById('editEventDescription');
-
-
+    const editEventColor = document.getElementById('editEventColor');
 
     // All Day toggle for edit modal
     if (editEventAllDay && editEventTimeFields && editEventStartTime && editEventEndTime) {
-        editEventAllDay.addEventListener('change', function() {
+        editEventAllDay.addEventListener('change', function () {
             if (editEventAllDay.checked) {
                 editEventStartTime.value = '';
                 editEventEndTime.value = '';
@@ -827,7 +936,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle save changes
     if (editEventForm) {
-        editEventForm.addEventListener('submit', function(e) {
+        editEventForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const id = editEventId.value;
             const idx = calendarEvents.findIndex(ev => ev.id === id);
@@ -838,9 +947,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 calendarEvents[idx].startTime = (!editEventAllDay.checked && editEventStartTime) ? editEventStartTime.value : null;
                 calendarEvents[idx].endTime = (!editEventAllDay.checked && editEventEndTime) ? editEventEndTime.value : null;
                 calendarEvents[idx].description = editEventDescription.value;
+                calendarEvents[idx].color = editEventColor.value || '#4285F4';
                 // Save to localStorage
                 if (window.localStorage) {
-                    try { localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents)); } catch (e) {}
+                    try { localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents)); } catch (e) { }
                 }
                 // Close modal and re-render
                 const modal = bootstrap.Modal.getInstance(editEventModal);
@@ -856,66 +966,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    
-    // Handle delete
-    if (deleteEventBtn) {
-        deleteEventBtn.addEventListener('click', function() {
-            const id = editEventId.value;
-            const idx = calendarEvents.findIndex(ev => ev.id === id);
-            if (idx !== -1) {
-                calendarEvents.splice(idx, 1);
-                if (window.localStorage) {
-                    try { localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents)); } catch (e) {}
-                }
-                const modal = bootstrap.Modal.getInstance(editEventModal);
-                if (modal) modal.hide();
-                if (currentView === 'month') {
-                    renderMonthView(currentDate);
-                } else if (currentView === 'week') {
-                    renderWeekView(currentDate);
-                } else if (currentView === 'day') {
-                    renderDayView(currentDate);
-                }
-            }
-        });
-    }
-
     // Utility: open edit modal with event data
     function openEditEventModal(eventId) {
-        const ev = calendarEvents.find(ev => ev.id === eventId);
-        if (!ev) return;
-        editEventId.value = ev.id;
-        editEventTitle.value = ev.title;
-        editEventDate.value = ev.date;
-        editEventAllDay.checked = !!ev.allDay;
-        editEventStartTime.value = ev.startTime || '';
-        editEventEndTime.value = ev.endTime || '';
-        editEventDescription.value = ev.description || '';
+        const event = calendarEvents.find(ev => ev.id === eventId);
+        if (!event) return;
+
+        editEventId.value = event.id;
+        editEventTitle.value = event.title;
+        editEventDate.value = event.date;
+        editEventAllDay.checked = event.allDay || false;
+        editEventStartTime.value = event.startTime || '';
+        editEventEndTime.value = event.endTime || '';
+        editEventDescription.value = event.description || '';
+        editEventColor.value = event.color || '#4285F4';
+
+        // Set the color picker
+        const color = event.color || '#4285F4';
+        document.querySelectorAll('#editEventModal .color-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.getAttribute('data-color') === color) {
+                option.classList.add('selected');
+            }
+        });
         if (editEventAllDay) editEventAllDay.dispatchEvent(new Event('change'));
         const modal = new bootstrap.Modal(editEventModal);
         modal.show();
     }
 
     if (addEventForm) {
-        addEventForm.addEventListener('submit', function(e) {
+        addEventForm.addEventListener('submit', function (e) {
             e.preventDefault();
             // Collect form data
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
-            const allDay = eventAllDay ? eventAllDay.checked : false;
-            const startTime = (!allDay && eventStartTime) ? eventStartTime.value : null;
-            const endTime = (!allDay && eventEndTime) ? eventEndTime.value : null;
+            const allDay = document.getElementById('eventAllDay').checked;
+            const startTime = document.getElementById('eventStartTime').value;
+            const endTime = document.getElementById('eventEndTime').value;
             const description = document.getElementById('eventDescription').value;
-            // Save event to global array
+            const color = document.getElementById('eventColor').value || '#4285F4';
+
+            // Create event object
             const newEvent = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-                title,
-                date,
-                allDay,
-                startTime,
-                endTime,
-                description
+                title: title,
+                date: date,
+                allDay: allDay,
+                startTime: allDay ? null : startTime,
+                endTime: allDay ? null : endTime,
+                description: description || '',
+                color: document.getElementById('eventColor').value || '#4285F4'
             };
             calendarEvents.push(newEvent);
             console.log('Event added:', newEvent);
@@ -924,103 +1023,171 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.localStorage) {
                 try {
                     localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
-                } catch (e) {}
+                } catch (e) { }
             }
             // Re-render current view
             console.log('Re-rendering current view:', currentView, currentDate);
-            if (currentView === 'month') {
-                renderMonthView(currentDate);
-            } else if (currentView === 'week') {
-                renderWeekView(currentDate);
-            } else if (currentView === 'day') {
-                renderDayView(currentDate);
-            }
-            // Re-render the current view after adding event
-            if (currentView === 'month') {
-                renderMonthView(currentDate);
-            } else if (currentView === 'week') {
-                renderWeekView(currentDate);
-            } else if (currentView === 'day') {
-                renderDayView(currentDate);
-            } else if (currentView === 'year') {
-                renderYearView(currentDate);
+            switch (currentView) {
+                case 'month':
+                    renderMonthView(currentDate);
+                    break;
+                case 'week':
+                    renderWeekView(currentDate);
+                    break;
+                case 'day':
+                    renderDayView(currentDate);
+                    break;
+                case 'year':
+                    renderYearView(currentDate);
+                    break;
             }
             // Close modal and clear form
             const modal = bootstrap.Modal.getInstance(addEventModal);
             if (modal) modal.hide();
+            // Clear form and reset color picker
             addEventForm.reset();
-            // Optionally, show a toast or alert for success
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            const defaultColor = document.querySelector('.color-option[data-color="#4285F4"]');
+            if (defaultColor) defaultColor.classList.add('selected');
+            // Reset event color input
+            const eventColorInput = document.getElementById('eventColor');
+            if (eventColorInput) eventColorInput.value = '#4285F4';
+            // Reset all day toggle
             if (eventAllDay) eventAllDay.dispatchEvent(new Event('change'));
         });
     }
 
-    window.monthViewBtn = document.querySelector('.monthViewBtn');
-    window.weekViewBtn = document.querySelector('.weekViewBtn');
-    window.dayViewBtn = document.querySelector('.dayViewBtn');
+    // Initialize view buttons in global scope and set up event listeners
+    const setupViewButtons = () => {
+        if (monthViewBtn) {
+            monthViewBtn.addEventListener('click', () => {
+                currentView = 'month';
+                renderMonthView(currentDate);
+                updateDropdownText();
+            });
+        }
+        if (weekViewBtn) {
+            weekViewBtn.addEventListener('click', () => {
+                currentView = 'week';
+                renderWeekView(currentDate);
+                updateDropdownText();
+            });
+        }
+        if (dayViewBtn) {
+            dayViewBtn.addEventListener('click', () => {
+                currentView = 'day';
+                renderDayView(currentDate);
+                updateDropdownText();
+            });
+        }
+        if (yearViewBtn) {
+            yearViewBtn.addEventListener('click', () => {
+                currentView = 'year';
+                renderYearView(currentDate);
+                updateDropdownText();
+            });
+        }
+    };
+    
+    setupViewButtons();
 
-    if (monthViewBtn) {
-        monthViewBtn.addEventListener('click', () => {
-            currentView = 'month';
-            renderMonthView(currentDate);
-            document.querySelector('.dropdown-toggle').textContent = 'Month';
-        });
+    // Update dropdown toggle text based on current view
+    function updateDropdownText() {
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        if (dropdownToggle) {
+            const textMap = {
+                'month': 'Month',
+                'week': 'Week',
+                'day': 'Day',
+                'year': 'Year'
+            };
+            dropdownToggle.textContent = textMap[currentView] || 'Month';
+        }
+    }
+    
+    // Initialize the current view
+    function initializeView() {
+        // Make sure all views are hidden first
+        if (monthView) monthView.style.display = 'none';
+        if (weekView) weekView.style.display = 'none';
+        if (dayView) dayView.style.display = 'none';
+        if (yearView) yearView.style.display = 'none';
+        
+        // Show the current view
+        switch (currentView) {
+            case 'month':
+                if (monthView) monthView.style.display = 'block';
+                renderMonthView(currentDate);
+                break;
+            case 'week':
+                if (weekView) weekView.style.display = 'block';
+                renderWeekView(currentDate);
+                break;
+            case 'day':
+                if (dayView) dayView.style.display = 'block';
+                renderDayView(currentDate);
+                break;
+            case 'year':
+                if (yearView) yearView.style.display = 'block';
+                renderYearView(currentDate);
+                break;
+            default:
+                // Default to month view
+                currentView = 'month';
+                if (monthView) monthView.style.display = 'block';
+                renderMonthView(currentDate);
+        }
+        
+        updateDropdownText();
     }
 
-    if (weekViewBtn) {
-        weekViewBtn.addEventListener('click', () => {
-            currentView = 'week';
-            renderWeekView(currentDate);
-            document.querySelector('.dropdown-toggle').textContent = 'Week';
-        });
-    }
-
-    if (dayViewBtn) {
-        dayViewBtn.addEventListener('click', () => {
-            currentView = 'day';
-            renderDayView(currentDate);
-            document.querySelector('.dropdown-toggle').textContent = 'Day';
-        });
-    }
-
-    if (yearViewBtn) {
-        yearViewBtn.addEventListener('click', () => {
-            currentView = 'year';
-            renderYearView(currentDate);
-            document.querySelector('.dropdown-toggle').textContent = 'Year';
-        });
-    }
-
-
-
-    //featureMenu
+    // Initialize the calendar
+    initializeView();
+    
+    // Feature menu
     const openMenuBtn = document.getElementById('openMenuBtn');
     const featureMenu = document.getElementById('featureMenu');
     const closeMenuBtn = document.getElementById('closeMenuBtn');
     const overlay = document.getElementById('overlay');
 
-    openMenuBtn.addEventListener('click', () => {
-        featureMenu.classList.remove('-translate-x-full');
-        featureMenu.classList.add('translate-x-0');
-        overlay.classList.remove('hidden');
-    });
+    if (openMenuBtn && featureMenu) {
+        openMenuBtn.addEventListener('click', () => {
+            featureMenu.classList.remove('-translate-x-full');
+            featureMenu.classList.add('translate-x-0');
+            if (overlay) overlay.classList.remove('hidden');
+        });
+    }
 
-    closeMenuBtn.addEventListener('click', () => {
-        featureMenu.classList.remove('translate-x-0');
-        featureMenu.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-    });
+    if (closeMenuBtn && featureMenu) {
+        closeMenuBtn.addEventListener('click', () => {
+            featureMenu.classList.remove('translate-x-0');
+            featureMenu.classList.add('-translate-x-full');
+            if (overlay) overlay.classList.add('hidden');
+        });
+    }
 
-    overlay.addEventListener('click', () => {
-        featureMenu.classList.remove('translate-x-0');
-        featureMenu.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-    });
+    if (overlay && featureMenu) {
+        overlay.addEventListener('click', () => {
+            featureMenu.classList.remove('translate-x-0');
+            featureMenu.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        });
+    }
 
+    // Initialize dropdowns
     const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-    const dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-        return new bootstrap.Dropdown(dropdownToggleEl);
+    dropdownElementList.forEach(dropdownToggleEl => {
+        new bootstrap.Dropdown(dropdownToggleEl);
     });
 
+    // Initial render
+    updateDropdownText();
+    initializeView();
+});
+
+// Initialize the calendar when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // This will be called after the DOM is fully loaded
     if (currentView === 'month') {
         renderMonthView(currentDate);
     } else if (currentView === 'week') {
