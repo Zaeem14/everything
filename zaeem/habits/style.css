@@ -22,6 +22,23 @@ input {
     transform: rotate(90deg);
 }
 
+.current-filter {
+    background-color: rgb(4, 91, 221);
+    color: white;
+}
+
+.current-filter:hover {
+    cursor: pointer;
+    background-color: rgb(21, 75, 141);
+    transition: background-color 0.3s ease;
+}
+
+.habit-icon-container {
+    font-size: 1.5rem;
+}
+
+folder-more-icon-menu-container
+
 
 .folder-div-icon-container {
     display: flex;

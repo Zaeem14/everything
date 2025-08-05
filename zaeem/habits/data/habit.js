@@ -5,30 +5,39 @@ import { folders, loadFoldersFromLocalStorage } from "./folder.js";
 document.addEventListener("DOMContentLoaded", () => {
     loadFoldersFromLocalStorage();
     loadHabitsFromLocalStorage();
-    console.log(habits);
     InputNewHabit();
     renderHabits();
-    hideAllEmptyGroups();
+    console.log(habits);
     document.querySelector(".habit-add-button").addEventListener("click", () => {
         addHabit();
-        console.log("Add Habit clicked!");
-        console.log(habits);
+        hideAllEmptyGroups();
         closeAddHabitModal();
         clearAddHabitInputs();
+
+        const activeFolder = document.querySelector(".folder-div.current-filter");
+        if (activeFolder) {
+            activeFolder.click();
+        }
     });    
 
     document.addEventListener("click", (event) => {
-        if (event.target.classList.contains("habit-more-icon")) {
-            const habitMoreMenuContainer = event.target.closest(".habits-more-container").querySelector(".habit-more-menu-container");
-            habitMoreMenuContainer.style.display = "block";
-            document.addEventListener("click", function closeMenuOutside(e) {
-                if (!event.target.closest(".habit-more-container")) {
-                    habitMoreMenuContainer.style.display = "none";
-                    document.removeEventListener("click", closeMenuOutside);
-                }
-            });
-        }
+        const allMenus = document.querySelectorAll(".habit-more-menu-container");
+        
+        // Check if the click was on a habit-more-icon
+        const isMoreIcon = event.target.classList.contains("habit-more-icon");
+    
+        allMenus.forEach(menu => {
+            // If this is the clicked one, toggle it
+            if (isMoreIcon && menu === event.target.closest(".habits-more-container")?.querySelector(".habit-more-menu-container")) {
+                const isCurrentlyVisible = menu.style.display === "block";
+                menu.style.display = isCurrentlyVisible ? "none" : "block";
+            } else {
+                // Close all others
+                menu.style.display = "none";
+            }
+        });
     });
+    
 });
 
 
@@ -63,9 +72,10 @@ function addHabit() {
    habits.push(addHabitInputs);
    renderHabits();
    saveHabitsToLocalStorage();
+   
 }
 
-function renderHabits() {
+export function renderHabits() {
     document.querySelectorAll(".habits-group .habits").forEach(group => {
         group.innerHTML = "";
     });
@@ -95,7 +105,7 @@ function renderHabits() {
                             <div class="habit-times-number">${habit.habitCompleted} / ${habit.habitGoalNumber} ${habit.habitGoalUnit}</div>
                         </div>
                         <div class="right-side-habit">
-                            <div class="habit-folder-container habit-editor" style="background-color: ${folder.folderColor}; color: ${color};">${folder.folderName}</div>
+                            <div class="habit-folder-container habit-editor" style="background-color: ${folder.folderColor}; color: ${color};">${folder.folderIcon} ${" "} ${folder.folderName}</div>
                             <div class="habit-done-container habit-editor">
                                 <div class="habit-done-icon-container">
                                     <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
@@ -136,6 +146,8 @@ function renderHabits() {
         addHabitToCorrectGroup(habit, habitHTML);
         
     });
+
+    hideAllEmptyGroups();
 }
 
 
@@ -348,11 +360,12 @@ function formatOrdinal(n) {
 function addHabitToCorrectGroup(habit, habitHTML) {
     let habitTimeOfDay = habit.habitTimeOfDay;
 
-    // Normalize to array
+    let timeOfDayArray = [];
     if (typeof habitTimeOfDay === "string") {
-        habitTimeOfDay = habitTimeOfDay.split(",").map(s => s.trim().toLowerCase());
-    } else {
-        habitTimeOfDay = [];
+        timeOfDayArray = habitTimeOfDay
+            .split(",")
+            .map(t => t.trim().toLowerCase())
+            .filter(t => t.length > 0);
     }
 
     const allHabitGroups = document.querySelectorAll(".habits-group");
@@ -360,7 +373,15 @@ function addHabitToCorrectGroup(habit, habitHTML) {
     allHabitGroups.forEach((group) => {
         const groupTime = group.dataset.time.toLowerCase();
 
-        if (habitTimeOfDay.length === 0 || habitTimeOfDay.includes(groupTime)) {
+        const isAnytime = timeOfDayArray.length === 1 && timeOfDayArray.includes("anytime");
+        const matchesSpecific = timeOfDayArray.includes(groupTime);
+
+        console.log({ groupTime, timeOfDayArray, isAnytime, matchesSpecific });
+
+        // 🟢 Add to group if:
+        // - it specifically matches, OR
+        // - it is only set to "anytime" and group is "anytime"
+        if (matchesSpecific || (isAnytime && groupTime === "anytime")) {
             const groupList = group.querySelector(".habits");
             groupList.insertAdjacentHTML("beforeend", habitHTML);
             updateHabitGroupCount(group);
@@ -369,16 +390,23 @@ function addHabitToCorrectGroup(habit, habitHTML) {
 }
 
 
+
+
 function hideAllEmptyGroups() {
     const allHabitGroups = document.querySelectorAll(".habits-group");
     allHabitGroups.forEach((group) => {
         const groupList = group.querySelector(".habits");
         const habitCount = groupList.querySelectorAll(".habit").length;
+        console.log(habitCount + " " + group.dataset.time);
         if (habitCount === 0) {
             group.classList.add("hidden");
+        } else {
+            group.classList.remove("hidden");
+            updateHabitGroupCount(group);
         }
     });
 }
+
 
 function updateHabitGroupCount(group) {
     const groupList = group.querySelector(".habits");
