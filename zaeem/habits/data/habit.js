@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadHabitsFromLocalStorage();
     InputNewHabit();
     renderHabits();
+    habitDateFilter();
     console.log(habits);
     document.querySelector(".habit-add-button").addEventListener("click", () => {
         addHabit();
@@ -43,37 +44,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-let habits = [];
+export let habits = [];
 
 function addHabit() {
-   const addHabitModal = document.querySelector(".habit-add-modal") 
-    
-   const addHabitInputs = {
-    habitId: Date.now(),
-    habitName: addHabitModal.querySelector("#new-habit-name").value,
-    habitIcon: addHabitModal.querySelector(".new-habit-icon").textContent,
-    habitGoalNumber: addHabitModal.querySelector("#habit-goal").value,
-    habitGoalUnit: addHabitModal.querySelector(".times").textContent,
-    habitPerUnit: addHabitModal.querySelector(".per").textContent,
-    habitInterval: addHabitModal.querySelector(".habit-repeat-text").textContent,
-    habitTimeOfDay: addHabitModal.querySelector(".habit-time-text").textContent.trim().toLowerCase(),
-    habitFolderId: addHabitModal.querySelector(".habit-folder-text").dataset.folderId,
-    habitStartDate: addHabitModal.querySelector("#habit-date").value,
-    habitDescription: addHabitModal.querySelector("#new-habit-description").value,
-    habitCompleted: 0,
-    habitFailed: 0,
-    habitSkipped: 0,
-    habitStreak: 0,
-    habitFinish: false
-   }
+    const addHabitModal = document.querySelector(".habit-add-modal");
 
-   console.log(addHabitInputs.habitFolderId);
+    const habitGoal = getHabitGoal();
+    const habitRepeat = getHabitRepeat();
 
-   habits.push(addHabitInputs);
-   renderHabits();
-   saveHabitsToLocalStorage();
-   
+    const newHabit = {
+        habitId: Date.now(),
+        habitName: addHabitModal.querySelector("#new-habit-name").value,
+        habitIcon: addHabitModal.querySelector(".new-habit-icon").textContent,
+        habitGoal, // ⬅️ Use structured goal
+        habitRepeat, // ⬅️ Use structured repeat
+        habitTimeOfDay: addHabitModal.querySelector(".habit-time-text").textContent.trim().toLowerCase(),
+        habitFolderId: addHabitModal.querySelector(".habit-folder-text").dataset.folderId,
+        habitStartDate: addHabitModal.querySelector("#habit-date").value,
+        habitDescription: addHabitModal.querySelector("#new-habit-description").value,
+        habitCompleted: 0,
+        habitFailed: 0,
+        habitSkipped: 0,
+        habitStreak: 0,
+        habitFinish: false
+    };
+
+    habits.push(newHabit);
+    renderHabits();
+    saveHabitsToLocalStorage();
 }
+
 
 export function renderHabits() {
     document.querySelectorAll(".habits-group .habits").forEach(group => {
@@ -102,7 +102,8 @@ export function renderHabits() {
                     <div class="habit-content-container">
                         <div class="left-side-habit">
                             <div class="habit-text">${habit.habitName}</div>
-                            <div class="habit-times-number">${habit.habitCompleted} / ${habit.habitGoalNumber} ${habit.habitGoalUnit}</div>
+                            <div class="habit-times-number">${formatGoalText(habit.habitCompleted, habit.habitGoal)}</div>
+                            <div class="habit-repeat-info">${formatRepeatText(habit.habitRepeat)}</div>
                         </div>
                         <div class="right-side-habit">
                             <div class="habit-folder-container habit-editor" style="background-color: ${folder.folderColor}; color: ${color};">${folder.folderIcon} ${" "} ${folder.folderName}</div>
@@ -397,7 +398,6 @@ function hideAllEmptyGroups() {
     allHabitGroups.forEach((group) => {
         const groupList = group.querySelector(".habits");
         const habitCount = groupList.querySelectorAll(".habit").length;
-        console.log(habitCount + " " + group.dataset.time);
         if (habitCount === 0) {
             group.classList.add("hidden");
         } else {
@@ -441,3 +441,198 @@ function habitStartDateLabelFormatter(inputDateValue) {
         return inputDate.toLocaleDateString("en-US", options); // e.g., "Aug 2, 2025"
     }
 }
+
+function getHabitGoal() {
+    const goalInput = document.querySelector("#habit-goal");
+    const timesUnit = document.querySelector(".times").textContent.trim();
+    const perUnit = document.querySelector(".per").textContent.trim();
+
+    return {
+        amount: Number(goalInput.value),
+        unit: timesUnit,        // "Times" or "Mins"
+        frequency: perUnit      // "Per Day", "Per Week", etc.
+    };
+}
+
+
+function getHabitRepeat() {
+    const repeatText = document.querySelector(".habit-repeat-text").textContent.trim();
+
+    // Match for Daily
+    if (repeatText === "Daily" || repeatText === "Weekdays" || repeatText === "Weekend" || repeatText.includes(",")) {
+        const selectedDays = [...document.querySelectorAll(".habit-repeat-daily-item-container")]
+            .filter(dayEl => !dayEl.querySelector(".habit-repeat-daily-item-check-container").classList.contains("hidden"))
+            .map(dayEl => dayEl.querySelector(".habit-repeat-daily-item-text-container").textContent.trim());
+
+        return {
+            type: "Daily",
+            days: selectedDays.length ? selectedDays : ["Every Day"]
+        };
+    }
+
+    // Match for Monthly
+    if (repeatText.startsWith("Every month on") || repeatText === "Monthly") {
+        const selectedDates = [...document.querySelectorAll(".habit-repeat-monthly-item-calendar-row-item.selected")]
+            .map(el => parseInt(el.textContent.trim()));
+
+        return {
+            type: "Monthly",
+            dates: selectedDates
+        };
+    }
+
+    // Match for Interval
+    if (repeatText.startsWith("Repeat every")) {
+        const match = repeatText.match(/Repeat every (\d+)/);
+        return {
+            type: "Interval",
+            intervalDays: match ? Number(match[1]) : null
+        };
+    }
+
+    return {
+        type: "Unknown"
+    };
+}
+
+
+function formatRepeatText(repeat) {
+    if (!repeat || !repeat.type) return "";
+    // Days of week for easy comparison
+    const weekOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const weekends = ["Saturday", "Sunday"];
+    if (repeat.type === "Daily") {
+        if (weekOrder.every(day => repeat.days.includes(day)) && repeat.days.length === 7) return "Every Day";
+        if (weekdays.every(day => repeat.days.includes(day)) && repeat.days.length === 5) return "Weekdays";
+        if (weekends.every(day => repeat.days.includes(day)) && repeat.days.length === 2) return "Weekend";
+        // Custom days: show short names in week order
+        const shortNames = weekOrder.filter(day => repeat.days.includes(day)).map(day => day.slice(0, 3));
+        return shortNames.join(", ");
+    }
+    if (repeat.type === "Monthly") {
+        if (!repeat.dates || repeat.dates.length === 0) return "Monthly";
+        // Show just numbers, not ordinals
+        const formatted = repeat.dates.map(d => d.toString());
+        return `Monthly on ${formatted.join(", ")}`;
+    }
+    if (repeat.type === "Interval") {
+        return repeat.intervalDays
+            ? `Repeat every ${repeat.intervalDays}`
+            : "Interval";
+    }
+    return "Custom";
+}
+
+function formatGoalText(completed, goal) {
+    if (!goal) return "";
+    let freq = goal.frequency ? goal.frequency.replace(/Per /i, "").toLowerCase() : "";
+    let freqText = freq ? `per ${freq}` : "";
+    return `${completed} / ${goal.amount || 0} ${goal.unit || ""} ${freqText}`.trim();
+}
+
+function habitDateFilter() {
+    const habitDateInput = document.querySelector(".habits-date-picker");
+    const habitDateDisplayText = document.querySelector(".habits-date-text");
+    const habitsDateFilterContainer = document.querySelector(".habits-date-filter-container");
+
+    habitsDateFilterContainer.addEventListener("click", () => {
+        habitDateInput.showPicker();
+    })
+
+    habitDateInput.addEventListener("change", () => {
+        habitDateDisplayText.textContent = habitStartDateLabelFormatter(habitDateInput.value);
+        filterHabitsByDate(habitDateInput.value);
+    })
+}
+
+function filterHabitsByDate(date) {
+    const selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    const filteredHabits = habits.filter(habit => {
+        const habitStart = new Date(habit.habitStartDate);
+        habitStart.setHours(0, 0, 0, 0);
+
+        const repeat = habit.habitRepeat;
+
+        // Exclude habits that haven't started yet
+        if (selectedDate < habitStart) return false;
+
+        // DAILY TYPE
+        if (repeat.type === "Daily") {
+            const selectedDayName = selectedDate.toLocaleDateString("en-US", { weekday: "long" });
+            return repeat.days.includes(selectedDayName);
+        }
+
+        // MONTHLY TYPE
+        if (repeat.type === "Monthly") {
+            const selectedDay = selectedDate.getDate(); // 1 to 31
+            return repeat.dates.includes(selectedDay);
+        }
+
+        // INTERVAL TYPE
+        if (repeat.type === "Interval") {
+            const diffInDays = Math.floor((selectedDate - habitStart) / (1000 * 60 * 60 * 24));
+            return diffInDays % repeat.intervalDays === 0;
+        }
+
+        // Unknown or unsupported
+        return false;
+    });
+
+    // Now render filteredHabits only
+    document.querySelectorAll(".habits-group .habits").forEach(group => group.innerHTML = ""); // clear
+
+    filteredHabits.forEach(habit => {
+        const folder = folders.find(folder => String(folder.folderId) === String(habit.habitFolderId));
+        if (!folder) return;
+
+        let color = "";
+        if (folder.folderId == "1") {
+            color = "black";
+        }
+
+        const habitHTML = `
+            <div class="habits-more-container" data-id="${habit.habitId}" data-folder-id="${habit.habitFolderId}">
+                <div class="habit">
+                    <div class="habit-icon-container"><div>${habit.habitIcon}</div></div>
+                    <div class="habit-content-container">
+                        <div class="left-side-habit">
+                            <div class="habit-text">${habit.habitName}</div>
+                            <div class="habit-times-number">${formatGoalText(habit.habitCompleted, habit.habitGoal)}</div>
+                            <div class="habit-repeat-info">${formatRepeatText(habit.habitRepeat)}</div>
+                        </div>
+                        <div class="right-side-habit">
+                            <div class="habit-folder-container habit-editor" style="background-color: ${folder.folderColor}; color: ${color};">
+                                ${folder.folderIcon} ${folder.folderName}
+                            </div>
+                            <div class="habit-done-container habit-editor">
+                                <div class="habit-done-icon-container">
+                                    <img src="images/habits-container-icons/icons8-done-30.png" class="habit-done-icon" alt="done">
+                                </div>
+                                <div class="habit-done-text">Done</div>
+                            </div>
+                            <div class="habit-more-container habit-editor">
+                                <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
+                                <div class="habit-more-menu-container" style="display: none;" data-id="${habit.habitId}">
+                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Check In</div></div>
+                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-right-arrow-16.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Skip</div></div>
+                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-wrong-16.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Fail</div></div>
+                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-edit-30.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Edit</div></div>
+                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-trash-can-50.png" class="habit-more-menu-item-icon habit-more-delete-icon"><div class="habit-more-menu-item">Delete</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        addHabitToCorrectGroup(habit, habitHTML);
+    });
+
+    hideAllEmptyGroups();
+}
+
+

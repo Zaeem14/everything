@@ -14,6 +14,7 @@
     <script src="data/folder.js" type="module" defer></script>
     <script src="data/habit.js" type="module" defer></script>
     <script src="scripts/menu.js" type="module" defer></script>
+    <script src="scripts/stats.js" type="module" defer></script>
     
 
 
@@ -98,7 +99,7 @@
                     <h2 class="habits-time-title">All</h2>
                 </div>
                 <div class="habits-actions-container">
-                    <div class="habits-action">
+                    <div class="habits-action habits-date-filter-container">
                         <div class="habits-date-text">Today</div>
                         <input type="date" class="habits-date-picker ">
                     </div>
@@ -509,7 +510,10 @@
                 <label for="new-habit-description">Description</label>
                 <textarea id="new-habit-description" placeholder="Describe your habit" class="add-habit-input"></textarea>
             </div>
-            <button class="add-folder-button habit-add-button">Add Habit</button>
+            <div class="habit-addition-button-container">
+                <button class="add-folder-button habit-add-button">Add Habit</button>
+                <button class="habit-cancel-button hidden">Cancel</button>
+            </div>
         </div>
         <div class="folder-add-modal hidden">
             <div class="folder-add-modal-header">

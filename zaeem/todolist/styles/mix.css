@@ -661,6 +661,7 @@ details[open] > summary .arrow {
 
 .habit-add-button {
     height: 30px;
+    width: 100%;
 }
 
 .hidden-element {

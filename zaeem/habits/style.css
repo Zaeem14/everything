@@ -63,7 +63,6 @@ folder-more-icon-menu-container
 .habits-header-container {
     justify-content: space-between;
     padding: 10px;
-    border-bottom: 1px solid black;
     height: 36px;
 }
 .habits-header-container-left,
@@ -170,13 +169,30 @@ folder-more-icon-menu-container
 }
 
 .habit-text {
-    font-size: 14px;
+    font-size: 16px;
     margin: 0;
-    font-weight: 500;
+    font-weight: 600;
 }
 
-.habit-times-number {
+.habit-times-number, 
+.habit-repeat-info {
     font-size: 10px;
+}
+
+.habits-group-header {
+    background: linear-gradient(135deg, rgb(30, 120, 255), rgb(4, 91, 221));
+    color: white;
+    border-radius: 4px;
+    padding: 2px 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+.habits-group-header .arrow {
+    border-left: 6px solid white !important;
 }
 
 .habit-done-container {
@@ -713,6 +729,7 @@ folder-more-icon-menu-container
 .habit-folder-menu-container {
     padding: 5px;
     width: 178px;
+    overflow-y: scroll;
 }
 
 .habit-date-input-box {
