@@ -1,0 +1,29 @@
+/* Event cell styles for solid color blocks */
+.event-cell {
+    position: relative;
+    overflow: hidden;
+}
+
+.week-event-title,
+.day-event-title {
+    position: relative;
+    z-index: 10;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Ensure event cells maintain their color */
+.week-cell.event-cell:hover,
+.day-cell.event-cell:hover {
+    opacity: 0.9;
+}
+
+/* Remove default hover background for event cells */
+.event-cell.hover\:bg-blue-50:hover {
+    background-color: inherit !important;
+}
+
+/* Override Tailwind hover styles for event cells */
+.event-cell {
+    background-color: var(--event-color) !important;
+}

@@ -425,9 +425,10 @@ body {
     white-space: nowrap;
     cursor: pointer;
     z-index: 1;
-    border-left: 3px solid #4285f4;
-    background-color: rgba(66, 133, 244, 0.1);
-    color: #1a73e8;
+    border-left: 3px solid #1a56db;
+    background-color: #e3f2fd;
+    color: #1a237e;
+    font-weight: 500;
 }
 
 .day-event:hover {
@@ -458,7 +459,11 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
+    border-left: 3px solid #1a56db;
+    background-color: #e3f2fd;
+    color: #1a237e;
+    font-weight: 500;
 }
 
 .all-day-event:hover {
@@ -523,6 +528,55 @@ body {
 
 .day-cell:hover {
     background: #f1f8fe !important;
+}
+
+/* Drag selection styles */
+.day-cell.selecting {
+    background: #c2e7ff !important;
+    border-color: #1a73e8 !important;
+    position: relative;
+}
+
+.day-cell.selecting::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 115, 232, 0.1);
+    pointer-events: none;
+}
+
+.month-cell.selecting {
+    background: #c2e7ff !important;
+    border-color: #1a73e8 !important;
+}
+
+.week-cell.selecting {
+    background: #c2e7ff !important;
+    border-color: #1a73e8 !important;
+}
+
+/* Prevent text selection during drag */
+.month-grid.dragging,
+.week-time-grid.dragging,
+.day-time-grid.dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Visual feedback for draggable areas */
+.month-cell.draggable,
+.day-cell.draggable {
+    cursor: crosshair;
+}
+
+.month-cell.draggable:hover,
+.day-cell.draggable:hover {
+    background: #f8f9fa !important;
 }
 
 .today-highlight {

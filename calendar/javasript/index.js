@@ -13,10 +13,12 @@ let dragStartDate = null;
 let dragStartHour = null;
 let currentHighlighted = [];
 
-// ---- Drag-select helper functions (global) ----
+// ---- Enhanced Drag-select helper functions (global) ----
 function clearDragHighlight() {
     currentHighlighted.forEach(cell => cell.classList.remove('selecting'));
     currentHighlighted = [];
+    // Remove dragging class from grids
+    document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
 }
 
 function highlightRange(gridEl, date, startH, endH) {
@@ -33,41 +35,134 @@ function highlightRange(gridEl, date, startH, endH) {
     });
 }
 
-function enableDragSelection(gridEl) {
+// Enhanced function to support month view drag selection
+function highlightMonthRange(startDate, endDate) {
+    clearDragHighlight();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const [minDate, maxDate] = start <= end ? [start, end] : [end, start];
+
+    const cells = Array.from(document.querySelectorAll('.month-cell'));
+    cells.forEach(cell => {
+        if (cell.dataset.date) {
+            const cellDate = new Date(cell.dataset.date);
+            if (cellDate >= minDate && cellDate <= maxDate) {
+                cell.classList.add('selecting');
+                currentHighlighted.push(cell);
+            }
+        }
+    });
+}
+
+// Universal drag selection enabler for all views
+function enableDragSelection(gridEl, viewType = 'time') {
     if (!gridEl || gridEl.dataset.dragSetup) return; // prevent duplicates
     gridEl.dataset.dragSetup = '1';
 
+    let dragStartCell = null;
+    let hasDragged = false;
+
+    // Add draggable class to cells for visual feedback
+    if (viewType === 'month') {
+        gridEl.querySelectorAll('.month-cell').forEach(cell => cell.classList.add('draggable'));
+    } else {
+        gridEl.querySelectorAll('.day-cell').forEach(cell => cell.classList.add('draggable'));
+    }
+
     gridEl.addEventListener('mousedown', e => {
-        const cell = e.target.closest('.day-cell');
-        if (!cell) return;
+        const cell = viewType === 'month' ?
+            e.target.closest('.month-cell') :
+            e.target.closest('.day-cell');
+
+        if (!cell || !cell.dataset.date) return;
+
+        // Don't start drag if clicking on an event
+        if (e.target.closest('.week-event, .month-event')) return;
+
         isDragging = true;
+        hasDragged = false;
+        dragStartCell = cell;
+        gridEl.classList.add('dragging');
         dragStartDate = cell.dataset.date;
-        dragStartHour = Number(cell.dataset.hour);
-        highlightRange(gridEl, dragStartDate, dragStartHour, dragStartHour);
+
+        if (viewType === 'month') {
+            highlightMonthRange(dragStartDate, dragStartDate);
+        } else {
+            dragStartHour = Number(cell.dataset.hour || 0);
+            highlightRange(gridEl, dragStartDate, dragStartHour, dragStartHour);
+        }
         e.preventDefault();
+        e.stopPropagation();
     });
 
     gridEl.addEventListener('mousemove', e => {
         if (!isDragging) return;
-        const cell = e.target.closest('.day-cell');
-        if (!cell || cell.dataset.date !== dragStartDate) return;
-        const hour = Number(cell.dataset.hour);
-        highlightRange(gridEl, dragStartDate, dragStartHour, hour);
+
+        const cell = viewType === 'month' ?
+            e.target.closest('.month-cell') :
+            e.target.closest('.day-cell');
+
+        if (!cell || !cell.dataset.date) return;
+
+        // Mark that we've actually dragged (not just clicked)
+        if (cell !== dragStartCell) {
+            hasDragged = true;
+        }
+
+        if (viewType === 'month') {
+            highlightMonthRange(dragStartDate, cell.dataset.date);
+        } else {
+            if (cell.dataset.date !== dragStartDate) return;
+            const hour = Number(cell.dataset.hour || 0);
+            highlightRange(gridEl, dragStartDate, dragStartHour, hour);
+        }
     });
 
-    document.addEventListener('mouseup', e => {
+    // Use a single global mouseup handler
+    const mouseUpHandler = e => {
         if (!isDragging) return;
+
+        const wasDragging = hasDragged;
         isDragging = false;
-        const cell = e.target.closest('.day-cell');
-        let endHour = dragStartHour;
-        if (cell && cell.dataset.date === dragStartDate) {
-            endHour = Number(cell.dataset.hour) + 1; // make end exclusive
+        hasDragged = false;
+        dragStartCell = null;
+        gridEl.classList.remove('dragging');
+
+        const cell = viewType === 'month' ?
+            e.target.closest('.month-cell') :
+            e.target.closest('.day-cell');
+
+        // Only open modal if we actually dragged
+        if (wasDragging) {
+            if (viewType === 'month') {
+                let endDate = dragStartDate;
+                if (cell && cell.dataset.date) {
+                    endDate = cell.dataset.date;
+                }
+                clearDragHighlight();
+                // For month view, open modal with all-day event
+                openAddEventModal(dragStartDate, null, true, null, endDate);
+            } else {
+                let endHour = dragStartHour;
+                if (cell && cell.dataset.date === dragStartDate) {
+                    endHour = Number(cell.dataset.hour || 0) + 1; // make end exclusive
+                } else {
+                    endHour = dragStartHour + 1;
+                }
+                clearDragHighlight();
+                openAddEventModal(dragStartDate, Math.min(dragStartHour, endHour - 1), false, endHour);
+            }
+            e.preventDefault();
+            e.stopPropagation();
         } else {
-            endHour = dragStartHour + 1;
+            // If we didn't drag, just clear the highlight
+            clearDragHighlight();
         }
-        clearDragHighlight();
-        openAddEventModal(dragStartDate, Math.min(dragStartHour, endHour - 1), false, endHour);
-    });
+    };
+
+    // Remove old listener if exists and add new one
+    document.removeEventListener('mouseup', mouseUpHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
 }
 
 // --- Utility: update dropdown toggle text based on current view (global) ---
@@ -316,7 +411,7 @@ function renderMonthView(date) {
     // creating the days of the month
     for (let i = 1; i <= daysInMonth; i++) {
         const dayDiv = document.createElement('div');
-        dayDiv.classList.add('calendar-day', 'py-2', 'relative');
+        dayDiv.classList.add('calendar-day', 'month-cell', 'py-2', 'relative');
         dayDiv.textContent = i;
         const fullDate = new Date(year, month, i);
         dayDiv.dataset.date = formatDateToISO(fullDate);
@@ -383,6 +478,9 @@ function renderMonthView(date) {
                 openAddEventModal(dayDiv.dataset.date);
             });
         });
+
+        // Enable drag selection for month view
+        enableDragSelection(monthGrid, 'month');
     }
 }
 
@@ -533,7 +631,7 @@ function renderWeekView(date) {
         // 7 day cells
         for (let d = 0; d < 7; d++) {
             const dayCell = document.createElement('div');
-            dayCell.classList.add('week-cell', 'border', 'border-gray-200', 'relative', 'hover:bg-blue-50', 'h-12');
+            dayCell.classList.add('week-cell', 'day-cell', 'border', 'border-gray-200', 'relative', 'hover:bg-blue-50', 'h-12');
 
             // For future event placement, store date and hour
             const currentDay = new Date(startOfWeek);
@@ -560,40 +658,44 @@ function renderWeekView(date) {
                 if (rowHour >= startH && rowHour <= endH) {
                     eventsForCell.push(ev);
 
-                    // Color the entire cell for this hour
-                    dayCell.style.backgroundColor = ev.color ? `${ev.color}15` : '#e3f2fd';
-                    dayCell.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+                    // Apply solid color to the entire cell for this hour
+                    dayCell.style.backgroundColor = ev.color || '#4285F4';
+                    dayCell.style.color = '#ffffff';
+                    dayCell.style.borderLeft = `4px solid ${ev.color || '#4285F4'}`;
+                    dayCell.classList.add('event-cell');
                 }
             });
 
-            // Only show event details in the starting hour cell
+            // Only show event title in the starting hour cell
             eventsForCell.forEach(ev => {
                 const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
                 if (rowHour === startH) {
                     const evDiv = document.createElement('div');
-                    evDiv.className = 'week-event px-1 py-0.5 rounded mb-1 text-xs truncate';
+                    evDiv.className = 'week-event-title text-white font-semibold text-xs p-1';
                     evDiv.style.cursor = 'pointer';
-                    evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
-                    evDiv.style.color = ev.color || '#0d47a1';
-                    evDiv.style.borderLeft = `2px solid ${ev.color || '#4285F4'}`;
-                    evDiv.style.margin = '2px';
-                    evDiv.style.padding = '2px 4px';
+                    evDiv.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
+                    evDiv.style.position = 'relative';
+                    evDiv.style.zIndex = '10';
 
                     evDiv.addEventListener('click', function (e) {
                         e.stopPropagation();
                         openEditEventModal(ev.id);
                     });
 
-                    let timeText = ev.startTime || '';
-                    if (ev.endTime) {
-                        timeText += ` - ${ev.endTime}`;
-                    }
-                    evDiv.textContent = `${ev.title}${timeText ? ` (${timeText})` : ''}`;
+                    evDiv.textContent = ev.title;
+                    const timeSpan = document.createElement('div');
+                    timeSpan.className = 'text-xs opacity-90';
+                    timeSpan.textContent = `${ev.startTime || ''} - ${ev.endTime || ''}`;
+                    evDiv.appendChild(timeSpan);
                     dayCell.appendChild(evDiv);
                 }
             });
-            // Add event by clicking empty week cell
+            // Add event by clicking empty week cell (only if not dragging)
             dayCell.addEventListener('click', function (e) {
+                // Don't open modal if we're dragging or just finished dragging
+                if (isDragging || weekTimeGrid.classList.contains('dragging')) {
+                    return;
+                }
                 console.log('Week cell clicked:', { target: e.target, classList: e.target.classList, cellDateStr, rowHour });
                 if (!e.target.classList.contains('week-event')) {
                     console.log('Opening Add Event modal for', cellDateStr, rowHour);
@@ -829,42 +931,37 @@ function renderDayView(date) {
             if (rowHour >= startH && rowHour <= endH) {
                 eventsForHour.push(ev);
 
-                // Color the entire cell for this hour
-                dayCell.style.backgroundColor = ev.color ? `${ev.color}15` : '#e3f2fd';
-                dayCell.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
-            }
-        });
+                // Apply solid color to the entire cell for this hour
+                dayCell.style.backgroundColor = ev.color || '#4285F4';
+                dayCell.style.color = '#ffffff';
+                dayCell.style.borderLeft = `4px solid ${ev.color || '#4285F4'}`;
+                dayCell.classList.add('event-cell');
 
-        // Only show event details in the starting hour cell
-        eventsForHour.forEach(ev => {
-            const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
-            if (rowHour === startH) {
-                const evDiv = document.createElement('div');
-                evDiv.className = 'day-event px-1 py-0.5 rounded mb-1 text-xs truncate';
-                evDiv.style.cursor = 'pointer';
-                evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
-                evDiv.style.color = ev.color || '#0d47a1';
-                evDiv.style.borderLeft = `2px solid ${ev.color || '#4285F4'}`;
-                evDiv.style.margin = '2px';
-                evDiv.style.padding = '2px 4px';
-
-                evDiv.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    openEditEventModal(ev.id);
-                });
-
-                let timeText = ev.startTime || '';
-                if (ev.endTime) {
-                    timeText += ` - ${ev.endTime}`;
+                // Only show event title in the starting hour
+                if (rowHour === startH) {
+                    const evDiv = document.createElement('div');
+                    evDiv.className = 'day-event-title text-white font-semibold text-xs p-1';
+                    evDiv.style.cursor = 'pointer';
+                    evDiv.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
+                    evDiv.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        openEditEventModal(ev.id);
+                    });
+                    evDiv.textContent = ev.title;
+                    const timeSpan = document.createElement('div');
+                    timeSpan.className = 'text-xs opacity-90';
+                    timeSpan.textContent = `${ev.startTime || ''} - ${ev.endTime || ''}`;
+                    evDiv.appendChild(timeSpan);
+                    dayCell.appendChild(evDiv);
                 }
-                evDiv.textContent = `${ev.title}${timeText ? ` (${timeText})` : ''}`;
-                dayCell.appendChild(evDiv);
             }
         });
 
-        // Add event on cell click
+        // Add event on cell click (only if not dragging)
         dayCell.addEventListener('click', (e) => {
-            if (e.target.closest('.day-event')) return;
+            // Don't open modal if we're dragging or just finished dragging
+            if (isDragging || dayTimeGrid.classList.contains('dragging')) return;
+            if (e.target.closest('.day-event-title')) return;
             openAddEventModal(formatDateToISO(date), rowHour);
         });
         // Add day cell to row
@@ -945,16 +1042,32 @@ function renderYearView(date) {
 }
 
 // Utility: open Add Event modal with date/time prefilled
-// If `endHour` is provided it will be used, otherwise defaults to start+1.
+// Enhanced to support multi-day events with endDate parameter
 
-function openAddEventModal(date, hour, isAllDay = false, endHour = null) {
+function openAddEventModal(date, hour, isAllDay = false, endHour = null, endDate = null) {
     const eventDateInput = document.getElementById('eventDate');
-    const eventStartTime = document.getElementById('startTime');
-    const eventEndTime = document.getElementById('endTime');
-    const eventAllDay = document.getElementById('allDay');
-    const timeFields = document.getElementById('timeFields');
+    const eventStartTime = document.getElementById('eventStartTime');
+    const eventEndTime = document.getElementById('eventEndTime');
+    const eventAllDay = document.getElementById('eventAllDay');
+    const timeFields = document.getElementById('eventTimeFields');
+    const eventTitle = document.getElementById('eventTitle');
+
+    // Clear previous values
+    if (eventTitle) eventTitle.value = '';
 
     if (eventDateInput && date) eventDateInput.value = date;
+
+    // For multi-day events, we'll need to enhance the form to support end date
+    // For now, we'll set the title to indicate the date range
+    if (endDate && endDate !== date) {
+        const startD = new Date(date);
+        const endD = new Date(endDate);
+        const options = { month: 'short', day: 'numeric' };
+        const rangeText = `${startD.toLocaleDateString('en-US', options)} - ${endD.toLocaleDateString('en-US', options)}`;
+        if (eventTitle) {
+            eventTitle.placeholder = `Event (${rangeText})`;
+        }
+    }
 
     if (isAllDay) {
         if (eventAllDay) eventAllDay.checked = true;
@@ -1214,8 +1327,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (addEventForm) {
+        console.log('Add event form found, attaching submit listener');
         addEventForm.addEventListener('submit', function (e) {
             e.preventDefault();
+            console.log('Form submitted!');
+
             // Collect form data
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
@@ -1224,6 +1340,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const endTime = document.getElementById('eventEndTime').value;
             const description = document.getElementById('eventDescription').value;
             const color = document.getElementById('eventColor').value || '#4285F4';
+
+            console.log('Form values:', { title, date, allDay, startTime, endTime, description, color });
 
             // Create event object
             const newEvent = {
@@ -1234,11 +1352,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 startTime: allDay ? null : startTime,
                 endTime: allDay ? null : endTime,
                 description: description || '',
-                color: document.getElementById('eventColor').value || '#4285F4'
+                color: color || '#4285F4'
             };
+
+            console.log('Creating new event:', newEvent);
             calendarEvents.push(newEvent);
-            console.log('Event added:', newEvent);
-            console.log('All events after add:', calendarEvents);
+            console.log('Event added successfully. Total events:', calendarEvents.length);
+            console.log('All events:', calendarEvents);
             // Persist to localStorage
             if (window.localStorage) {
                 try {
