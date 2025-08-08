@@ -7,8 +7,101 @@ let calendarEvents = [];
 let monthView, weekView, dayView, yearView, monthGrid, weekTimeGrid, dayTimeGrid, yearGrid, currentDisplay, todayBtn;
 let weekViewBtn, dayViewBtn, monthViewBtn, yearViewBtn;
 
+// --- Drag-select globals ---
+let isDragging = false;
+let dragStartDate = null;
+let dragStartHour = null;
+let currentHighlighted = [];
+
+// ---- Drag-select helper functions (global) ----
+function clearDragHighlight() {
+    currentHighlighted.forEach(cell => cell.classList.remove('selecting'));
+    currentHighlighted = [];
+}
+
+function highlightRange(gridEl, date, startH, endH) {
+    clearDragHighlight();
+    const [minH, maxH] = startH < endH ? [startH, endH] : [endH, startH];
+    const selector = `.day-cell[data-date="${date}"]`;
+    const cells = Array.from(gridEl.querySelectorAll(selector));
+    cells.forEach(cell => {
+        const h = Number(cell.dataset.hour);
+        if (h >= minH && h <= maxH) {
+            cell.classList.add('selecting');
+            currentHighlighted.push(cell);
+        }
+    });
+}
+
+function enableDragSelection(gridEl) {
+    if (!gridEl || gridEl.dataset.dragSetup) return; // prevent duplicates
+    gridEl.dataset.dragSetup = '1';
+
+    gridEl.addEventListener('mousedown', e => {
+        const cell = e.target.closest('.day-cell');
+        if (!cell) return;
+        isDragging = true;
+        dragStartDate = cell.dataset.date;
+        dragStartHour = Number(cell.dataset.hour);
+        highlightRange(gridEl, dragStartDate, dragStartHour, dragStartHour);
+        e.preventDefault();
+    });
+
+    gridEl.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const cell = e.target.closest('.day-cell');
+        if (!cell || cell.dataset.date !== dragStartDate) return;
+        const hour = Number(cell.dataset.hour);
+        highlightRange(gridEl, dragStartDate, dragStartHour, hour);
+    });
+
+    document.addEventListener('mouseup', e => {
+        if (!isDragging) return;
+        isDragging = false;
+        const cell = e.target.closest('.day-cell');
+        let endHour = dragStartHour;
+        if (cell && cell.dataset.date === dragStartDate) {
+            endHour = Number(cell.dataset.hour) + 1; // make end exclusive
+        } else {
+            endHour = dragStartHour + 1;
+        }
+        clearDragHighlight();
+        openAddEventModal(dragStartDate, Math.min(dragStartHour, endHour - 1), false, endHour);
+    });
+}
+
+// --- Utility: update dropdown toggle text based on current view (global) ---
+function updateDropdownText() {
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    if (dropdownToggle) {
+        const textMap = {
+            'month': 'Month',
+            'week': 'Week',
+            'day': 'Day',
+            'year': 'Year'
+        };
+        dropdownToggle.textContent = textMap[currentView] || 'Month';
+    }
+}
+
+// --- Utility: setup color pickers ---
+function setupColorPickers() {
+    document.querySelectorAll('.color-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            // Deselect others
+            document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            const color = opt.getAttribute('data-color');
+            const eventColorInput = document.getElementById('eventColor');
+            if (eventColorInput) eventColorInput.value = color;
+            const editEventColorInput = document.getElementById('editEventColor');
+            if (editEventColorInput) editEventColorInput.value = color;
+        });
+    });
+}
+
 // Initialize the calendar when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize DOM elements
     monthView = document.getElementById('monthView');
     weekView = document.getElementById('weekView');
@@ -75,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event listeners for the calendar navigation
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const todayBtn = document.getElementById('todayBtn');
+    const todayNavBtn = document.getElementById('todayBtn');
 
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
@@ -305,18 +398,18 @@ function renderWeekView(date) {
     const weekAllDayEvents = document.getElementById('weekAllDayEvents');
     if (weekAllDayEvents) {
         weekAllDayEvents.innerHTML = '';
-        
+
         // Create a cell for each day of the week
         for (let d = 0; d < 7; d++) {
             const dayCell = document.createElement('div');
             dayCell.className = 'day-cell p-1 min-h-[2rem]';
             dayCell.dataset.date = formatDateToISO(new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + d));
-            
+
             // Find all-day events for this day
-            const allDayEvents = calendarEvents.filter(ev => 
+            const allDayEvents = calendarEvents.filter(ev =>
                 ev.date === dayCell.dataset.date && ev.allDay
             );
-            
+
             // Add each all-day event
             allDayEvents.forEach(ev => {
                 const evDiv = document.createElement('div');
@@ -326,24 +419,24 @@ function renderWeekView(date) {
                 evDiv.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
                 evDiv.style.cursor = 'pointer';
                 evDiv.textContent = ev.title;
-                
-                evDiv.addEventListener('click', function(e) {
+
+                evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
                     openEditEventModal(ev.id);
                 });
-                
+
                 dayCell.appendChild(evDiv);
             });
-            
+
             // Make empty cells clickable to add new all-day events
             if (allDayEvents.length === 0) {
                 dayCell.style.minHeight = '2rem';
                 dayCell.style.cursor = 'pointer';
-                dayCell.addEventListener('click', function() {
+                dayCell.addEventListener('click', function () {
                     openAddEventModal(dayCell.dataset.date, 0, true);
                 });
             }
-            
+
             weekAllDayEvents.appendChild(dayCell);
         }
     }
@@ -400,9 +493,16 @@ function renderWeekView(date) {
         }
     }
 
+    // Ensure drag-to-select listeners are attached
+    if (weekTimeGrid) {
+        enableDragSelection(weekTimeGrid);
+    }
+
     // Clear the week time grid
     if (weekTimeGrid) {
         weekTimeGrid.innerHTML = '';
+        weekTimeGrid.classList.add('time-grid');
+        weekTimeGrid.style.position = 'relative';
     }
 
     // Define time slots (e.g., 1:00 to 24:00)
@@ -446,26 +546,26 @@ function renderWeekView(date) {
             const eventsForCell = [];
             calendarEvents.forEach(ev => {
                 if (ev.date !== cellDateStr || ev.allDay) return;
-                
+
                 const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
                 let endH = 23, endM = 59; // Default to end of day if no end time
-                
+
                 if (ev.endTime) {
                     [endH, endM] = ev.endTime.split(":").map(Number);
                     // If end time is on the hour, include the previous hour
                     if (endM === 0) endH--;
                 }
-                
+
                 // Check if current hour is within event's time range
                 if (rowHour >= startH && rowHour <= endH) {
                     eventsForCell.push(ev);
-                    
+
                     // Color the entire cell for this hour
                     dayCell.style.backgroundColor = ev.color ? `${ev.color}15` : '#e3f2fd';
                     dayCell.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
                 }
             });
-            
+
             // Only show event details in the starting hour cell
             eventsForCell.forEach(ev => {
                 const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
@@ -478,12 +578,12 @@ function renderWeekView(date) {
                     evDiv.style.borderLeft = `2px solid ${ev.color || '#4285F4'}`;
                     evDiv.style.margin = '2px';
                     evDiv.style.padding = '2px 4px';
-                    
+
                     evDiv.addEventListener('click', function (e) {
                         e.stopPropagation();
                         openEditEventModal(ev.id);
                     });
-                    
+
                     let timeText = ev.startTime || '';
                     if (ev.endTime) {
                         timeText += ` - ${ev.endTime}`;
@@ -502,6 +602,10 @@ function renderWeekView(date) {
                     console.log('Click was on an event, not opening Add Event modal.');
                 }
             });
+            // Enable drag selection for the grid
+            if (!weekTimeGrid.dataset.dragSetup) {
+                enableDragSelection(weekTimeGrid);
+            }
             // All-day events are now handled in the dedicated all-day row above
             weekTimeGrid.appendChild(dayCell);
         }
@@ -518,6 +622,25 @@ function renderDayView(date) {
     const monthView = document.getElementById('monthView');
     const currentDisplay = document.getElementById('currentDisplay');
     const dayTimeGrid = document.getElementById('dayTimeGrid');
+
+    if (!dayView) {
+        console.error('dayView container not found');
+        return;
+    }
+    if (!dayTimeGrid) {
+        console.error('dayTimeGrid container not found');
+        return;
+    }
+
+    // Clear existing grid
+    dayTimeGrid.innerHTML = '';
+
+    // Ensure grid has the right classes for selection
+    dayTimeGrid.classList.add('time-grid');
+    dayTimeGrid.style.position = 'relative';
+
+    // Attach drag-to-select listeners
+    enableDragSelection(dayTimeGrid);
     const dayViewContent = dayView.querySelector('.day-view-content');
 
     if (!dayView) {
@@ -534,14 +657,14 @@ function renderDayView(date) {
     if (weekView) weekView.style.display = 'none';
     if (monthView) monthView.style.display = 'none';
     if (yearGrid) yearGrid.style.display = 'none';
-    
+
     // Set the main header (if needed)
     if (currentDisplay) {
-        currentDisplay.textContent = new Intl.DateTimeFormat('en-US', { 
-            weekday: 'long', 
-            month: 'long', 
-            day: 'numeric', 
-            year: 'numeric' 
+        currentDisplay.textContent = new Intl.DateTimeFormat('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
         }).format(date);
     }
 
@@ -558,9 +681,9 @@ function renderDayView(date) {
     // Highlight header if today
     const today = new Date();
     const isToday = date.getFullYear() === today.getFullYear() &&
-                   date.getMonth() === today.getMonth() &&
-                   date.getDate() === today.getDate();
-    
+        date.getMonth() === today.getMonth() &&
+        date.getDate() === today.getDate();
+
     if (isToday) {
         dayViewHeader.classList.add('day-header-today');
     } else {
@@ -568,27 +691,32 @@ function renderDayView(date) {
     }
 
     // Set the header content
-    dayViewHeader.textContent = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'long', 
-        day: 'numeric', 
-        year: 'numeric' 
+    dayViewHeader.textContent = date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
     });
 
     // Clear the time grid
     dayTimeGrid.innerHTML = '';
     console.log('dayTimeGrid cleared, ready to populate');
 
+    // Create a container for the time grid
+    const timeGridContainer = document.createElement('div');
+    timeGridContainer.className = 'day-time-grid-container';
+    dayTimeGrid.appendChild(timeGridContainer);
+
     // Clear all-day events row
     const dayAllDayEvents = document.getElementById('dayAllDayEvents');
     if (dayAllDayEvents) {
         dayAllDayEvents.innerHTML = '';
-        
+
         // Find all-day events for this day
-        const allDayEvents = calendarEvents.filter(ev => 
+        const allDayEvents = calendarEvents.filter(ev =>
             ev.date === formatDateToISO(date) && ev.allDay
         );
-        
+
         // Add each all-day event
         allDayEvents.forEach(ev => {
             const evDiv = document.createElement('div');
@@ -598,21 +726,21 @@ function renderDayView(date) {
             evDiv.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
             evDiv.style.cursor = 'pointer';
             evDiv.textContent = ev.title;
-            
-            evDiv.addEventListener('click', function(e) {
+
+            evDiv.addEventListener('click', function (e) {
                 e.stopPropagation();
                 openEditEventModal(ev.id);
             });
-            
+
             dayAllDayEvents.appendChild(evDiv);
         });
-        
+
         // Add "+ Add" button if no all-day events
         if (allDayEvents.length === 0) {
             const addButton = document.createElement('button');
             addButton.className = 'text-xs text-gray-500 hover:text-blue-500';
             addButton.innerHTML = '+ Add';
-            addButton.addEventListener('click', function() {
+            addButton.addEventListener('click', function () {
                 openAddEventModal(formatDateToISO(date), 0, true);
             });
             dayAllDayEvents.appendChild(addButton);
@@ -647,20 +775,37 @@ function renderDayView(date) {
         });
         dayTimeGrid.appendChild(allDayRow);
     }
-    // For each hour, create a row: first column is time label, second column is the day cell for the current day
+
+    // For each hour, create a row with time label and day cell
     for (let i = 0; i < hours.length; i++) {
         const rowHour = hours[i];
 
-        // Time label cell
-        const timeCell = document.createElement('div');
-        timeCell.classList.add('time-label', 'border', 'border-gray-200', 'text-xs', 'text-right', 'pr-2', 'py-1', 'bg-gray-50');
-        const hourStr = rowHour < 12 ? `${rowHour} AM` : rowHour === 12 ? '12 PM' : rowHour === 24 ? '12 AM' : rowHour === 25 ? '1 AM' : `${rowHour - 12} PM`;
-        timeCell.textContent = hourStr;
-        dayTimeGrid.appendChild(timeCell);
+        // Create a row container
+        const row = document.createElement('div');
+        row.className = 'day-time-row';
 
-        // Single day cell
+        // Time label cell (left side)
+        const timeCell = document.createElement('div');
+        timeCell.className = 'time-label-cell';
+
+        const timeLabel = document.createElement('div');
+        timeLabel.className = 'time-label';
+
+        // Format time (e.g., 12 PM, 1 PM, etc.)
+        let displayHour = rowHour % 12 || 12;
+        const ampm = rowHour < 12 || rowHour === 24 ? 'AM' : 'PM';
+        if (rowHour === 0) displayHour = 12; // 12 AM
+        if (rowHour === 24) displayHour = 12; // 12 AM next day
+
+        timeLabel.textContent = `${displayHour} ${ampm}`;
+        timeCell.appendChild(timeLabel);
+        row.appendChild(timeCell);
+
+        // Day cell (right side)
         const dayCell = document.createElement('div');
-        dayCell.classList.add('day-cell', 'border', 'border-gray-200', 'relative', 'hover:bg-blue-50', 'h-12');
+        dayCell.className = 'day-cell';
+        dayCell.dataset.date = formatDateToISO(date);
+        dayCell.dataset.hour = rowHour;
 
         // Store date and hour for event placement
         dayCell.dataset.date = formatDateToISO(date);
@@ -670,26 +815,26 @@ function renderDayView(date) {
         const eventsForHour = [];
         calendarEvents.forEach(ev => {
             if (ev.date !== formatDateToISO(date) || ev.allDay) return;
-            
+
             const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
             let endH = 23, endM = 59; // Default to end of day if no end time
-            
+
             if (ev.endTime) {
                 [endH, endM] = ev.endTime.split(":").map(Number);
                 // If end time is on the hour, include the previous hour
                 if (endM === 0) endH--;
             }
-            
+
             // Check if current hour is within event's time range
             if (rowHour >= startH && rowHour <= endH) {
                 eventsForHour.push(ev);
-                
+
                 // Color the entire cell for this hour
                 dayCell.style.backgroundColor = ev.color ? `${ev.color}15` : '#e3f2fd';
                 dayCell.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
             }
         });
-        
+
         // Only show event details in the starting hour cell
         eventsForHour.forEach(ev => {
             const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
@@ -702,12 +847,12 @@ function renderDayView(date) {
                 evDiv.style.borderLeft = `2px solid ${ev.color || '#4285F4'}`;
                 evDiv.style.margin = '2px';
                 evDiv.style.padding = '2px 4px';
-                
+
                 evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
                     openEditEventModal(ev.id);
                 });
-                
+
                 let timeText = ev.startTime || '';
                 if (ev.endTime) {
                     timeText += ` - ${ev.endTime}`;
@@ -722,23 +867,95 @@ function renderDayView(date) {
             if (e.target.closest('.day-event')) return;
             openAddEventModal(formatDateToISO(date), rowHour);
         });
-        dayTimeGrid.appendChild(dayCell);
+        // Add day cell to row
+        row.appendChild(dayCell);
+
+        // Add row to container
+        timeGridContainer.appendChild(row);
     }
 
     console.log('dayTimeGrid children after render:', dayTimeGrid.children.length);
     console.log('dayTimeGrid:', dayTimeGrid, 'children:', dayTimeGrid.children.length, 'dayView.style.display:', dayView.style.display, 'computed display:', getComputedStyle(dayView).display);
 }
 
+// Year view
+function renderYearView(date) {
+    // Show year view, hide others
+    if (yearView) yearView.style.display = 'block';
+    if (monthView) monthView.style.display = 'none';
+    if (weekView) weekView.style.display = 'none';
+    if (dayView) dayView.style.display = 'none';
+
+    // Clear the year grid and set layout
+    if (yearGrid) {
+        yearGrid.innerHTML = '';
+        yearGrid.style.display = 'grid';
+        yearGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        yearGrid.style.gap = '8px';
+    }
+
+    const year = date.getFullYear();
+    if (currentDisplay) currentDisplay.textContent = `${year}`;
+
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    for (let m = 0; m < 12; m++) {
+        const monthContainer = document.createElement('div');
+        monthContainer.className = 'year-month border rounded p-1 text-xs cursor-pointer hover:bg-gray-100';
+
+        // Month header
+        const monthHeader = document.createElement('div');
+        monthHeader.className = 'font-semibold text-center mb-1';
+        monthHeader.textContent = monthNames[m];
+        monthContainer.appendChild(monthHeader);
+
+        // Mini month grid
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+        const firstDay = new Date(year, m, 1).getDay();
+
+        const miniGrid = document.createElement('div');
+        miniGrid.style.display = 'grid';
+        miniGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+        miniGrid.style.gap = '1px';
+
+        // Leading blanks for first week alignment
+        for (let i = 0; i < firstDay; i++) {
+            miniGrid.appendChild(document.createElement('div'));
+        }
+        // Day numbers
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayCell = document.createElement('div');
+            dayCell.textContent = d;
+            dayCell.className = 'text-center';
+            miniGrid.appendChild(dayCell);
+        }
+
+        monthContainer.appendChild(miniGrid);
+
+        // Clicking a month switches to month view of that month
+        monthContainer.addEventListener('click', () => {
+            currentDate = new Date(year, m, 1);
+            currentView = 'month';
+            renderMonthView(currentDate);
+            updateDropdownText();
+        });
+
+        if (yearGrid) yearGrid.appendChild(monthContainer);
+    }
+}
+
 // Utility: open Add Event modal with date/time prefilled
-function openAddEventModal(date, hour, isAllDay = false) {
+// If `endHour` is provided it will be used, otherwise defaults to start+1.
+
+function openAddEventModal(date, hour, isAllDay = false, endHour = null) {
     const eventDateInput = document.getElementById('eventDate');
     const eventStartTime = document.getElementById('startTime');
     const eventEndTime = document.getElementById('endTime');
     const eventAllDay = document.getElementById('allDay');
     const timeFields = document.getElementById('timeFields');
-    
+
     if (eventDateInput && date) eventDateInput.value = date;
-    
+
     if (isAllDay) {
         if (eventAllDay) eventAllDay.checked = true;
         if (timeFields) timeFields.style.display = 'none';
@@ -747,18 +964,21 @@ function openAddEventModal(date, hour, isAllDay = false) {
     } else {
         if (eventAllDay) eventAllDay.checked = false;
         if (timeFields) timeFields.style.display = 'block';
-        if (hour) {
-            if (eventStartTime) eventStartTime.value = `${String(hour).padStart(2, '0')}:00`;
-            if (eventEndTime) eventEndTime.value = `${String(hour + 1).padStart(2, '0')}:00`;
+        if (hour !== undefined && hour !== null) {
+            const computedEnd = endHour !== null ? endHour : (hour + 1);
+            const startVal = `${String(hour).padStart(2, '0')}:00`;
+            const endVal = `${String(computedEnd).padStart(2, '0')}:00`;
+            if (eventStartTime) eventStartTime.value = startVal;
+            if (eventEndTime) eventEndTime.value = endVal;
         }
     }
-    
+
     const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
     modal.show();
 }
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Set up event listeners for view buttons
     const weekViewBtn = document.querySelector('.weekViewBtn');
     const dayViewBtn = document.querySelector('.dayViewBtn');
@@ -766,9 +986,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const yearViewBtn = document.querySelector('.yearViewBtn');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const todayBtn = document.querySelector('.today-button');
+    const todayNavBtn2 = document.querySelector('.today-button');
     const addEventBtn = document.getElementById('addEventBtn');
-    
+
     // View switch event listeners
     if (weekViewBtn) {
         weekViewBtn.addEventListener('click', () => {
@@ -777,7 +997,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDropdownText();
         });
     }
-    
+
     if (dayViewBtn) {
         dayViewBtn.addEventListener('click', () => {
             currentView = 'day';
@@ -785,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDropdownText();
         });
     }
-    
+
     if (monthViewBtn) {
         monthViewBtn.addEventListener('click', () => {
             currentView = 'month';
@@ -793,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDropdownText();
         });
     }
-    
+
     if (yearViewBtn) {
         yearViewBtn.addEventListener('click', () => {
             currentView = 'year';
@@ -801,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDropdownText();
         });
     }
-    
+
     // Navigation buttons
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
@@ -820,7 +1040,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             if (currentView === 'month') {
@@ -838,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Today button
     if (todayBtn) {
         todayBtn.addEventListener('click', () => {
@@ -854,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Add event button
     if (addEventBtn) {
         addEventBtn.addEventListener('click', () => {
@@ -1088,8 +1308,66 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     };
-    
+
     setupViewButtons();
+
+    // ---- Drag-select helper functions ----
+    function clearDragHighlight() {
+        currentHighlighted.forEach(cell => cell.classList.remove('selecting'));
+        currentHighlighted = [];
+    }
+
+    function highlightRange(gridEl, date, startH, endH) {
+        clearDragHighlight();
+        const [minH, maxH] = startH < endH ? [startH, endH] : [endH, startH];
+        const selector = `.day-cell[data-date="${date}"]`;
+        const cells = Array.from(gridEl.querySelectorAll(selector));
+        cells.forEach(cell => {
+            const h = Number(cell.dataset.hour);
+            if (h >= minH && h <= maxH) {
+                cell.classList.add('selecting');
+                currentHighlighted.push(cell);
+            }
+        });
+    }
+
+    function enableDragSelection(gridEl) {
+        if (!gridEl || gridEl.dataset.dragSetup) return; // prevent duplicates
+        gridEl.dataset.dragSetup = '1';
+
+        gridEl.addEventListener('mousedown', e => {
+            const cell = e.target.closest('.day-cell');
+            if (!cell) return;
+            isDragging = true;
+            dragStartDate = cell.dataset.date;
+            dragStartHour = Number(cell.dataset.hour);
+            highlightRange(gridEl, dragStartDate, dragStartHour, dragStartHour);
+            e.preventDefault();
+        });
+
+        gridEl.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const cell = e.target.closest('.day-cell');
+            if (!cell || cell.dataset.date !== dragStartDate) return;
+            const currHour = Number(cell.dataset.hour);
+            highlightRange(gridEl, dragStartDate, dragStartHour, currHour);
+        });
+
+        document.addEventListener('mouseup', e => {
+            if (!isDragging) return;
+            isDragging = false;
+            const cell = e.target.closest('.day-cell');
+            let endHour = dragStartHour;
+            if (cell && cell.dataset.date === dragStartDate) {
+                endHour = Number(cell.dataset.hour) + 1; // make end exclusive
+            } else {
+                // if mouseup outside grid keep original hour+1
+                endHour = dragStartHour + 1;
+            }
+            clearDragHighlight();
+            openAddEventModal(dragStartDate, Math.min(dragStartHour, endHour - 1), false, endHour);
+        });
+    }
 
     // Update dropdown toggle text based on current view
     function updateDropdownText() {
@@ -1104,7 +1382,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownToggle.textContent = textMap[currentView] || 'Month';
         }
     }
-    
+
     // Initialize the current view
     function initializeView() {
         // Make sure all views are hidden first
@@ -1112,7 +1390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (weekView) weekView.style.display = 'none';
         if (dayView) dayView.style.display = 'none';
         if (yearView) yearView.style.display = 'none';
-        
+
         // Show the current view
         switch (currentView) {
             case 'month':
@@ -1137,13 +1415,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (monthView) monthView.style.display = 'block';
                 renderMonthView(currentDate);
         }
-        
+
         updateDropdownText();
     }
 
     // Initialize the calendar
     initializeView();
-    
+
     // Feature menu
     const openMenuBtn = document.getElementById('openMenuBtn');
     const featureMenu = document.getElementById('featureMenu');
@@ -1186,7 +1464,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Initialize the calendar when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // This will be called after the DOM is fully loaded
     if (currentView === 'month') {
         renderMonthView(currentDate);

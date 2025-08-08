@@ -187,12 +187,12 @@ body {
     padding: 8px 0;
 }
 
-.week-grid-header > div {
+.week-grid-header>div {
     padding: 4px;
     border-right: 1px solid #e0e0e0;
 }
 
-.week-grid-header > div:last-child {
+.week-grid-header>div:last-child {
     border-right: none;
 }
 
@@ -225,13 +225,13 @@ body {
     min-height: 100%;
 }
 
-.all-day-events-container > div {
+.all-day-events-container>div {
     border-right: 1px solid #e0e0e0;
     padding: 4px;
     min-height: 32px;
 }
 
-.all-day-events-container > div:last-child {
+.all-day-events-container>div:last-child {
     border-right: none;
 }
 
@@ -295,20 +295,99 @@ body {
     font-weight: 500;
 }
 
-.day-view-content {
-    display: flex;
-    flex-direction: column;
+/* Main time grid container */
+.day-time-grid {
+    position: relative;
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
+    background-color: #fff;
 }
 
-/* All-day events row in day view */
+/* Time grid container */
+.day-time-grid-container {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    width: 100%;
+    position: relative;
+}
+
+/* Time row container */
+.day-time-row {
+    display: contents;
+}
+
+/* Time label cell (left side) */
+.time-label-cell {
+    position: relative;
+    height: 48px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    background-color: #fff;
+    border-right: 1px solid #e0e0e0;
+}
+
+/* Time label text */
+.time-label {
+    font-size: 10px;
+    color: #70757a;
+    margin-top: -8px;
+    padding-right: 8px;
+    position: relative;
+    background-color: #fff;
+    z-index: 2;
+    font-weight: 400;
+}
+
+/* Day cell (right side) */
+.day-cell {
+    position: relative;
+    min-height: 48px;
+    border-bottom: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    box-sizing: border-box;
+    background-color: #fff;
+    transition: background-color 0.2s;
+}
+
+/* Hover effect for day cells */
+.day-cell:hover {
+    background-color: #f8f9fa;
+}
+
+/* Current time indicator line */
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ea4335;
+    z-index: 2;
+}
+
+.current-time-indicator::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ea4335;
+}
+
+/* All-day events row */
 .day-all-day-row {
     display: grid;
-    grid-template-columns: 4rem 1fr;
-    min-height: 40px;
+    grid-template-columns: 64px 1fr;
+    min-height: 24px;
     border-bottom: 1px solid #e0e0e0;
     background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 3;
 }
 
 .day-all-day-row .time-label {
@@ -325,39 +404,48 @@ body {
 
 .day-all-day-row .all-day-events-container {
     padding: 4px 8px;
-    min-height: 40px;
+    min-height: 24px;
     display: flex;
     align-items: center;
     background: #fff;
+    overflow-x: auto;
 }
 
-/* Time grid in day view */
-.day-time-grid {
-    display: grid;
-    grid-template-columns: 4rem 1fr;
-    overflow-y: auto;
-    flex: 1;
-}
-
-/* Time slots in day view */
-.day-time-slot {
-    height: 48px;
-    border-bottom: 1px solid #f1f3f4;
-    position: relative;
-}
-
-.day-time-slot-label {
+/* Individual events in day view */
+.day-event {
     position: absolute;
-    top: -8px;
-    right: 4px;
-    font-size: 0.75rem;
-    color: #5f6368;
+    left: 8px;
+    right: 8px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 11px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    z-index: 1;
+    border-left: 3px solid #4285f4;
+    background-color: rgba(66, 133, 244, 0.1);
+    color: #1a73e8;
 }
 
-.day-time-cell {
-    border-right: 1px solid #f1f3f4;
-    border-bottom: 1px solid #f1f3f4;
-    position: relative;
+.day-event:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Hour grid lines */
+.day-time-grid-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 64px;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient(to bottom, #f1f3f4 1px, transparent 1px);
+    background-size: 100% 48px;
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Common styles for all-day events */
@@ -417,7 +505,7 @@ body {
     border: 1px solid #e0e0e0 !important;
     transition: background 0.2s;
     position: relative;
-    width: 100% !important;
+    width: 90vw !important;
     margin: 0 !important;
     display: flex;
     align-items: stretch;
@@ -477,7 +565,8 @@ body {
     background: #f8f9fa !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-end !important;
+    justify-content: flex-start !important;
+    padding-left: 8px !important;
     padding-right: 8px !important;
     font-size: 12px !important;
     color: #888 !important;
@@ -485,6 +574,7 @@ body {
     box-sizing: border-box !important;
     border: none !important;
     font-weight: 500;
+    text-align: left;
 }
 
 
