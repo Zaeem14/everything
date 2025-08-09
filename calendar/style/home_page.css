@@ -8,7 +8,7 @@ body {
     color: #202124;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
 }
 
 
@@ -424,7 +424,6 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Hour grid lines */
 .day-time-grid-container::before {
     content: '';
     position: absolute;
@@ -438,7 +437,6 @@ body {
     z-index: 0;
 }
 
-/* Common styles for all-day events */
 .all-day-event {
     padding: 4px 8px;
     border-radius: 4px;
@@ -546,7 +544,7 @@ body {
     border-color: #1a73e8 !important;
 }
 
-/* Prevent text selection during drag */
+
 .month-grid.dragging,
 .week-time-grid.dragging,
 .day-time-grid.dragging {
@@ -769,7 +767,7 @@ body {
         transform: translateX(100%);
         opacity: 0;
         visibility: hidden;
-        display: block !important; /* Ensure it's always block for transform to work */
+        display: block !important; 
     }
     
     #calendarSidebar.show {
@@ -779,7 +777,7 @@ body {
     }
 }
 
-/* Ensure the main content doesn't get hidden behind the sidebar */
+
 .main-container {
     transition: margin-right 0.3s ease;
 }
