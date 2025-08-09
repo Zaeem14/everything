@@ -1,29 +1,153 @@
-/* Event cell styles for solid color blocks */
+/* Event cell base styles */
 .event-cell {
     position: relative;
     overflow: hidden;
+    color: #1a202c !important; /* Default dark text color */
+    transition: opacity 0.2s;
 }
 
+/* All day event specific styles */
+.all-day-event {
+    padding: 2px 6px;
+    margin: 1px 0;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ensure text is visible on colored backgrounds */
 .week-event-title,
-.day-event-title {
+.day-event-title,
+.event-cell {
     position: relative;
     z-index: 10;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    color: inherit !important; /* Force text color to be inherited */
 }
 
-/* Ensure event cells maintain their color */
-.week-cell.event-cell:hover,
-.day-cell.event-cell:hover {
+/* Hover states */
+.event-cell:hover {
     opacity: 0.9;
 }
 
-/* Remove default hover background for event cells */
-.event-cell.hover\:bg-blue-50:hover {
-    background-color: inherit !important;
+/* Override any text-white inheritance */
+.event-cell,
+.event-cell * {
+    color: inherit !important;
 }
 
-/* Override Tailwind hover styles for event cells */
+/* Week view cells */
+.week-cell {
+    min-height: 3rem;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    background-color: white !important; /* Force white background */
+    transition: background-color 0.1s ease;
+}
+
+.week-cell:hover {
+    background-color: #f8fafc !important; /* Force hover color */
+}
+
+/* Reset any unwanted background colors */
+.week-cell.selecting,
+.week-cell.dragging {
+    background-color: #f0f9ff !important; /* Light blue for selection */
+}
+
+/* Time-based events in week view */
+.time-event {
+    --event-bg-color: #4285F4CC;
+    --event-border-color: #4285F4;
+    
+    position: absolute;
+    left: 2px !important;
+    right: 2px !important;
+    width: calc(100% - 4px) !important;
+    max-width: none !important;
+    z-index: 2;
+    pointer-events: auto;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 2px;
+    padding: 1px 4px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    margin: 0 !important;
+    color: #ffffff;
+    background-color: var(--event-bg-color);
+    border-left: 3px solid var(--event-border-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.2s ease, transform 0.1s ease;
+    contain: content;
+}
+
+.time-event > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.time-event:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    z-index: 3;
+}
+
+/* Ensure parent cells properly contain their events */
+.week-cell {
+    position: relative;
+    overflow: visible;
+    contain: layout style;
+}
+
+/* Reset any conflicting styles */
+.time-event[style*="width:"] {
+    width: calc(100% - 4px) !important;
+}
+
+/* Clear any inherited background colors */
+.week-cell:not(.selecting):not(.dragging) {
+    background-color: white !important;
+}
+
+/* Ensure background color is properly set */
 .event-cell {
-    background-color: var(--event-color) !important;
+    background-color: var(--event-color, #e3f2fd) !important;
+    border-left: 3px solid var(--event-border-color, #4285F4);
+}
+
+/* Time-based events in week view */
+.time-event {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    border-radius: 4px;
+    padding: 2px 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.time-event:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+.time-event .title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.time-event .time {
+    font-size: 0.7rem;
+    opacity: 0.9;
 }

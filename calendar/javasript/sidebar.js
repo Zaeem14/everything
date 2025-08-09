@@ -6,6 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const addAppBtn = document.getElementById('addAppBtn');
     const connectedApps = document.getElementById('connectedApps');
     
+    // Ensure sidebar is always visible
+    if (sidebar) {
+        sidebar.style.display = 'block';
+        sidebar.style.visibility = 'visible';
+        sidebar.style.opacity = '1';
+        sidebar.style.transform = 'none';
+    }
+    
     // Toggle sidebar on mobile
     function toggleSidebar() {
         document.body.classList.toggle('sidebar-open');

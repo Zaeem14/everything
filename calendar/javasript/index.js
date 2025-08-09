@@ -62,6 +62,13 @@ function enableDragSelection(gridEl, viewType = 'time') {
     let dragStartCell = null;
     let hasDragged = false;
 
+    // Clear any existing drag-related classes
+    const clearDragClasses = () => {
+        document.querySelectorAll('.selecting, .dragging').forEach(el => {
+            el.classList.remove('selecting', 'dragging');
+        });
+    };
+
     // Add draggable class to cells for visual feedback
     if (viewType === 'month') {
         gridEl.querySelectorAll('.month-cell').forEach(cell => cell.classList.add('draggable'));
@@ -70,6 +77,8 @@ function enableDragSelection(gridEl, viewType = 'time') {
     }
 
     gridEl.addEventListener('mousedown', e => {
+        clearDragClasses();
+        
         const cell = viewType === 'month' ?
             e.target.closest('.month-cell') :
             e.target.closest('.day-cell');
@@ -77,7 +86,7 @@ function enableDragSelection(gridEl, viewType = 'time') {
         if (!cell || !cell.dataset.date) return;
 
         // Don't start drag if clicking on an event
-        if (e.target.closest('.week-event, .month-event')) return;
+        if (e.target.closest('.week-event, .month-event, .time-event')) return;
 
         isDragging = true;
         hasDragged = false;
@@ -199,6 +208,12 @@ function setupColorPickers() {
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize DOM elements
     monthView = document.getElementById('monthView');
+    
+    // Ensure sidebar is visible
+    const calendarSidebar = document.getElementById('calendarSidebar');
+    if (calendarSidebar) {
+        calendarSidebar.style.display = 'block';
+    }
     weekView = document.getElementById('weekView');
     dayView = document.getElementById('dayView');
     yearView = document.getElementById('yearView');
@@ -511,10 +526,17 @@ function renderWeekView(date) {
             // Add each all-day event
             allDayEvents.forEach(ev => {
                 const evDiv = document.createElement('div');
-                evDiv.className = 'all-day-event px-2 py-1 rounded text-xs truncate mb-1';
-                evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
-                evDiv.style.color = ev.color || '#0d47a1';
-                evDiv.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+                evDiv.className = 'all-day-event event-cell';
+                
+                // Set background with opacity and solid border
+                const bgColor = ev.color ? `${ev.color}30` : '#e3f2fd';
+                const borderColor = ev.color || '#4285F4';
+                
+                evDiv.style.setProperty('--event-color', bgColor);
+                evDiv.style.setProperty('--event-border-color', borderColor);
+                evDiv.style.backgroundColor = bgColor;
+                evDiv.style.borderLeft = `3px solid ${borderColor}`;
+                evDiv.style.color = '#1a202c';
                 evDiv.style.cursor = 'pointer';
                 evDiv.textContent = ev.title;
 
@@ -643,52 +665,99 @@ function renderWeekView(date) {
             // Check if any event spans this hour for this day
             const eventsForCell = [];
             calendarEvents.forEach(ev => {
-                if (ev.date !== cellDateStr || ev.allDay) return;
+                // Skip all-day events as they are handled separately
+                if (ev.allDay) return;
+                
+                // Parse event date and time
+                const eventDate = new Date(ev.date);
+                const cellDate = new Date(cellDateStr);
+                
+                // Only process events for this specific day
+                if (eventDate.toDateString() !== cellDate.toDateString()) {
+                    return;
+                }
 
+                // Parse start and end times
                 const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
-                let endH = 23, endM = 59; // Default to end of day if no end time
-
-                if (ev.endTime) {
-                    [endH, endM] = ev.endTime.split(":").map(Number);
-                    // If end time is on the hour, include the previous hour
-                    if (endM === 0) endH--;
+                let [endH, endM] = ev.endTime ? ev.endTime.split(":").map(Number) : [23, 59];
+                
+                // If end time is on the hour, include the previous hour
+                if (endM === 0 && endH > 0) {
+                    endH--;
+                    endM = 59;
                 }
 
                 // Check if current hour is within event's time range
                 if (rowHour >= startH && rowHour <= endH) {
                     eventsForCell.push(ev);
-
-                    // Apply solid color to the entire cell for this hour
-                    dayCell.style.backgroundColor = ev.color || '#4285F4';
-                    dayCell.style.color = '#ffffff';
-                    dayCell.style.borderLeft = `4px solid ${ev.color || '#4285F4'}`;
-                    dayCell.classList.add('event-cell');
                 }
             });
 
-            // Only show event title in the starting hour cell
+            // Process events for this cell
             eventsForCell.forEach(ev => {
-                const [startH] = ev.startTime ? ev.startTime.split(":").map(Number) : [0];
+                const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
+                let [endH, endM] = ev.endTime ? ev.endTime.split(":").map(Number) : [23, 59];
+                
+                // Create event element
+                const evDiv = document.createElement('div');
+                evDiv.className = 'time-event';
+                
+                // Set color-related styles
+                const bgColor = ev.color ? `${ev.color}CC` : '#4285F4CC';
+                const borderColor = ev.color || '#4285F4';
+                
+                // Apply styles as CSS properties
+                evDiv.style.setProperty('--event-bg-color', bgColor);
+                evDiv.style.setProperty('--event-border-color', borderColor);
+                
+                // Reset any problematic styles
+                evDiv.style.margin = '0';
+                evDiv.style.position = 'absolute';
+                evDiv.style.left = '2px';
+                evDiv.style.right = '2px';
+                evDiv.style.width = 'calc(100% - 4px)';
+                evDiv.style.boxSizing = 'border-box';
+                
+                // Set cursor and z-index
+                evDiv.style.cursor = 'pointer';
+                evDiv.style.zIndex = '5';
+
+                // Calculate position and height based on time
+                const startMinute = rowHour === startH ? startM : 0;
+                const endMinute = rowHour === endH ? endM : 60;
+                const heightPercent = ((endMinute - startMinute) / 60) * 100;
+                const topPercent = (startMinute / 60) * 100;
+                
+                evDiv.style.top = `${topPercent}%`;
+                evDiv.style.height = `calc(${heightPercent}% - 1px)`; // Subtract 1px for border
+
+                // Only show title in the starting hour cell
                 if (rowHour === startH) {
-                    const evDiv = document.createElement('div');
-                    evDiv.className = 'week-event-title text-white font-semibold text-xs p-1';
-                    evDiv.style.cursor = 'pointer';
-                    evDiv.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
-                    evDiv.style.position = 'relative';
-                    evDiv.style.zIndex = '10';
-
-                    evDiv.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        openEditEventModal(ev.id);
-                    });
-
-                    evDiv.textContent = ev.title;
-                    const timeSpan = document.createElement('div');
-                    timeSpan.className = 'text-xs opacity-90';
-                    timeSpan.textContent = `${ev.startTime || ''} - ${ev.endTime || ''}`;
-                    evDiv.appendChild(timeSpan);
-                    dayCell.appendChild(evDiv);
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'font-semibold truncate';
+                    titleDiv.textContent = ev.title;
+                    titleDiv.style.overflow = 'hidden';
+                    titleDiv.style.textOverflow = 'ellipsis';
+                    titleDiv.style.whiteSpace = 'nowrap';
+                    evDiv.appendChild(titleDiv);
+                    
+                    const timeDiv = document.createElement('div');
+                    timeDiv.className = 'text-xxs opacity-90';
+                    timeDiv.textContent = `${String(startH).padStart(2, '0')}:${String(startM).padStart(2, '0')} - ${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+                    timeDiv.style.overflow = 'hidden';
+                    timeDiv.style.textOverflow = 'ellipsis';
+                    timeDiv.style.whiteSpace = 'nowrap';
+                    evDiv.appendChild(timeDiv);
                 }
+
+                evDiv.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    openEditEventModal(ev.id);
+                });
+
+                dayCell.style.position = 'relative';
+                dayCell.style.overflow = 'visible';
+                dayCell.appendChild(evDiv);
             });
             // Add event by clicking empty week cell (only if not dragging)
             dayCell.addEventListener('click', function (e) {

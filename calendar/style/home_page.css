@@ -163,18 +163,17 @@ body {
     box-sizing: border-box;
 }
 
-/* Week View Grid Container */
 .week-grid {
     display: grid;
-    grid-template-columns: 4rem repeat(7, 1fr);
+    grid-template-columns: 4rem repeat(7, minmax(0, 1fr));
     grid-template-rows: auto auto 1fr;
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
+    width: 100%;
 }
 
-/* Days of Week Header */
 .week-grid-header {
     grid-column: 1 / -1;
     display: grid;
@@ -196,7 +195,6 @@ body {
     border-right: none;
 }
 
-/* All-day events row */
 .week-all-day-row {
     grid-column: 1 / -1;
     display: grid;
@@ -235,16 +233,17 @@ body {
     border-right: none;
 }
 
-/* Time grid */
-.week-time-grid {
+
+#weekTimeGrid {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 4rem repeat(7, minmax(0, 1fr));
-    overflow-y: auto;
-    max-height: 70vh;
+    grid-auto-rows: 3rem;
+    position: relative;
+    width: 100%;
+    min-width: 0;
 }
 
-/* Time slots */
 .time-slot {
     height: 48px;
     border-bottom: 1px solid #f1f3f4;
@@ -259,18 +258,18 @@ body {
     color: #5f6368;
 }
 
-/* Day cells */
 .day-cell {
     border-right: 1px solid #f1f3f4;
     border-bottom: 1px solid #f1f3f4;
     position: relative;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .day-cell:last-child {
     border-right: none;
 }
 
-/* Day View */
 .day-view {
     display: flex;
     flex-direction: column;
@@ -295,7 +294,6 @@ body {
     font-weight: 500;
 }
 
-/* Main time grid container */
 .day-time-grid {
     position: relative;
     flex: 1;
@@ -303,7 +301,6 @@ body {
     background-color: #fff;
 }
 
-/* Time grid container */
 .day-time-grid-container {
     display: grid;
     grid-template-columns: 64px 1fr;
@@ -311,12 +308,10 @@ body {
     position: relative;
 }
 
-/* Time row container */
 .day-time-row {
     display: contents;
 }
 
-/* Time label cell (left side) */
 .time-label-cell {
     position: relative;
     height: 48px;
@@ -329,7 +324,6 @@ body {
     border-right: 1px solid #e0e0e0;
 }
 
-/* Time label text */
 .time-label {
     font-size: 10px;
     color: #70757a;
@@ -341,7 +335,6 @@ body {
     font-weight: 400;
 }
 
-/* Day cell (right side) */
 .day-cell {
     position: relative;
     min-height: 48px;
@@ -352,12 +345,10 @@ body {
     transition: background-color 0.2s;
 }
 
-/* Hover effect for day cells */
 .day-cell:hover {
     background-color: #f8f9fa;
 }
 
-/* Current time indicator line */
 .current-time-indicator {
     position: absolute;
     left: 0;
@@ -378,7 +369,6 @@ body {
     background-color: #ea4335;
 }
 
-/* All-day events row */
 .day-all-day-row {
     display: grid;
     grid-template-columns: 64px 1fr;
@@ -411,7 +401,6 @@ body {
     overflow-x: auto;
 }
 
-/* Individual events in day view */
 .day-event {
     position: absolute;
     left: 8px;
@@ -530,7 +519,6 @@ body {
     background: #f1f8fe !important;
 }
 
-/* Drag selection styles */
 .day-cell.selecting {
     background: #c2e7ff !important;
     border-color: #1a73e8 !important;
@@ -756,19 +744,48 @@ body {
     width: 100%;
 }
 
+/* Sidebar styles - Force visibility */
 #calendarSidebar {
-    width: 3%;
-    background-color: #ffffff;
-    border-left: 1px solid #e0e0e0;
-    height: calc(100vh - 64px);
-    position: fixed;
-    right: 0;
-    top: 64px;
-    overflow-y: auto;
-    transition: transform 0.3s ease, width 0.3s ease;
-    z-index: 990;
-    padding: 16px;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+    width: 3% !important;
+    background-color: #ffffff !important;
+    border-left: 1px solid #e0e0e0 !important;
+    height: calc(100vh - 64px) !important;
+    position: fixed !important;
+    right: 0 !important;
+    top: 64px !important;
+    overflow-y: auto !important;
+    z-index: 990 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05) !important;
+    pointer-events: auto !important;
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+    #calendarSidebar {
+        transform: translateX(100%);
+        opacity: 0;
+        visibility: hidden;
+        display: block !important; /* Ensure it's always block for transform to work */
+    }
+    
+    #calendarSidebar.show {
+        transform: translateX(0);
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* Ensure the main content doesn't get hidden behind the sidebar */
+.main-container {
+    transition: margin-right 0.3s ease;
+}
+
+.sidebar-open .main-container {
+    margin-right: 16rem;
 }
 
 
@@ -782,7 +799,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* Sidebar Sections */
 .sidebar-section {
     margin-bottom: 20px;
 }
