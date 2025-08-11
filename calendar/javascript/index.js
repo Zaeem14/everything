@@ -316,7 +316,7 @@ function renderMonthView(date) {
                 evDiv.style.color = ev.color || '#0d47a1';
                 evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    openEditEventModal(ev.id);
+                    openViewEventModal(ev.id);
                 });
                 if (ev.allDay) {
                     evDiv.textContent = `• ${ev.title} (All Day)`;
@@ -404,7 +404,7 @@ function renderWeekView(date) {
 
                 evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    openEditEventModal(ev.id);
+                    openViewEventModal(ev.id);
                 });
 
                 dayCell.appendChild(evDiv);
@@ -614,7 +614,7 @@ function renderWeekView(date) {
 
                 evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    openEditEventModal(ev.id);
+                    openViewEventModal(ev.id);
                 });
 
                 dayCell.style.position = 'relative';
@@ -762,7 +762,7 @@ function renderDayView(date) {
 
             evDiv.addEventListener('click', function (e) {
                 e.stopPropagation();
-                openEditEventModal(ev.id);
+                openViewEventModal(ev.id);
             });
 
             dayAllDayEvents.appendChild(evDiv);
@@ -801,7 +801,7 @@ function renderDayView(date) {
             evDiv.style.color = ev.color || '#0d47a1';
             evDiv.addEventListener('click', function (e) {
                 e.stopPropagation();
-                openEditEventModal(ev.id);
+                openViewEventModal(ev.id);
             });
             evDiv.textContent = `${ev.title} (All Day)`;
             allDayRow.appendChild(evDiv);
@@ -865,7 +865,7 @@ function renderDayView(date) {
                 // Apply solid color to the entire cell for this hour
                 dayCell.style.backgroundColor = ev.color || '#4285F4';
                 dayCell.style.color = '#ffffff';
-                dayCell.style.borderLeft = `4px solid ${ev.color || '#4285F4'}`;
+                dayCell.style.borderLeft = `4px solid ${ev.color || '#1a237e'}`;
                 dayCell.classList.add('event-cell');
 
                 // Only show event title in the starting hour
@@ -876,7 +876,7 @@ function renderDayView(date) {
                     evDiv.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
                     evDiv.addEventListener('click', function (e) {
                         e.stopPropagation();
-                        openEditEventModal(ev.id);
+                        openViewEventModal(ev.id);
                     });
                     evDiv.textContent = ev.title;
                     const timeSpan = document.createElement('div');
@@ -1018,6 +1018,72 @@ function openAddEventModal(date, hour, isAllDay = false, endHour = null, endDate
     }
 
     const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+    modal.show();
+}
+
+function openViewEventModal(eventId) {
+    const event = calendarEvents.find(e => e.id === eventId);
+    if (!event) return;
+
+    document.getElementById('viewEventTitle').textContent = event.title;
+    document.getElementById('viewEventDate').textContent = new Date(event.date).toLocaleDateString();
+    document.getElementById('viewEventTime').textContent = event.allDay ? 'All Day' : `${event.startTime} - ${event.endTime}`;
+    document.getElementById('viewEventDescription').textContent = event.description || 'No description provided.';
+    
+    const colorSpan = document.getElementById('viewEventColor');
+    colorSpan.textContent = event.color;
+    colorSpan.style.color = event.color;
+
+    const viewEventModalEl = document.getElementById('viewEventModal');
+    let viewModal = bootstrap.Modal.getInstance(viewEventModalEl);
+    if (!viewModal) {
+        viewModal = new bootstrap.Modal(viewEventModalEl);
+    }
+    viewModal.show();
+
+    document.getElementById('editEventBtn').onclick = () => {
+        viewModal.hide();
+        openEditEventModal(eventId);
+    };
+
+    document.getElementById('deleteEventBtn').onclick = () => {
+        if (confirm('Are you sure you want to delete this event?')) {
+            calendarEvents = calendarEvents.filter(e => e.id !== eventId);
+            if (window.localStorage) {
+                localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
+            }
+            viewModal.hide();
+            // Re-render the current view
+            if (currentView === 'month') renderMonthView(currentDate);
+            else if (currentView === 'week') renderWeekView(currentDate);
+            else if (currentView === 'day') renderDayView(currentDate);
+        }
+    };
+}
+
+function openEditEventModal(eventId) {
+    const event = calendarEvents.find(ev => ev.id === eventId);
+    if (!event) return;
+
+    editEventId.value = event.id;
+    editEventTitle.value = event.title;
+    editEventDate.value = event.date;
+    editEventAllDay.checked = event.allDay || false;
+    editEventStartTime.value = event.startTime || '';
+    editEventEndTime.value = event.endTime || '';
+    editEventDescription.value = event.description || '';
+    editEventColor.value = event.color || '#4285F4';
+
+    // Set the color picker
+    const color = event.color || '#4285F4';
+    document.querySelectorAll('#editEventModal .color-option').forEach(option => {
+        option.classList.remove('selected');
+        if (option.getAttribute('data-color') === color) {
+            option.classList.add('selected');
+        }
+    });
+    if (editEventAllDay) editEventAllDay.dispatchEvent(new Event('change'));
+    const modal = new bootstrap.Modal(editEventModal);
     modal.show();
 }
 
@@ -1230,33 +1296,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Utility: open edit modal with event data
-    function openEditEventModal(eventId) {
-        const event = calendarEvents.find(ev => ev.id === eventId);
-        if (!event) return;
-
-        editEventId.value = event.id;
-        editEventTitle.value = event.title;
-        editEventDate.value = event.date;
-        editEventAllDay.checked = event.allDay || false;
-        editEventStartTime.value = event.startTime || '';
-        editEventEndTime.value = event.endTime || '';
-        editEventDescription.value = event.description || '';
-        editEventColor.value = event.color || '#4285F4';
-
-        // Set the color picker
-        const color = event.color || '#4285F4';
-        document.querySelectorAll('#editEventModal .color-option').forEach(option => {
-            option.classList.remove('selected');
-            if (option.getAttribute('data-color') === color) {
-                option.classList.add('selected');
-            }
-        });
-        if (editEventAllDay) editEventAllDay.dispatchEvent(new Event('change'));
-        const modal = new bootstrap.Modal(editEventModal);
-        modal.show();
-    }
-
     if (addEventForm) {
         console.log('Add event form found, attaching submit listener');
         addEventForm.addEventListener('submit', function (e) {
@@ -1270,26 +1309,27 @@ document.addEventListener('DOMContentLoaded', function () {
             const startTime = document.getElementById('eventStartTime').value;
             const endTime = document.getElementById('eventEndTime').value;
             const description = document.getElementById('eventDescription').value;
-            const color = document.getElementById('eventColor').value || '#4285F4';
+            const color = document.getElementById('eventColor').value;
 
-            console.log('Form values:', { title, date, allDay, startTime, endTime, description, color });
+            // Basic validation
+            if (!title || !date) {
+                alert('Title and date are required.');
+                return;
+            }
 
-            // Create event object
             const newEvent = {
-                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                id: `event-${Date.now()}`,
                 title: title,
                 date: date,
                 allDay: allDay,
                 startTime: allDay ? null : startTime,
                 endTime: allDay ? null : endTime,
-                description: description || '',
+                description: description,
                 color: color || '#4285F4'
             };
 
-            console.log('Creating new event:', newEvent);
             calendarEvents.push(newEvent);
             console.log('Event added successfully. Total events:', calendarEvents.length);
-            console.log('All events:', calendarEvents);
             // Persist to localStorage
             if (window.localStorage) {
                 try {

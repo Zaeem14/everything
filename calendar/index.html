@@ -199,6 +199,28 @@
       +
     </button>
 
+    <!-- View Event Modal -->
+    <div class="modal fade" id="viewEventModal" tabindex="-1" aria-labelledby="viewEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewEventTitle">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Date:</strong> <span id="viewEventDate"></span></p>
+                    <p><strong>Time:</strong> <span id="viewEventTime"></span></p>
+                    <p><strong>Description:</strong> <span id="viewEventDescription"></span></p>
+                    <p><strong>Color:</strong> <span id="viewEventColor"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteEventBtn">Delete</button>
+                    <button type="button" class="btn btn-primary" id="editEventBtn">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Event Modal -->
     <div id="addEventModal" class="modal fade" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
@@ -311,10 +333,9 @@
       </div>
     </div>
 
-    <script src="/calendar/javasript/openAddEventModal.global.js"></script>
-    <script src="/calendar/javasript/index.js"></script>
-    <script src="/calendar/javasript/event_blocks.js"></script>
-    <script src="/calendar/javasript/sidebar.js"></script>
+    <script src="/calendar/javascript/openAddEventModal.global.js"></script>
+    <script src="/calendar/javascript/index.js"></script>
+    <script src="/calendar/javascript/sidebar.js"></script>
   </body>
 
 </html>
