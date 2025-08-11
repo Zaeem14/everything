@@ -802,46 +802,47 @@ function renderDayView(date) {
     // Filter timed events for the current day once
     const timedEvents = calendarEvents.filter(ev => ev.date === formatDateToISO(date) && !ev.allDay);
 
-    // For each hour, create a row with time label and day cell
-    for (let i = 0; i < hours.length; i++) {
-        const rowHour = hours[i];
+    // Create time slots for every 30 minutes
+    for (let h = 0; h < 24; h++) {
+        for (let m = 0; m < 60; m += 30) {
+            const row = document.createElement('div');
+            row.className = 'day-time-row';
 
-        // Create a row container
-        const row = document.createElement('div');
-        row.className = 'day-time-row';
+            // Time label cell
+            const timeCell = document.createElement('div');
+            timeCell.className = 'time-label-cell';
 
-        // Time label cell (left side)
-        const timeCell = document.createElement('div');
-        timeCell.className = 'time-label-cell';
+            // Only show label for the full hour
+            if (m === 0) {
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                let displayHour = h % 12 || 12;
+                const ampm = h < 12 ? 'AM' : 'PM';
+                if (h === 0) displayHour = 12; // Midnight
+                timeLabel.textContent = `${displayHour} ${ampm}`;
+                timeCell.appendChild(timeLabel);
+            }
+            row.appendChild(timeCell);
 
-        const timeLabel = document.createElement('div');
-        timeLabel.className = 'time-label';
+            // Day cell for the time slot
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell';
+            if (m === 0) {
+                dayCell.classList.add('hour-start'); // Add border to top of hour cells
+            }
+            dayCell.dataset.date = formatDateToISO(date);
+            dayCell.dataset.hour = h;
+            dayCell.dataset.minute = m;
 
-        // Format time (e.g., 12 PM, 1 PM, etc.)
-        let displayHour = rowHour % 12 || 12;
-        const ampm = rowHour < 12 || rowHour === 24 ? 'AM' : 'PM';
-        if (rowHour === 0) displayHour = 12; // 12 AM
+            dayCell.addEventListener('click', (e) => {
+                if (isDragging || dayTimeGrid.classList.contains('dragging') || e.target.closest('.time-event')) return;
+                const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                openAddEventModal(formatDateToISO(date), h, false, null, null, time);
+            });
 
-        timeLabel.textContent = `${displayHour} ${ampm}`;
-        timeCell.appendChild(timeLabel);
-        row.appendChild(timeCell);
-
-        // Day cell (right side)
-        const dayCell = document.createElement('div');
-        dayCell.className = 'day-cell';
-        dayCell.dataset.date = formatDateToISO(date);
-        dayCell.dataset.hour = rowHour;
-
-
-
-        // Add event on cell click (only if not dragging)
-        dayCell.addEventListener('click', (e) => {
-            if (isDragging || dayTimeGrid.classList.contains('dragging') || e.target.closest('.time-event')) return;
-            openAddEventModal(formatDateToISO(date), rowHour);
-        });
-
-        row.appendChild(dayCell);
-        timeGridContainer.appendChild(row);
+            row.appendChild(dayCell);
+            timeGridContainer.appendChild(row);
+        }
     }
 
     // Create a separate container for timed events, positioned over the grid
@@ -855,8 +856,33 @@ function renderDayView(date) {
     timedEventsContainer.style.pointerEvents = 'none'; // Allow clicks to pass through to the grid
     timeGridContainer.appendChild(timedEventsContainer);
 
+    // Function to find overlapping events
+    const getOverlappingEvents = (events) => {
+        const sortedEvents = events.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+        const groups = [];
+        let lastEventEnd = null;
+
+        sortedEvents.forEach(event => {
+            const eventStart = new Date(`${event.date}T${event.startTime || '00:00:00'}`);
+            if (lastEventEnd && eventStart < lastEventEnd) {
+                groups[groups.length - 1].push(event);
+            } else {
+                groups.push([event]);
+            }
+            const eventEnd = new Date(`${event.date}T${event.endTime || '23:59:59'}`);
+            if (!lastEventEnd || eventEnd > lastEventEnd) {
+                lastEventEnd = eventEnd;
+            }
+        });
+        return groups;
+    };
+
+    const eventGroups = getOverlappingEvents(timedEvents);
+
     // Render timed events in the overlay container
-    timedEvents.forEach(ev => {
+    eventGroups.forEach(group => {
+        const groupWidth = 100 / group.length;
+        group.forEach((ev, index) => {
         const [startH, startM] = ev.startTime ? ev.startTime.split(':').map(Number) : [0, 0];
         const [endH, endM] = ev.endTime ? ev.endTime.split(':').map(Number) : [startH, 30];
 
@@ -870,8 +896,8 @@ function renderDayView(date) {
         evDiv.style.backgroundColor = ev.color || '#4285F4';
         evDiv.style.color = 'white';
         evDiv.style.position = 'absolute';
-        evDiv.style.left = '0';
-        evDiv.style.right = '10px'; // Add some padding
+        evDiv.style.left = `${index * groupWidth}%`;
+        evDiv.style.width = `${groupWidth}%`;
         evDiv.style.top = `${(totalStartMinutes / (24 * 60)) * 100}%`;
         evDiv.style.height = `${(durationMinutes / (24 * 60)) * 100}%`;
         evDiv.style.borderLeft = `3px solid ${ev.color ? darkenColor(ev.color, 20) : '#1a237e'}`;
@@ -886,6 +912,7 @@ function renderDayView(date) {
         });
 
         timedEventsContainer.appendChild(evDiv);
+        });
     });
 
 
@@ -1009,13 +1036,22 @@ function openAddEventModal(date, hour, isAllDay = false, endHour = null, endDate
     modal.show();
 }
 
+// Utility to format time to 12-hour AM/PM format
+function formatTime12Hour(timeString) {
+    if (!timeString) return '';
+    const [hour, minute] = timeString.split(':').map(Number);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${String(minute).padStart(2, '0')} ${ampm}`;
+}
+
 function openViewEventModal(eventId) {
     const event = calendarEvents.find(e => e.id === eventId);
     if (!event) return;
 
     document.getElementById('viewEventTitle').textContent = event.title;
     document.getElementById('viewEventDate').textContent = new Date(event.date).toLocaleDateString();
-    document.getElementById('viewEventTime').textContent = event.allDay ? 'All Day' : `${event.startTime} - ${event.endTime}`;
+    document.getElementById('viewEventTime').textContent = event.allDay ? 'All Day' : `${formatTime12Hour(event.startTime)} - ${formatTime12Hour(event.endTime)}`;
     document.getElementById('viewEventDescription').textContent = event.description || 'No description provided.';
     
     const colorSpan = document.getElementById('viewEventColor');
