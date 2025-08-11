@@ -645,6 +645,17 @@ function renderWeekView(date) {
     }
 }
 
+// Helper to darken color for border
+function darkenColor(color, percent) {
+    let f = parseInt(color.slice(1), 16);
+    let t = percent < 0 ? 0 : 255;
+    let p = percent < 0 ? percent * -1 : percent;
+    let R = f >> 16;
+    let G = (f >> 8) & 0x00FF;
+    let B = f & 0x0000FF;
+    return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
+}
+
 // for the day view
 
 function renderDayView(date) {
@@ -788,26 +799,8 @@ function renderDayView(date) {
         hours.push(h);
     }
 
-    // All-day events at the top (before time rows)
-    const allDayEvents = calendarEvents.filter(ev => ev.date === formatDateToISO(date) && ev.allDay);
-    if (allDayEvents.length > 0) {
-        const allDayRow = document.createElement('div');
-        allDayRow.className = 'day-all-day-events mb-2';
-        allDayEvents.forEach(ev => {
-            const evDiv = document.createElement('div');
-            evDiv.className = 'day-event px-1 py-0.5 rounded mb-1 text-xs truncate';
-            evDiv.style.cursor = 'pointer';
-            evDiv.style.backgroundColor = ev.color ? `${ev.color}20` : '#e3f2fd';
-            evDiv.style.color = ev.color || '#0d47a1';
-            evDiv.addEventListener('click', function (e) {
-                e.stopPropagation();
-                openViewEventModal(ev.id);
-            });
-            evDiv.textContent = `${ev.title} (All Day)`;
-            allDayRow.appendChild(evDiv);
-        });
-        dayTimeGrid.appendChild(allDayRow);
-    }
+    // Filter timed events for the current day once
+    const timedEvents = calendarEvents.filter(ev => ev.date === formatDateToISO(date) && !ev.allDay);
 
     // For each hour, create a row with time label and day cell
     for (let i = 0; i < hours.length; i++) {
@@ -828,7 +821,6 @@ function renderDayView(date) {
         let displayHour = rowHour % 12 || 12;
         const ampm = rowHour < 12 || rowHour === 24 ? 'AM' : 'PM';
         if (rowHour === 0) displayHour = 12; // 12 AM
-        if (rowHour === 24) displayHour = 12; // 12 AM next day
 
         timeLabel.textContent = `${displayHour} ${ampm}`;
         timeCell.appendChild(timeLabel);
@@ -840,67 +832,63 @@ function renderDayView(date) {
         dayCell.dataset.date = formatDateToISO(date);
         dayCell.dataset.hour = rowHour;
 
-        // Store date and hour for event placement
-        dayCell.dataset.date = formatDateToISO(date);
-        dayCell.dataset.hour = rowHour;
 
-        // Check if any event spans this hour
-        const eventsForHour = [];
-        calendarEvents.forEach(ev => {
-            if (ev.date !== formatDateToISO(date) || ev.allDay) return;
-
-            const [startH, startM] = ev.startTime ? ev.startTime.split(":").map(Number) : [0, 0];
-            let endH = 23, endM = 59; // Default to end of day if no end time
-
-            if (ev.endTime) {
-                [endH, endM] = ev.endTime.split(":").map(Number);
-                // If end time is on the hour, include the previous hour
-                if (endM === 0) endH--;
-            }
-
-            // Check if current hour is within event's time range
-            if (rowHour >= startH && rowHour <= endH) {
-                eventsForHour.push(ev);
-
-                // Apply solid color to the entire cell for this hour
-                dayCell.style.backgroundColor = ev.color || '#4285F4';
-                dayCell.style.color = '#ffffff';
-                dayCell.style.borderLeft = `4px solid ${ev.color || '#1a237e'}`;
-                dayCell.classList.add('event-cell');
-
-                // Only show event title in the starting hour
-                if (rowHour === startH) {
-                    const evDiv = document.createElement('div');
-                    evDiv.className = 'day-event-title text-white font-semibold text-xs p-1';
-                    evDiv.style.cursor = 'pointer';
-                    evDiv.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
-                    evDiv.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        openViewEventModal(ev.id);
-                    });
-                    evDiv.textContent = ev.title;
-                    const timeSpan = document.createElement('div');
-                    timeSpan.className = 'text-xs opacity-90';
-                    timeSpan.textContent = `${ev.startTime || ''} - ${ev.endTime || ''}`;
-                    evDiv.appendChild(timeSpan);
-                    dayCell.appendChild(evDiv);
-                }
-            }
-        });
 
         // Add event on cell click (only if not dragging)
         dayCell.addEventListener('click', (e) => {
-            // Don't open modal if we're dragging or just finished dragging
-            if (isDragging || dayTimeGrid.classList.contains('dragging')) return;
-            if (e.target.closest('.day-event-title')) return;
+            if (isDragging || dayTimeGrid.classList.contains('dragging') || e.target.closest('.time-event')) return;
             openAddEventModal(formatDateToISO(date), rowHour);
         });
-        // Add day cell to row
-        row.appendChild(dayCell);
 
-        // Add row to container
+        row.appendChild(dayCell);
         timeGridContainer.appendChild(row);
     }
+
+    // Create a separate container for timed events, positioned over the grid
+    const timedEventsContainer = document.createElement('div');
+    timedEventsContainer.className = 'timed-events-container';
+    timedEventsContainer.style.position = 'absolute';
+    timedEventsContainer.style.top = '0';
+    timedEventsContainer.style.left = '60px'; // Width of the time label
+    timedEventsContainer.style.right = '0';
+    timedEventsContainer.style.bottom = '0';
+    timedEventsContainer.style.pointerEvents = 'none'; // Allow clicks to pass through to the grid
+    timeGridContainer.appendChild(timedEventsContainer);
+
+    // Render timed events in the overlay container
+    timedEvents.forEach(ev => {
+        const [startH, startM] = ev.startTime ? ev.startTime.split(':').map(Number) : [0, 0];
+        const [endH, endM] = ev.endTime ? ev.endTime.split(':').map(Number) : [startH, 30];
+
+        const totalStartMinutes = startH * 60 + startM;
+        const totalEndMinutes = endH * 60 + endM;
+        const durationMinutes = totalEndMinutes - totalStartMinutes;
+
+        const evDiv = document.createElement('div');
+        evDiv.className = 'time-event';
+        evDiv.textContent = ev.title;
+        evDiv.style.backgroundColor = ev.color || '#4285F4';
+        evDiv.style.color = 'white';
+        evDiv.style.position = 'absolute';
+        evDiv.style.left = '0';
+        evDiv.style.right = '10px'; // Add some padding
+        evDiv.style.top = `${(totalStartMinutes / (24 * 60)) * 100}%`;
+        evDiv.style.height = `${(durationMinutes / (24 * 60)) * 100}%`;
+        evDiv.style.borderLeft = `3px solid ${ev.color ? darkenColor(ev.color, 20) : '#1a237e'}`;
+        evDiv.style.padding = '2px 5px';
+        evDiv.style.fontSize = '12px';
+        evDiv.style.borderRadius = '4px';
+        evDiv.style.pointerEvents = 'auto'; // Make individual events clickable
+
+        evDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openViewEventModal(ev.id);
+        });
+
+        timedEventsContainer.appendChild(evDiv);
+    });
+
+
 
     console.log('dayTimeGrid children after render:', dayTimeGrid.children.length);
     console.log('dayTimeGrid:', dayTimeGrid, 'children:', dayTimeGrid.children.length, 'dayView.style.display:', dayView.style.display, 'computed display:', getComputedStyle(dayView).display);
@@ -1269,6 +1257,15 @@ document.addEventListener('DOMContentLoaded', function () {
         editEventForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const id = editEventId.value;
+            const allDay = editEventAllDay.checked;
+            const startTime = editEventStartTime.value;
+            const endTime = editEventEndTime.value;
+
+            if (!allDay && (!startTime || !endTime)) {
+                alert('Start time and end time are required for non-all-day events.');
+                return;
+            }
+
             const idx = calendarEvents.findIndex(ev => ev.id === id);
             if (idx !== -1) {
                 calendarEvents[idx].title = editEventTitle.value;
@@ -1312,6 +1309,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const color = document.getElementById('eventColor').value;
 
             // Basic validation
+            if (!allDay && (!startTime || !endTime)) {
+                alert('Start time and end time are required for non-all-day events.');
+                return;
+            }
+
             if (!title || !date) {
                 alert('Title and date are required.');
                 return;
