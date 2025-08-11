@@ -56,122 +56,65 @@ function highlightMonthRange(startDate, endDate) {
 
 // Universal drag selection enabler for all views
 function enableDragSelection(gridEl, viewType = 'time') {
-    if (!gridEl || gridEl.dataset.dragSetup) return; // prevent duplicates
-    gridEl.dataset.dragSetup = '1';
+    if (!gridEl || gridEl.dataset.dragSetup) return;
+    gridEl.dataset.dragSetup = 'true';
 
     let dragStartCell = null;
-    let hasDragged = false;
 
-    // Clear any existing drag-related classes
-    const clearDragClasses = () => {
-        document.querySelectorAll('.selecting, .dragging').forEach(el => {
-            el.classList.remove('selecting', 'dragging');
-        });
-    };
-
-    // Add draggable class to cells for visual feedback
-    if (viewType === 'month') {
-        gridEl.querySelectorAll('.month-cell').forEach(cell => cell.classList.add('draggable'));
-    } else {
-        gridEl.querySelectorAll('.day-cell').forEach(cell => cell.classList.add('draggable'));
-    }
-
-    gridEl.addEventListener('mousedown', e => {
-        clearDragClasses();
-        
-        const cell = viewType === 'month' ?
-            e.target.closest('.month-cell') :
-            e.target.closest('.day-cell');
-
-        if (!cell || !cell.dataset.date) return;
-
-        // Don't start drag if clicking on an event
-        if (e.target.closest('.week-event, .month-event, .time-event')) return;
+    const handleMouseDown = (e) => {
+        const targetCell = viewType === 'month' ? e.target.closest('.month-cell') : e.target.closest('.day-cell');
+        if (!targetCell || e.target.closest('.week-event, .month-event, .time-event')) return;
 
         isDragging = true;
-        hasDragged = false;
-        dragStartCell = cell;
+        dragStartCell = targetCell;
+        dragStartDate = targetCell.dataset.date;
+        if (viewType !== 'month') {
+            dragStartHour = Number(targetCell.dataset.hour);
+        }
+
         gridEl.classList.add('dragging');
-        dragStartDate = cell.dataset.date;
-
-        if (viewType === 'month') {
-            highlightMonthRange(dragStartDate, dragStartDate);
-        } else {
-            dragStartHour = Number(cell.dataset.hour || 0);
-            highlightRange(gridEl, dragStartDate, dragStartHour, dragStartHour);
-        }
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
         e.preventDefault();
-        e.stopPropagation();
-    });
+    };
 
-    gridEl.addEventListener('mousemove', e => {
+    const handleMouseMove = (e) => {
         if (!isDragging) return;
 
-        const cell = viewType === 'month' ?
-            e.target.closest('.month-cell') :
-            e.target.closest('.day-cell');
-
-        if (!cell || !cell.dataset.date) return;
-
-        // Mark that we've actually dragged (not just clicked)
-        if (cell !== dragStartCell) {
-            hasDragged = true;
-        }
+        const overCell = viewType === 'month' ? e.target.closest('.month-cell') : e.target.closest('.day-cell');
+        if (!overCell) return;
 
         if (viewType === 'month') {
-            highlightMonthRange(dragStartDate, cell.dataset.date);
+            highlightMonthRange(dragStartDate, overCell.dataset.date);
         } else {
-            if (cell.dataset.date !== dragStartDate) return;
-            const hour = Number(cell.dataset.hour || 0);
-            highlightRange(gridEl, dragStartDate, dragStartHour, hour);
-        }
-    });
-
-    // Use a single global mouseup handler
-    const mouseUpHandler = e => {
-        if (!isDragging) return;
-
-        const wasDragging = hasDragged;
-        isDragging = false;
-        hasDragged = false;
-        dragStartCell = null;
-        gridEl.classList.remove('dragging');
-
-        const cell = viewType === 'month' ?
-            e.target.closest('.month-cell') :
-            e.target.closest('.day-cell');
-
-        // Only open modal if we actually dragged
-        if (wasDragging) {
-            if (viewType === 'month') {
-                let endDate = dragStartDate;
-                if (cell && cell.dataset.date) {
-                    endDate = cell.dataset.date;
-                }
-                clearDragHighlight();
-                // For month view, open modal with all-day event
-                openAddEventModal(dragStartDate, null, true, null, endDate);
-            } else {
-                let endHour = dragStartHour;
-                if (cell && cell.dataset.date === dragStartDate) {
-                    endHour = Number(cell.dataset.hour || 0) + 1; // make end exclusive
-                } else {
-                    endHour = dragStartHour + 1;
-                }
-                clearDragHighlight();
-                openAddEventModal(dragStartDate, Math.min(dragStartHour, endHour - 1), false, endHour);
-            }
-            e.preventDefault();
-            e.stopPropagation();
-        } else {
-            // If we didn't drag, just clear the highlight
-            clearDragHighlight();
+            const currentHour = Number(overCell.dataset.hour);
+            highlightRange(gridEl, dragStartDate, dragStartHour, currentHour);
         }
     };
 
-    // Remove old listener if exists and add new one
-    document.removeEventListener('mouseup', mouseUpHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
+    const handleMouseUp = (e) => {
+        if (!isDragging) return;
+
+        const endCell = viewType === 'month' ? e.target.closest('.month-cell') : e.target.closest('.day-cell');
+        
+        if (dragStartCell && endCell && dragStartCell !== endCell) {
+            if (viewType === 'month') {
+                openAddEventModal(dragStartDate, null, true, null, endCell.dataset.date);
+            } else {
+                const endHour = Number(endCell.dataset.hour) + 1;
+                openAddEventModal(dragStartDate, dragStartHour, false, endHour);
+            }
+        }
+
+        isDragging = false;
+        dragStartCell = null;
+        gridEl.classList.remove('dragging');
+        clearDragHighlight();
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    gridEl.addEventListener('mousedown', handleMouseDown);
 }
 
 // --- Utility: update dropdown toggle text based on current view (global) ---
@@ -208,12 +151,6 @@ function setupColorPickers() {
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize DOM elements
     monthView = document.getElementById('monthView');
-    
-    // Ensure sidebar is visible
-    const calendarSidebar = document.getElementById('calendarSidebar');
-    if (calendarSidebar) {
-        calendarSidebar.style.display = 'block';
-    }
     weekView = document.getElementById('weekView');
     dayView = document.getElementById('dayView');
     yearView = document.getElementById('yearView');
@@ -224,96 +161,53 @@ document.addEventListener('DOMContentLoaded', function () {
     currentDisplay = document.getElementById('currentDisplay');
     todayBtn = document.querySelector('.today-button');
 
-    // Initialize view buttons
+    // View buttons
     weekViewBtn = document.querySelector('.weekViewBtn');
     dayViewBtn = document.querySelector('.dayViewBtn');
     monthViewBtn = document.querySelector('.monthViewBtn');
     yearViewBtn = document.querySelector('.yearViewBtn');
 
-    // Set up view switch event listeners
-    if (weekViewBtn) {
-        weekViewBtn.addEventListener('click', () => {
-            currentView = 'week';
-            renderWeekView(currentDate);
-            updateDropdownText();
-        });
-    }
-    if (dayViewBtn) {
-        dayViewBtn.addEventListener('click', () => {
-            currentView = 'day';
-            renderDayView(currentDate);
-            updateDropdownText();
-        });
-    }
-    if (monthViewBtn) {
-        monthViewBtn.addEventListener('click', () => {
-            currentView = 'month';
-            renderMonthView(currentDate);
-            updateDropdownText();
-        });
-    }
-    if (yearViewBtn) {
-        yearViewBtn.addEventListener('click', () => {
-            currentView = 'year';
-            renderYearView(currentDate);
-            updateDropdownText();
-        });
-    }
-
-    // Initial render
-    if (currentView === 'month') {
-        renderMonthView(currentDate);
-    } else if (currentView === 'week') {
-        renderWeekView(currentDate);
-    } else if (currentView === 'day') {
-        renderDayView(currentDate);
-    } else if (currentView === 'year') {
-        renderYearView(currentDate);
-    }
-    updateDropdownText();
-
-    // Initialize color pickers
-    setupColorPickers();
-
-    // Set up event listeners for the calendar navigation
+    // Calendar navigation
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const todayNavBtn = document.getElementById('todayBtn');
 
+    // Event listeners for view switching
+    const viewButtons = [
+        { btn: monthViewBtn, view: 'month', render: renderMonthView },
+        { btn: weekViewBtn, view: 'week', render: renderWeekView },
+        { btn: dayViewBtn, view: 'day', render: renderDayView },
+        { btn: yearViewBtn, view: 'year', render: renderYearView },
+    ];
+
+    viewButtons.forEach(({ btn, view, render }) => {
+        if (btn) {
+            btn.addEventListener('click', () => {
+                currentView = view;
+                render(currentDate);
+                updateDropdownText();
+            });
+        }
+    });
+
+    // Event listeners for navigation
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
-            if (currentView === 'month') {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                renderMonthView(currentDate);
-            } else if (currentView === 'week') {
-                currentDate.setDate(currentDate.getDate() - 7);
-                renderWeekView(currentDate);
-            } else if (currentView === 'day') {
-                currentDate.setDate(currentDate.getDate() - 1);
-                renderDayView(currentDate);
-            } else if (currentView === 'year') {
-                currentDate.setFullYear(currentDate.getFullYear() - 1);
-                renderYearView(currentDate);
-            }
+            if (currentView === 'month') currentDate.setMonth(currentDate.getMonth() - 1);
+            else if (currentView === 'week') currentDate.setDate(currentDate.getDate() - 7);
+            else if (currentView === 'day') currentDate.setDate(currentDate.getDate() - 1);
+            else if (currentView === 'year') currentDate.setFullYear(currentDate.getFullYear() - 1);
+            viewButtons.find(v => v.view === currentView)?.render(currentDate);
             updateDropdownText();
         });
     }
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
-            if (currentView === 'month') {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                renderMonthView(currentDate);
-            } else if (currentView === 'week') {
-                currentDate.setDate(currentDate.getDate() + 7);
-                renderWeekView(currentDate);
-            } else if (currentView === 'day') {
-                currentDate.setDate(currentDate.getDate() + 1);
-                renderDayView(currentDate);
-            } else if (currentView === 'year') {
-                currentDate.setFullYear(currentDate.getFullYear() + 1);
-                renderYearView(currentDate);
-            }
+            if (currentView === 'month') currentDate.setMonth(currentDate.getMonth() + 1);
+            else if (currentView === 'week') currentDate.setDate(currentDate.getDate() + 7);
+            else if (currentView === 'day') currentDate.setDate(currentDate.getDate() + 1);
+            else if (currentView === 'year') currentDate.setFullYear(currentDate.getFullYear() + 1);
+            viewButtons.find(v => v.view === currentView)?.render(currentDate);
             updateDropdownText();
         });
     }
@@ -321,47 +215,18 @@ document.addEventListener('DOMContentLoaded', function () {
     if (todayBtn) {
         todayBtn.addEventListener('click', () => {
             currentDate = new Date();
-            if (currentView === 'month') {
-                renderMonthView(currentDate);
-            } else if (currentView === 'week') {
-                renderWeekView(currentDate);
-            } else if (currentView === 'day') {
-                renderDayView(currentDate);
-            } else if (currentView === 'year') {
-                renderYearView(currentDate);
-            }
+            viewButtons.find(v => v.view === currentView)?.render(currentDate);
             updateDropdownText();
         });
     }
+
+    // Initialize color pickers and modals
+    setupColorPickers();
+
+    // Initial render
+    viewButtons.find(v => v.view === currentView)?.render(currentDate);
+    updateDropdownText();
 });
-
-
-
-// Today button event listener
-if (todayBtn) {
-    todayBtn.addEventListener('click', () => {
-        currentDate = new Date();
-        if (currentView === 'month') {
-            renderMonthView(currentDate);
-        } else if (currentView === 'week') {
-            renderWeekView(currentDate);
-        } else if (currentView === 'day') {
-            renderDayView(currentDate);
-        } else if (currentView === 'year') {
-            renderYearView(currentDate);
-        }
-    });
-}
-
-
-
-
-
-
-
-
-
-
 
 // Load events from localStorage if present
 if (window.localStorage) {
@@ -382,9 +247,6 @@ function formatDateToISO(date) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
-
-
-
 
 // for the month view function
 function renderMonthView(date) {
@@ -1501,25 +1363,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setupViewButtons();
 
     // ---- Drag-select helper functions ----
-    function clearDragHighlight() {
-        currentHighlighted.forEach(cell => cell.classList.remove('selecting'));
-        currentHighlighted = [];
-    }
-
-    function highlightRange(gridEl, date, startH, endH) {
-        clearDragHighlight();
-        const [minH, maxH] = startH < endH ? [startH, endH] : [endH, startH];
-        const selector = `.day-cell[data-date="${date}"]`;
-        const cells = Array.from(gridEl.querySelectorAll(selector));
-        cells.forEach(cell => {
-            const h = Number(cell.dataset.hour);
-            if (h >= minH && h <= maxH) {
-                cell.classList.add('selecting');
-                currentHighlighted.push(cell);
-            }
-        });
-    }
-
     function enableDragSelection(gridEl) {
         if (!gridEl || gridEl.dataset.dragSetup) return; // prevent duplicates
         gridEl.dataset.dragSetup = '1';
@@ -1653,15 +1496,3 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Initialize the calendar when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-    // This will be called after the DOM is fully loaded
-    if (currentView === 'month') {
-        renderMonthView(currentDate);
-    } else if (currentView === 'week') {
-        renderWeekView(currentDate);
-    } else if (currentView === 'day') {
-        renderDayView(currentDate);
-    } else if (currentView === 'year') {
-        renderYearView(currentDate);
-    }
-});
