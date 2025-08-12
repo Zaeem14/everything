@@ -21,6 +21,14 @@ function clearDragHighlight() {
     document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
 }
 
+// Robust dark mode detection
+function isDarkModeEnabled() {
+    return (
+        document.documentElement.classList.contains('dark') ||
+        (document.body && document.body.classList.contains('dark'))
+    );
+}
+
 function highlightRange(gridEl, date, startH, endH) {
     clearDragHighlight();
     const [minH, maxH] = startH < endH ? [startH, endH] : [endH, startH];
@@ -279,7 +287,7 @@ function renderMonthView(date) {
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startDayIndex - 1; i >= 0; i--) {
         const dayDiv = document.createElement('div');
-        dayDiv.classList.add('calendar-day', 'text-gray-400', 'py-2');
+        dayDiv.classList.add('calendar-day', 'py-2');
         dayDiv.textContent = prevMonthLastDay - i;
         dayDiv.classList.add('non-current-month');
         if (monthGrid) monthGrid.appendChild(dayDiv);
@@ -298,8 +306,6 @@ function renderMonthView(date) {
         if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
             dayDiv.innerHTML = `<span class="today-highlight_for_month_week">${i}</span>`;
             dayDiv.classList.add('today-container');
-        } else {
-            dayDiv.classList.add('text-gray-800');
         }
 
         // Render events for this date
@@ -340,7 +346,7 @@ function renderMonthView(date) {
     const remainingCells = 42 - totalDaysDisplayed;
     for (let i = 1; i <= remainingCells; i++) {
         const dayDiv = document.createElement('div');
-        dayDiv.classList.add('calendar-day', 'text-gray-400', 'py-2');
+        dayDiv.classList.add('calendar-day', 'py-2');
         dayDiv.textContent = i;
         dayDiv.classList.add('non-current-month');
         if (monthGrid) monthGrid.appendChild(dayDiv);
@@ -387,18 +393,25 @@ function renderWeekView(date) {
 
             // Add each all-day event
             allDayEvents.forEach(ev => {
+                const isDarkMode = isDarkModeEnabled();
                 const evDiv = document.createElement('div');
                 evDiv.className = 'all-day-event event-cell';
-                
-                // Set background with opacity and solid border
-                const bgColor = ev.color ? `${ev.color}30` : '#e3f2fd';
-                const borderColor = ev.color || '#4285F4';
-                
-                evDiv.style.setProperty('--event-color', bgColor);
-                evDiv.style.setProperty('--event-border-color', borderColor);
-                evDiv.style.backgroundColor = bgColor;
-                evDiv.style.borderLeft = `3px solid ${borderColor}`;
-                evDiv.style.color = '#1a202c';
+
+                // Only apply inline color if event has a custom color; let CSS handle defaults via 'event-default'
+                if (ev.color) {
+                    if (isDarkMode) {
+                        evDiv.style.backgroundColor = `${ev.color}80`;
+                        evDiv.style.color = '#e8eaed';
+                        evDiv.style.borderLeft = `3px solid ${ev.color}`;
+                    } else {
+                        evDiv.style.backgroundColor = `${ev.color}30`;
+                        evDiv.style.color = '#1a202c';
+                        evDiv.style.borderLeft = `3px solid ${ev.color}`;
+                    }
+                } else {
+                    evDiv.classList.add('event-default');
+                }
+
                 evDiv.style.cursor = 'pointer';
                 evDiv.textContent = ev.title;
 
@@ -470,7 +483,7 @@ function renderWeekView(date) {
             const isToday = dayDate.getFullYear() === today.getFullYear() &&
                 dayDate.getMonth() === today.getMonth() &&
                 dayDate.getDate() === today.getDate();
-            headerDiv.innerHTML = `<div>${weekdayNames[d]}</div><div class="text-sm text-gray-500${isToday ? ' today-highlight_for_month_week' : ''}">${dayDate.getDate()}</div>`;
+            headerDiv.innerHTML = `<div>${weekdayNames[d]}</div><div class="text-sm${isToday ? ' today-highlight_for_month_week' : ''}">${dayDate.getDate()}</div>`;
             weekDaysHeader.appendChild(headerDiv);
         }
     }
@@ -487,13 +500,10 @@ function renderWeekView(date) {
         weekTimeGrid.style.position = 'relative';
     }
 
-    // Define time slots (e.g., 1:00 to 24:00)
-    const startHour = 1;
-    const endHour = 24;
-    const hours = [];
-    for (let h = startHour; h <= endHour; h++) {
-        hours.push(h);
-    }
+    // Define hours (unused array retained for potential future use)
+    const startHour = 0;
+    const endHour = 23;
+    const hours = Array.from({ length: 24 }, (_, i) => i);
 
     // Get the start of the week (Sunday)
     const year = date.getFullYear();
@@ -507,7 +517,7 @@ function renderWeekView(date) {
 
         // Time label cell
         const timeCell = document.createElement('div');
-        timeCell.classList.add('time-label', 'border', 'border-gray-200', 'text-xs', 'text-right', 'pr-2', 'py-1', 'bg-gray-50');
+        timeCell.classList.add('time-label', 'border', 'text-xs', 'text-right', 'pr-2', 'py-1');
         const hourStr = rowHour < 12 ? `${rowHour} AM` : rowHour === 12 ? '12 PM' : rowHour === 24 ? '12 AM' : rowHour === 25 ? '1 AM' : `${rowHour - 12} PM`;
         timeCell.textContent = hourStr;
         weekTimeGrid.appendChild(timeCell);
@@ -515,7 +525,7 @@ function renderWeekView(date) {
         // 7 day cells
         for (let d = 0; d < 7; d++) {
             const dayCell = document.createElement('div');
-            dayCell.classList.add('week-cell', 'day-cell', 'border', 'border-gray-200', 'relative', 'hover:bg-blue-50', 'h-12');
+            dayCell.classList.add('week-cell', 'day-cell', 'border', 'relative', 'h-12');
 
             // For future event placement, store date and hour
             const currentDay = new Date(startOfWeek);
@@ -656,8 +666,6 @@ function darkenColor(color, percent) {
     return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
 }
 
-// for the day view
-
 function renderDayView(date) {
     console.log('renderDayView called with date:', date);
 
@@ -763,11 +771,26 @@ function renderDayView(date) {
 
         // Add each all-day event
         allDayEvents.forEach(ev => {
+            const isDarkMode = isDarkModeEnabled();
             const evDiv = document.createElement('div');
             evDiv.className = 'all-day-event px-3 py-2 rounded text-sm mb-1 inline-block mr-2';
-            evDiv.style.backgroundColor = ev.color ? `${ev.color}30` : '#e3f2fd';
-            evDiv.style.color = ev.color || '#0d47a1';
-            evDiv.style.borderLeft = `3px solid ${ev.color || '#4285F4'}`;
+
+            // Only set inline colors when event has a custom color.
+            // Otherwise, let CSS control light/dark defaults using 'event-default'.
+            if (ev.color) {
+                if (isDarkMode) {
+                    evDiv.style.backgroundColor = `${ev.color}80`;
+                    evDiv.style.color = '#e8eaed';
+                    evDiv.style.borderLeft = `3px solid ${ev.color}`;
+                } else {
+                    evDiv.style.backgroundColor = `${ev.color}30`;
+                    evDiv.style.color = '#1a202c';
+                    evDiv.style.borderLeft = `3px solid ${ev.color}`;
+                }
+            } else {
+                evDiv.classList.add('event-default');
+            }
+
             evDiv.style.cursor = 'pointer';
             evDiv.textContent = ev.title;
 
@@ -782,7 +805,7 @@ function renderDayView(date) {
         // Add "+ Add" button if no all-day events
         if (allDayEvents.length === 0) {
             const addButton = document.createElement('button');
-            addButton.className = 'text-xs text-gray-500 hover:text-blue-500';
+            addButton.className = 'text-xs hover:text-blue-500';
             addButton.innerHTML = '+ Add';
             addButton.addEventListener('click', function () {
                 openAddEventModal(formatDateToISO(date), 0, true);
@@ -802,47 +825,41 @@ function renderDayView(date) {
     // Filter timed events for the current day once
     const timedEvents = calendarEvents.filter(ev => ev.date === formatDateToISO(date) && !ev.allDay);
 
-    // Create time slots for every 30 minutes
+    // Create one row per hour; draw half-hour guideline via CSS
     for (let h = 0; h < 24; h++) {
-        for (let m = 0; m < 60; m += 30) {
-            const row = document.createElement('div');
-            row.className = 'day-time-row';
+        const row = document.createElement('div');
+        row.className = 'day-time-row';
 
-            // Time label cell
-            const timeCell = document.createElement('div');
-            timeCell.className = 'time-label-cell';
+        // Time label cell
+        const timeLabelCell = document.createElement('div');
+        timeLabelCell.className = 'time-label-cell';
+        const timeLabel = document.createElement('div');
+        timeLabel.className = 'time-label';
+        let displayHour = h % 12 || 12;
+        const ampm = h < 12 ? 'AM' : 'PM';
+        if (h === 0) displayHour = 12; // Midnight
+        timeLabel.textContent = `${displayHour} ${ampm}`;
+        timeLabelCell.appendChild(timeLabel);
+        row.appendChild(timeLabelCell);
 
-            // Only show label for the full hour
-            if (m === 0) {
-                const timeLabel = document.createElement('div');
-                timeLabel.className = 'time-label';
-                let displayHour = h % 12 || 12;
-                const ampm = h < 12 ? 'AM' : 'PM';
-                if (h === 0) displayHour = 12; // Midnight
-                timeLabel.textContent = `${displayHour} ${ampm}`;
-                timeCell.appendChild(timeLabel);
-            }
-            row.appendChild(timeCell);
+        // Day cell for the hour
+        const dayCell = document.createElement('div');
+        dayCell.className = 'day-cell hour-start';
+        dayCell.dataset.date = formatDateToISO(date);
+        dayCell.dataset.hour = h;
+        dayCell.dataset.minute = 0;
 
-            // Day cell for the time slot
-            const dayCell = document.createElement('div');
-            dayCell.className = 'day-cell';
-            if (m === 0) {
-                dayCell.classList.add('hour-start'); // Add border to top of hour cells
-            }
-            dayCell.dataset.date = formatDateToISO(date);
-            dayCell.dataset.hour = h;
-            dayCell.dataset.minute = m;
+        dayCell.addEventListener('click', (e) => {
+            if (isDragging || dayTimeGrid.classList.contains('dragging') || e.target.closest('.time-event')) return;
+            const rect = dayCell.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            const minute = clickY < rect.height / 2 ? 0 : 30;
+            const time = `${String(h).padStart(2, '0')}:${minute === 0 ? '00' : '30'}`;
+            openAddEventModal(formatDateToISO(date), h, false, null, null, time);
+        });
 
-            dayCell.addEventListener('click', (e) => {
-                if (isDragging || dayTimeGrid.classList.contains('dragging') || e.target.closest('.time-event')) return;
-                const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-                openAddEventModal(formatDateToISO(date), h, false, null, null, time);
-            });
-
-            row.appendChild(dayCell);
-            timeGridContainer.appendChild(row);
-        }
+        row.appendChild(dayCell);
+        timeGridContainer.appendChild(row);
     }
 
     // Create a separate container for timed events, positioned over the grid
@@ -891,10 +908,16 @@ function renderDayView(date) {
         const durationMinutes = totalEndMinutes - totalStartMinutes;
 
         const evDiv = document.createElement('div');
+        const isDarkMode = isDarkModeEnabled();
         evDiv.className = 'time-event';
         evDiv.textContent = ev.title;
-        evDiv.style.backgroundColor = ev.color || '#4285F4';
-        evDiv.style.color = 'white';
+        // Only set inline background if event has a custom color; otherwise rely on CSS per theme using 'event-default'
+        if (ev.color) {
+            evDiv.style.backgroundColor = isDarkMode ? `${ev.color}80` : ev.color;
+            evDiv.style.color = isDarkMode ? '#e8eaed' : 'white';
+        } else {
+            evDiv.classList.add('event-default');
+        }
         evDiv.style.position = 'absolute';
         evDiv.style.left = `${index * groupWidth}%`;
         evDiv.style.width = `${groupWidth}%`;
@@ -944,11 +967,11 @@ function renderYearView(date) {
 
     for (let m = 0; m < 12; m++) {
         const monthContainer = document.createElement('div');
-        monthContainer.className = 'year-month border rounded p-1 text-xs cursor-pointer hover:bg-gray-100';
+        monthContainer.className = 'year-month border rounded-lg p-2';
 
         // Month header
         const monthHeader = document.createElement('div');
-        monthHeader.className = 'font-semibold text-center mb-1';
+        monthHeader.className = 'p-2 border-r text-center';
         monthHeader.textContent = monthNames[m];
         monthContainer.appendChild(monthHeader);
 

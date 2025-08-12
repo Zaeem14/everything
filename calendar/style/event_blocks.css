@@ -1,12 +1,11 @@
-/* Event cell base styles */
+
 .event-cell {
     position: relative;
     overflow: hidden;
-    color: #1a202c !important; /* Default dark text color */
+    color: #1a202c !important;
     transition: opacity 0.2s;
 }
 
-/* All day event specific styles */
 .all-day-event {
     padding: 2px 6px;
     margin: 1px 0;
@@ -17,7 +16,6 @@
     text-overflow: ellipsis;
 }
 
-/* Ensure text is visible on colored backgrounds */
 .week-event-title,
 .day-event-title,
 .event-cell {
@@ -25,40 +23,35 @@
     z-index: 10;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    color: inherit !important; /* Force text color to be inherited */
+    color: inherit !important;
 }
 
-/* Hover states */
 .event-cell:hover {
     opacity: 0.9;
 }
 
-/* Override any text-white inheritance */
 .event-cell,
 .event-cell * {
     color: inherit !important;
 }
 
-/* Week view cells */
 .week-cell {
     min-height: 3rem;
     border: 1px solid #e2e8f0;
     position: relative;
-    background-color: white !important; /* Force white background */
+    background-color: white !important;
     transition: background-color 0.1s ease;
 }
 
 .week-cell:hover {
-    background-color: #f8fafc !important; /* Force hover color */
+    background-color: #f8fafc !important;
 }
 
-/* Reset any unwanted background colors */
 .week-cell.selecting,
 .week-cell.dragging {
-    background-color: #f0f9ff !important; /* Light blue for selection */
+    background-color: #f0f9ff !important;
 }
 
-/* Time-based events in week view */
 .time-event {
     --event-bg-color: #4285F4CC;
     --event-border-color: #4285F4;
@@ -100,30 +93,24 @@
     z-index: 3;
 }
 
-/* Ensure parent cells properly contain their events */
 .week-cell {
     position: relative;
     overflow: visible;
     contain: layout style;
 }
 
-/* Reset any conflicting styles */
 .time-event[style*="width:"] {
     width: calc(100% - 4px) !important;
 }
-
-/* Clear any inherited background colors */
 .week-cell:not(.selecting):not(.dragging) {
     background-color: white !important;
 }
 
-/* Ensure background color is properly set */
 .event-cell {
     background-color: var(--event-color, #e3f2fd) !important;
     border-left: 3px solid var(--event-border-color, #4285F4);
 }
 
-/* Time-based events in week view */
 .time-event {
     position: absolute;
     left: 2px;
