@@ -16,6 +16,20 @@
     text-overflow: ellipsis;
 }
 
+/* Default style for all-day events without custom color (light mode) */
+.all-day-event.event-default {
+    background-color: #e3f2fd;
+    color: #1a202c;
+    border-left: 3px solid #4285F4;
+}
+
+/* Default style for month view events without custom color (light mode) */
+.month-event.event-default {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border-left: 3px solid #4285F4;
+}
+
 .week-event-title,
 .day-event-title,
 .event-cell {

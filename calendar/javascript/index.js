@@ -315,11 +315,26 @@ function renderMonthView(date) {
             const eventsList = document.createElement('div');
             eventsList.className = 'month-events-list';
             eventsForDay.forEach(ev => {
+                const isDarkMode = isDarkModeEnabled();
                 const evDiv = document.createElement('div');
                 evDiv.className = 'month-event px-1 py-0.5 rounded mb-1 text-xs truncate';
                 evDiv.style.cursor = 'pointer';
-                evDiv.style.backgroundColor = ev.color ? `${ev.color}20` : '#e3f2fd';
-                evDiv.style.color = ev.color || '#0d47a1';
+
+                // Only set inline colors for custom-colored events; otherwise rely on CSS with 'event-default'
+                if (ev.color) {
+                    if (isDarkMode) {
+                        evDiv.style.backgroundColor = `${ev.color}80`;
+                        evDiv.style.color = '#e8eaed';
+                        evDiv.style.borderLeft = `3px solid ${ev.color}`;
+                    } else {
+                        evDiv.style.backgroundColor = `${ev.color}20`;
+                        evDiv.style.color = ev.color;
+                        evDiv.style.borderLeft = `3px solid ${ev.color}`;
+                    }
+                } else {
+                    evDiv.classList.add('event-default');
+                }
+
                 evDiv.addEventListener('click', function (e) {
                     e.stopPropagation();
                     openViewEventModal(ev.id);
