@@ -13,8 +13,9 @@
     <script src="scripts/script.js" type="module" defer></script>
     <script src="data/folder.js" type="module" defer></script>
     <script src="data/habit.js" type="module" defer></script>
-    <script src="scripts/menu.js" type="module" defer></script>
     <script src="scripts/stats.js" type="module" defer></script>
+    <script src="scripts/menu.js" type="module" defer></script>
+   
     
 
 
@@ -196,10 +197,10 @@
         <div id="habits-stats-container" class="strip" >
             <div class="habits-stats-header">
                 <div class="habits-stats-header-left">
-                    <div class="habits-stats-title">Fajr Prayer</div>
+                    <div class="habits-stats-title"></div>
                 </div>
                 <div class="habits-stats-header-right">
-                    <div class="habits-stats-folder">Islam</div>
+                    <div class="habits-stats-folder hidden"></div>
                     <div class="habits-stats-edit-icon-container">
                         <img src="images/habits-container-icons/icons8-edit-50.png" class="habit-edit-icon" alt="edit">
                     </div>
@@ -251,7 +252,7 @@
     <div id="modal-overlay" class="hidden">
         <div class="modal habit-add-modal hidden">
             <div class="modal-header">
-                <h2>ADD A HABIT</h2>
+                <h2 class="habit-add-modal-title">ADD A HABIT</h2>
                 <div class="close-modal-icon-container">
                     <img src="../todolist/images/todo-container/icons8-close-16.png" class="close-modal-icon" alt="close">
                 </div>
@@ -511,7 +512,7 @@
                 <textarea id="new-habit-description" placeholder="Describe your habit" class="add-habit-input"></textarea>
             </div>
             <div class="habit-addition-button-container">
-                <button class="add-folder-button habit-add-button">Add Habit</button>
+                <button class="add-folder-button habit-add-button" id="habit-add-button">Add Habit</button>
                 <button class="habit-cancel-button hidden">Cancel</button>
             </div>
         </div>

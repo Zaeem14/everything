@@ -1,3 +1,6 @@
+
+import { addHabitRefreshParams } from "../data/habit.js";
+
 document.addEventListener("DOMContentLoaded", () => {
     const addHabitMenusParents = document.querySelectorAll(".add-habit-input");
     addHabitMenusParents.forEach(parent => {
@@ -25,6 +28,7 @@ document.querySelectorAll('.habits-group-header').forEach(header => {
 });
 
 document.querySelector(".add-habits-container").addEventListener("click", () => {
+    addHabitRefreshParams();
     const modalOverlay = document.getElementById("modal-overlay");
     const habitModal = document.querySelector(".habit-add-modal");
     modalOverlay.classList.remove("hidden");

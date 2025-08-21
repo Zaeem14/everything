@@ -1,6 +1,8 @@
 
 
 import { folders, loadFoldersFromLocalStorage } from "./folder.js";
+import { editHabit } from "../scripts/stats.js";
+import { resetStatsPanel } from "../scripts/stats.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     loadFoldersFromLocalStorage();
@@ -9,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHabits();
     habitDateFilter();
     console.log(habits);
-    document.querySelector(".habit-add-button").addEventListener("click", () => {
+    document.querySelector("#habit-add-button").addEventListener("click", () => {
         addHabit();
         hideAllEmptyGroups();
         closeAddHabitModal();
@@ -38,9 +40,37 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-    
 });
 
+// Delegated handler for clicks on any habit-more-menu item (works for all instances)
+document.addEventListener("click", (e) => {
+    const item = e.target.closest(".habit-more-menu-item-container");
+    if (!item) return;
+
+    const menu = item.closest(".habit-more-menu-container");
+    if (!menu) return; // Not in a menu
+
+    const habitId = Number(menu.dataset.id);
+    const op = item.dataset.operation;
+
+    switch (op) {
+        case "check-in":
+            habitCheckInHandler(habitId);
+            break;
+        case "skip":
+            habitSkipHandler(habitId);
+            break;
+        case "fail":
+            habitFailHandler(habitId);
+            break;
+        case "edit":
+            habitEditHandler(habitId);
+            break;
+        case "delete":
+            habitDeleteHandler(habitId);
+            break;
+    }
+}); 
 
 
 
@@ -81,9 +111,10 @@ export function renderHabits() {
     });
 
     habits.forEach(habit => {
-        const folder = folders.find(folder => String(folder.folderId) === String(habit.habitFolderId));
+        let folder = folders.find(folder => String(folder.folderId) === String(habit.habitFolderId));
+        console.log(folder);
         if (!folder) {
-            console.warn("No matching folder found for habit:", habit.habitName);
+            console.error(`No matching folder found for habit: ${habit.habitName} (ID: ${habit.habitId}, FolderID: ${habit.habitFolderId})`);
             return;
         }
 
@@ -116,23 +147,23 @@ export function renderHabits() {
                             <div class="habit-more-container habit-editor">
                                 <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
                                 <div class="habit-more-menu-container" style="display: none;" data-id="${habit.habitId}">
-                                    <div class="habit-more-menu-item-container">
+                                    <div class="habit-more-menu-item-container" data-operation="check-in">
                                         <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-more-menu-item-icon">
                                         <div class="habit-more-menu-item">Check In</div>
                                     </div>
-                                    <div class="habit-more-menu-item-container">
+                                    <div class="habit-more-menu-item-container" data-operation="skip">
                                         <img src="images/habits-container-icons/icons8-right-arrow-16.png" class="habit-more-menu-item-icon">
                                         <div class="habit-more-menu-item">Skip</div>
                                     </div>
-                                    <div class="habit-more-menu-item-container">
+                                    <div class="habit-more-menu-item-container" data-operation="fail">
                                         <img src="images/habits-container-icons/icons8-wrong-16.png" class="habit-more-menu-item-icon">
                                         <div class="habit-more-menu-item">Fail</div>
                                     </div>
-                                    <div class="habit-more-menu-item-container">
+                                    <div class="habit-more-menu-item-container" data-operation="edit">
                                         <img src="images/habits-container-icons/icons8-edit-30.png" class="habit-more-menu-item-icon">
                                         <div class="habit-more-menu-item">Edit</div>
                                     </div>
-                                    <div class="habit-more-menu-item-container">
+                                    <div class="habit-more-menu-item-container" data-operation="delete">
                                         <img src="images/habits-container-icons/icons8-trash-can-50.png" class="habit-more-menu-item-icon habit-more-delete-icon">
                                         <div class="habit-more-menu-item">Delete</div>
                                     </div>
@@ -145,32 +176,32 @@ export function renderHabits() {
         `;
 
         addHabitToCorrectGroup(habit, habitHTML);
-        
     });
 
+    
     hideAllEmptyGroups();
 }
 
 
-function saveHabitsToLocalStorage() {
+export function saveHabitsToLocalStorage() {
     localStorage.setItem("habits", JSON.stringify(habits));
 }
 
-function loadHabitsFromLocalStorage() {
+export function loadHabitsFromLocalStorage() {
     const savedHabits = localStorage.getItem("habits");
     if (savedHabits) {
         habits = JSON.parse(savedHabits);
     }
 }
 
-function closeAddHabitModal() {
+export function closeAddHabitModal() {
     const modalOverlay = document.getElementById("modal-overlay");
     const habitModal = document.querySelector(".habit-add-modal");
     modalOverlay.classList.add("hidden");
     habitModal.classList.add("hidden");
 }
 
-function clearAddHabitInputs() {
+export function clearAddHabitInputs() {
     const addHabitModal = document.querySelector(".habit-add-modal");
     addHabitModal.querySelector("#new-habit-name").value = "";
     addHabitModal.querySelector(".new-habit-icon").textContent = "";
@@ -350,6 +381,30 @@ function InputNewHabit() {
     
 } 
 
+export function addHabitRefreshParams() {
+    const addHabitModal = document.querySelector(".habit-add-modal");
+    const modalOverlay = document.getElementById("modal-overlay");
+    const habitAddButton = addHabitModal.querySelector(".habit-add-button");
+    const habitCancelButton = addHabitModal.querySelector(".habit-cancel-button");
+    const addHabitModalTitle = addHabitModal.querySelector(".habit-add-modal-title");
+    const addHabitModalCloseIconContainer = addHabitModal.querySelector(".close-modal-icon-container");
+
+    habitAddButton.textContent = "Save Habit";
+    habitAddButton.id = "";
+
+    habitCancelButton.classList.add("hidden");
+    habitCancelButton.id = "";
+
+    addHabitModalTitle.textContent = "ADD A HABIT";
+
+    addHabitModalCloseIconContainer.addEventListener("click", () => {
+        addHabitModal.classList.add("hidden");
+        modalOverlay.classList.add("hidden");
+    });
+
+    clearAddHabitInputs();
+}
+
 // Helper function to format numbers as 1st, 2nd, 3rd, etc.
 function formatOrdinal(n) {
     const suffixes = ["th", "st", "nd", "rd"];
@@ -377,8 +432,6 @@ function addHabitToCorrectGroup(habit, habitHTML) {
         const isAnytime = timeOfDayArray.length === 1 && timeOfDayArray.includes("anytime");
         const matchesSpecific = timeOfDayArray.includes(groupTime);
 
-        console.log({ groupTime, timeOfDayArray, isAnytime, matchesSpecific });
-
         // 🟢 Add to group if:
         // - it specifically matches, OR
         // - it is only set to "anytime" and group is "anytime"
@@ -389,8 +442,6 @@ function addHabitToCorrectGroup(habit, habitHTML) {
         }
     });
 }
-
-
 
 
 function hideAllEmptyGroups() {
@@ -442,7 +493,7 @@ function habitStartDateLabelFormatter(inputDateValue) {
     }
 }
 
-function getHabitGoal() {
+export function getHabitGoal() {
     const goalInput = document.querySelector("#habit-goal");
     const timesUnit = document.querySelector(".times").textContent.trim();
     const perUnit = document.querySelector(".per").textContent.trim();
@@ -455,7 +506,7 @@ function getHabitGoal() {
 }
 
 
-function getHabitRepeat() {
+export function getHabitRepeat() {
     const repeatText = document.querySelector(".habit-repeat-text").textContent.trim();
 
     // Match for Daily
@@ -583,6 +634,7 @@ function filterHabitsByDate(date) {
 
     // Now render filteredHabits only
     document.querySelectorAll(".habits-group .habits").forEach(group => group.innerHTML = ""); // clear
+    console.log(filteredHabits);
 
     filteredHabits.forEach(habit => {
         const folder = folders.find(folder => String(folder.folderId) === String(habit.habitFolderId));
@@ -616,11 +668,26 @@ function filterHabitsByDate(date) {
                             <div class="habit-more-container habit-editor">
                                 <img src="images/habits-container-icons/icons8-more-50.png" class="habit-more-icon" alt="more">
                                 <div class="habit-more-menu-container" style="display: none;" data-id="${habit.habitId}">
-                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Check In</div></div>
-                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-right-arrow-16.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Skip</div></div>
-                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-wrong-16.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Fail</div></div>
-                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-edit-30.png" class="habit-more-menu-item-icon"><div class="habit-more-menu-item">Edit</div></div>
-                                    <div class="habit-more-menu-item-container"><img src="images/habits-container-icons/icons8-trash-can-50.png" class="habit-more-menu-item-icon habit-more-delete-icon"><div class="habit-more-menu-item">Delete</div></div>
+                                    <div class="habit-more-menu-item-container" data-operation="check-in">
+                                        <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-more-menu-item-icon">
+                                        <div class="habit-more-menu-item">Check In</div>
+                                    </div>
+                                    <div class="habit-more-menu-item-container" data-operation="skip">
+                                        <img src="images/habits-container-icons/icons8-right-arrow-16.png" class="habit-more-menu-item-icon">
+                                        <div class="habit-more-menu-item">Skip</div>
+                                    </div>
+                                    <div class="habit-more-menu-item-container" data-operation="fail">
+                                        <img src="images/habits-container-icons/icons8-wrong-16.png" class="habit-more-menu-item-icon">
+                                        <div class="habit-more-menu-item">Fail</div>
+                                    </div>
+                                        <div class="habit-more-menu-item-container" data-operation="edit">
+                                        <img src="images/habits-container-icons/icons8-edit-30.png" class="habit-more-menu-item-icon">
+                                        <div class="habit-more-menu-item">Edit</div>
+                                    </div>
+                                    <div class="habit-more-menu-item-container" data-operation="delete">
+                                        <img src="images/habits-container-icons/icons8-trash-can-50.png" class="habit-more-menu-item-icon habit-more-delete-icon">
+                                        <div class="habit-more-menu-item">Delete</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -636,3 +703,52 @@ function filterHabitsByDate(date) {
 }
 
 
+function habitCheckInHandler(habitId) {
+    const habit = habits.find(habit => habit.habitId === habitId);
+    habit.habitCompleted += 1;
+    saveHabitsToLocalStorage();
+    renderHabits();
+    habitContainerIsClicked(habitId);
+}
+
+function habitSkipHandler(habitId) {
+    const habit = habits.find(habit => habit.habitId === habitId);
+    habit.habitSkipped += 1;
+    saveHabitsToLocalStorage();
+    renderHabits();
+    habitContainerIsClicked(habitId);
+}
+
+function habitFailHandler(habitId) {
+    const habit = habits.find(habit => habit.habitId === habitId);
+    habit.habitFailed += 1;
+    saveHabitsToLocalStorage();
+    renderHabits();
+    habitContainerIsClicked(habitId);
+}
+    
+function habitEditHandler(habitId) {
+    const habitDiv = document.querySelector(`.habits-more-container[data-id="${habitId}"]`);
+    habitDiv.click();
+
+    setTimeout(() => {
+        const statsEditIcon = document.querySelector(".habits-stats-edit-icon-container");
+        if (statsEditIcon) {
+            statsEditIcon.click();
+        }
+    }, 10);
+}
+
+function habitDeleteHandler(habitId) {
+    const habit = habits.find(habit => habit.habitId === habitId);
+    habits.splice(habits.indexOf(habit), 1);
+    saveHabitsToLocalStorage();
+    renderHabits();
+
+    resetStatsPanel();
+}
+
+function habitContainerIsClicked(habitId) {
+    const habitDiv = document.querySelector(`.habits-more-container[data-id="${habitId}"]`);
+    habitDiv.click();
+}
