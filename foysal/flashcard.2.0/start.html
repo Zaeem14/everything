@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="style/vertical-bar.css">
         <link rel="stylesheet" href="style/main_content.css">
         <link rel="stylesheet" href="style/start.css">
+        <link rel="stylesheet" href="style/theme.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="javasript/start.js" defer></script>
 
@@ -21,8 +22,8 @@
 
 
             <!-- Flashcard container -->
-            <div class="flashcard-container" style="width: 220px; min-width: 180px; max-width: 260px; height: 100vh; padding: 0; margin: 0; background: #222d3b; box-shadow: 1px 0 6px rgba(0,0,0,0.07); display: flex; align-items: stretch; justify-content: flex-start; position: relative; flex-direction: column;">
-                <div id="flashcard-menu" class="strip quizlet-menu" style="width: 100%; padding: 0; margin: 0; flex-direction: column; justify-content: flex-start; flex: 1;">
+            <div class="flashcard-container">
+                <div id="flashcard-menu" class="strip quizlet-menu">
                     <!-- Section: Start Here -->
                     <div class="menu-section">
                         <button class="menu-btn active">
@@ -49,20 +50,20 @@
                             <span class="menu-icon">&#128193;</span>
                             <span class="menu-label js-createFolder">New Folder</span>
                         </button>
-                        <details class="folder-container" style="color: black;">
+                        <details class="folder-container">
                             <summary class="summary-row">
-                                <div class="folder-addition-container" style="padding-left: 20px;">
+                                <div class="folder-addition-container">
                                     <span class="folder-icon fs-6 fw-semibold">📁 Your Folder</span>
                                 </div>
                             </summary>
-                            <div class="folder-list" style="padding-left: 20px;">
-                                <div class="folder-div" style="padding-left: 20px;">
+                            <div class="folder-list">
+                                <div class="folder-div">
                                     <span class="folder-icon">📁 Business</span>
                                 </div>
-                                <div class="folder-div" style="padding-left: 20px;">
+                                <div class="folder-div">
                                     <span class="folder-icon">📁 Personal</span>
                                 </div>
-                                <div class="folder-div" style="padding-left: 20px;">
+                                <div class="folder-div">
                                     <span class="folder-icon">📁 Study</span>
                                 </div>
                             </div>
@@ -110,11 +111,13 @@
 
             <!-- Main area -->
             <div class="Main-content">
-                <div class="showbox" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f0f0;">
-                    <h1>Welcome to the Flashcard App</h1>
-                    <p>Start creating your flashcards and enhance your learning experience!</p>
+                <div class="showbox start-showbox">
+                    <div class="start-hero">
+                        <h1>Welcome to the Flashcard App</h1>
+                        <p class="lead text-muted">Start creating your flashcards and enhance your learning experience!</p>
+                    </div>
                     <!-- Flashcard App -->
-                    <div id="flashcard-app" class="card shadow-sm mt-4" style="max-width: 500px; margin: 0 auto; border-radius: 16px;">
+                    <div id="flashcard-app" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <h3 class="card-title mb-3 text-primary">Add a Flashcard</h3>
                             <form id="flashcard-form" class="row g-2 align-items-center" autocomplete="off">
