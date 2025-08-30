@@ -54,6 +54,94 @@ document.querySelector(".add-folder-icon").addEventListener("click", () => {
     });
 });
 
+const sidebarIcon = document.querySelector(".collapse-sidebar-icon"); // initial class
+const habitsMenu = document.getElementById("habits-menu");
+const habitsContainer = document.getElementById("habits-container");
+
+sidebarIcon.addEventListener("click", () => {
+  const isSmallScreen = window.matchMedia("(min-width: 786px)").matches;
+
+  if (isSmallScreen) {
+    // Just show the menu, do not toggle icon
+    habitsMenu.classList.add("pop-up-menu");
+    const statsPanel = document.querySelector("#habits-stats-container");
+
+    // ✅ If on small screen and stats panel is active, remove it
+    if (window.innerWidth < 786 && statsPanel.classList.contains("pop-up-stats-panel")) {
+      statsPanel.classList.remove("pop-up-stats-panel");
+    }
+
+    // Hide on outside click
+    document.addEventListener("click", function handleOutsideClick(e) {
+      if (!habitsMenu.contains(e.target) && !sidebarIcon.contains(e.target)) {
+        habitsMenu.classList.remove("pop-up-menu");
+        document.removeEventListener("click", handleOutsideClick);
+      }
+    });
+  } else {
+    // Toggle expand/collapse logic
+    const isCollapsed = sidebarIcon.classList.contains("collapse-sidebar-icon");
+
+    if (isCollapsed) {
+      // Collapse
+      habitsMenu.classList.add("hidden-menu");
+      habitsContainer.style.width = "67%";
+      sidebarIcon.src = "images/habits-container-icons/expand.png";
+      sidebarIcon.classList.remove("collapse-sidebar-icon");
+      sidebarIcon.classList.add("expand-sidebar-icon");
+    } else {
+      // Expand
+      habitsMenu.classList.remove("hidden-menu");
+      habitsContainer.style.width = "50%";
+      sidebarIcon.src = "images/habits-container-icons/collapse.png";
+      sidebarIcon.classList.remove("expand-sidebar-icon");
+      sidebarIcon.classList.add("collapse-sidebar-icon");
+    }
+  }
+});
+
+
+
+function updateExpandSideBarIconSrc(e) {
+  if (e.matches) {
+    sidebarIcon.src = "images/habits-container-icons/expand.png";
+    sidebarIcon.classList.remove("collapse-sidebar-icon");
+    sidebarIcon.classList.add("expand-sidebar-icon");
+  }
+}
+
+function updateCollapseSideBarIconSrc(e) {
+  if (e.matches) {
+    // Clean mobile classes
+    habitsMenu.classList.remove("pop-up-menu");
+
+    if (habitsMenu.classList.contains("hidden-menu")) {
+      // ✅ Sidebar is collapsed — update icon to expand
+      sidebarIcon.src = "images/habits-container-icons/expand.png";
+      sidebarIcon.classList.remove("collapse-sidebar-icon");
+      sidebarIcon.classList.add("expand-sidebar-icon");
+    } else {
+      // Sidebar is expanded — show collapse icon
+      sidebarIcon.src = "images/habits-container-icons/collapse.png";
+      sidebarIcon.classList.remove("expand-sidebar-icon");
+      sidebarIcon.classList.add("collapse-sidebar-icon");
+    }
+  }
+}
+
+// Create a media query list
+const mq = window.matchMedia('(max-width: 786px)');
+const mq2 = window.matchMedia('(min-width: 787px)');
+
+// Initial check
+updateExpandSideBarIconSrc(mq);
+updateCollapseSideBarIconSrc(mq2);
+
+// Listen for viewport changes
+mq.addEventListener('change', updateExpandSideBarIconSrc);
+mq2.addEventListener('change', updateCollapseSideBarIconSrc);
+
+
 function toggleAddHabitMenus(parent) {
     let clickedMenu = parent.querySelector(".add-habit-menu-container");
 

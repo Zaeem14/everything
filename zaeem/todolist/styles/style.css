@@ -48,25 +48,8 @@ footer a:hover {
     height: 100vh;
 }
 
-.pop-up-stats-panel {
-    display: block !important;
-    position: absolute !important;
-    top: 0;
-    right: 0;
-    z-index: 1000;
-    background-color: white;
-    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1); /* left shadow */
-}
 
-.pop-up-menu {
-    display: block !important;
-    position: absolute !important;
-    top: 0;
-    left: 45px !important;
-    z-index: 1000;
-    background-color: white;
-    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1); /* right shadow */
-}
+
 
 .close-stats-panel-icon {
     padding: 5px;

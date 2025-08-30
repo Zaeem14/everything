@@ -482,6 +482,27 @@ details[open] > summary .arrow {
     background-color: white;
 }
 
+.pop-up-stats-panel {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1); /* left shadow */
+}
+
+.pop-up-menu {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 45px !important;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1); /* right shadow */
+}
+
+
 .folder-more-icon-menu {
     height: 30px;
     width: 100%;

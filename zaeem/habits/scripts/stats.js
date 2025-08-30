@@ -15,11 +15,6 @@ document.addEventListener("click", (e) => {
         console.log("No habit element found");
         return;
     }
-
-    
-
-
-
     
     const habitId = habitElement.getAttribute("data-id");
     const habitFolderId = habitElement.getAttribute("data-folder-id");

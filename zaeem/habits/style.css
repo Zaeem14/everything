@@ -3,6 +3,26 @@
     padding: 0;
 }
 
+#habits-menu, 
+#habits-container,
+#habits-stats-container {
+    background-color: rgba(25,25,25, 0.0.5);
+}
+
+#feature-menu, 
+#habits-menu, 
+#habits-stats-container {
+    flex: 0 0 auto;
+}
+
+
+#habits-container {
+    flex: 1 1 auto;
+    min-width: 200px;
+
+}
+    
+
 textarea,
 input {
     outline: none;
@@ -763,3 +783,15 @@ folder-more-icon-menu-container
     width: 140px;
 }
     
+
+@media (max-width: 1122px) {
+    #habits-stats-container {
+        display: none;
+    }
+}
+    
+@media (max-width: 790px) {
+    #habits-menu {
+        display: none;
+    }
+}
