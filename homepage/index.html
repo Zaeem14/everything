@@ -3,15 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Homepage</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style/dark_mode.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="container">
-        
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold">My Projects</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">A collection of my web applications.</p>
+        </header>
+
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Calendar -->
+            <a href="../calendar/index.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">Calendar</h2>
+                    <p class="text-gray-600 dark:text-gray-400">A full-featured calendar application.</p>
+                </div>
+            </a>
+
+            <!-- Grades -->
+            <a href="../grades/index.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">Grade Tracker</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Track your academic grades.</p>
+                </div>
+            </a>
+
+            <!-- Flashcard -->
+            <a href="../foysal/flashcard.2.0/index.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">Flashcards</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Study with interactive flashcards.</p>
+                </div>
+            </a>
+
+            <!-- Flip Clock -->
+            <a href="/foysal/Flip Clock/clock/clock.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">Flip Clock</h2>
+                    <p class="text-gray-600 dark:text-gray-400">A classic flip clock.</p>
+                </div>
+            </a>
+
+            <!-- Habits -->
+            <a href="../zaeem/habits/index.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">Habit Tracker</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Monitor and build your habits.</p>
+                </div>
+            </a>
+
+            <!-- Notes -->
+            <a href="../zaeem/notes/index.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">Notes</h2>
+                    <p class="text-gray-600 dark:text-gray-400">A simple note-taking app.</p>
+                </div>
+            </a>
+
+            <!-- Todolist -->
+            <a href="../zaeem/todolist/index.html" class="project-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-2">To-do List</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Organize your tasks.</p>
+                </div>
+            </a>
+        </main>
     </div>
-    
-    <script src="javascript/theme.js"></script>
+
+    <script src="script.js"></script>
 </body>
 </html>
