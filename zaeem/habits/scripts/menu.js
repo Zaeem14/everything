@@ -63,6 +63,7 @@ function setupTimeFilterClicks() {
         timeFilter.onclick = () => {
             const selectedTime = timeFilter.querySelector(".habits-time").textContent.toLowerCase();
             handleTimeFilterClick(selectedTime);
+            closePopUpMenuWhenClickedFilter();
             assignCurrentFilterClass(timeFilter, null);
         };
     });
@@ -76,6 +77,7 @@ function setupFolderClicks() {
             const folderId = folderFilter.getAttribute("data-id");
             const folderName = folderFilter.getAttribute("data-folder");
             handleFolderClick(folderId, folderName);
+            closePopUpMenuWhenClickedFilter();
             assignCurrentFilterClass(null, folderFilter);
         };
     });
@@ -97,7 +99,64 @@ function assignCurrentFilterClass(selectedTimeFilter, selectedFolderFilter) {
 
     timeFilterList.forEach(filter => filter.classList.remove("current-filter"));
     folderFilterList.forEach(filter => filter.classList.remove("current-filter"));
+    const matchTimeWithIcon = {
+        "all": "all-icon",
+        "anytime": "hours",
+        "morning": "morning",
+        "afternoon": "sun",
+        "evening": "moon",
+        "night": "night"
+    }
 
-    if (selectedTimeFilter) selectedTimeFilter.classList.add("current-filter");
-    if (selectedFolderFilter) selectedFolderFilter.classList.add("current-filter");
+    if (selectedTimeFilter) {
+        console.log(selectedTimeFilter);
+
+
+        selectedTimeFilter.classList.add("current-filter");
+
+
+        for (let i = 0; i < timeFilterList.length; i++) {
+            const element = timeFilterList[i];
+            element.querySelector(".habits-time-icon").src = `images/habits_menu_icons/${matchTimeWithIcon[element.querySelector(".habits-time").textContent.toLowerCase()]}.png`;
+        }
+
+        selectedTimeFilter.querySelector(".habits-time-icon").src = `images/habits_menu_icons/${matchTimeWithIcon[selectedTimeFilter.querySelector(".habits-time").textContent.toLowerCase()]}-white.png`;
+
+        
+
+       
+    }
+
+    
+    
+    if (selectedFolderFilter) {
+        selectedFolderFilter.classList.add("current-filter");
+
+        for (let i = 0; i < timeFilterList.length; i++) {
+            const element = timeFilterList[i];
+            element.querySelector(".habits-time-icon").src = `images/habits_menu_icons/${matchTimeWithIcon[element.querySelector(".habits-time").textContent.toLowerCase()]}.png`;
+        }
+    }
+}
+
+export function popUpMenuInSmallScreen() {
+    const isSmallScreen = window.matchMedia("(max-width: 790px)").matches;
+    const menu = document.querySelector("#habits-menu");
+    const statsPanel = document.querySelector("#habits-stats-container");
+
+    if (isSmallScreen) {
+        statsPanel.classList.remove("pop-up-stats-panel");
+        menu.classList.add("pop-up-menu");
+    } else {
+        menu.classList.remove("pop-up-menu");
+    }
+}
+
+
+function closePopUpMenuWhenClickedFilter() {
+    const menu = document.querySelector("#habits-menu");
+
+    if (menu.classList.contains("pop-up-menu")) {
+        menu.classList.remove("pop-up-menu");
+    }
 }

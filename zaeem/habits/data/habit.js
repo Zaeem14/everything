@@ -11,7 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHabits();
     habitDateFilter();
     console.log(habits);
+
+    document.querySelector(".add-habits-container").addEventListener("click", () => {
+        defaultAddHabitParams();
+    })
     document.querySelector("#habit-add-button").addEventListener("click", () => {
+
+        if (document.querySelector("#new-habit-name").value === "") {
+            alert("Please enter a habit name");
+            return;
+        }
         addHabit();
         hideAllEmptyGroups();
         closeAddHabitModal();
@@ -240,39 +249,22 @@ function InputNewHabit() {
 
     habitTimeOfDayMenuItems.forEach((item) => {
         item.addEventListener("click", () => {
-            const timeCheckMarkContainer = item.querySelector(".habit-time-item-check-container");
-
-            // Toggle the checkmark
-            const willHide = !timeCheckMarkContainer.classList.contains("hidden");
-            timeCheckMarkContainer.classList.toggle("hidden");
-
-            // Check how many items have checkmarks
-            let selectedItems = [];
-            habitTimeOfDayMenuItems.forEach((item) => {
-                const check = item.querySelector(".habit-time-item-check-container");
-                if (!check.classList.contains("hidden")) {
-                    selectedItems.push(item);
-                }
+            // Remove checkmarks from all items
+            habitTimeOfDayMenuItems.forEach((otherItem) => {
+                const check = otherItem.querySelector(".habit-time-item-check-container");
+                check.classList.add("hidden");
             });
 
-            // 🛑 Rule 3: Don't allow all to be unchecked
-            if (selectedItems.length === 0) {
-                timeCheckMarkContainer.classList.remove("hidden"); // Re-check the one just clicked
-                selectedItems.push(item);
-            }
+            // Add checkmark to the clicked one
+            const timeCheckMarkContainer = item.querySelector(".habit-time-item-check-container");
+            timeCheckMarkContainer.classList.remove("hidden");
 
-            // 🕒 Rule 2: If all items checked, show "Anytime"
-            if (selectedItems.length === habitTimeOfDayMenuItems.length) {
-                habitTimeOfDayMenuText.textContent = "Anytime";
-            } else {
-                // Show selected time labels
-                const selectedText = selectedItems.map(selectedItem =>
-                    selectedItem.querySelector(".habit-time-item-text-container").textContent.trim()
-                );
-                habitTimeOfDayMenuText.textContent = selectedText.join(", ");
-            }
+            // Update text to the clicked one’s label
+            const selectedText = item.querySelector(".habit-time-item-text-container").textContent.trim();
+            habitTimeOfDayMenuText.textContent = selectedText;
         });
     });
+
 
 
     const habitFolderMenu = addHabitModal.querySelector(".habit-folder-menu-container");
@@ -751,4 +743,29 @@ function habitDeleteHandler(habitId) {
 function habitContainerIsClicked(habitId) {
     const habitDiv = document.querySelector(`.habits-more-container[data-id="${habitId}"]`);
     habitDiv.click();
+}
+
+function defaultAddHabitParams() {
+    const addHabitModal = document.querySelector(".habit-add-modal");
+    const today = new Date();
+    const todayFormatted = today.toISOString().split("T")[0];
+
+    addHabitModal.querySelector("#new-habit-name").value = "";
+    addHabitModal.querySelector(".new-habit-icon").textContent = "❓";
+    addHabitModal.querySelector("#habit-goal").value = "1";
+    addHabitModal.querySelector(".times").textContent = "Times";
+    addHabitModal.querySelector(".per").textContent = "Per Day";
+    addHabitModal.querySelector(".habit-repeat-text").textContent = "Daily";
+    addHabitModal.querySelector(".habit-time-text").textContent = "Anytime";
+    addHabitModal.querySelector(".habit-folder-text").textContent = "Habit Queue";
+    addHabitModal.querySelector(".habit-folder-text").dataset.folderId = "1";
+    addHabitModal.querySelector("#habit-date").value = todayFormatted;
+    addHabitModal.querySelector(".habit-date-text").textContent = "Today";
+    addHabitModal.querySelector("#new-habit-description").value = "";
+
+    addHabitModal.querySelectorAll(".habit-time-item-check-container").forEach(checkContainer => {
+        checkContainer.classList.add("hidden");
+    });
+
+    addHabitModal.querySelector(".habit-time-item-check-container-anytime").classList.remove("hidden");
 }

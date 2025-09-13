@@ -1,7 +1,35 @@
 import { habits, closeAddHabitModal, saveHabitsToLocalStorage, renderHabits, getHabitGoal, getHabitRepeat, clearAddHabitInputs } from "../data/habit.js";
 import { folders } from "../data/folder.js";
 
+document.addEventListener("DOMContentLoaded", () => {
+    popUpStatsPanelInSmallScreen();
+});
+
+
+
 const statsPanel = document.querySelector("#habits-stats-container");
+
+window.addEventListener("click", (e) => {
+    const habitElement = e.target.closest(".habits-more-container");
+    
+    if (habitElement) {
+        popUpStatsPanelInSmallScreen();
+    }
+    
+});
+
+window.addEventListener("resize", () => {
+    if (window.innerWidth > 1122) {
+        statsPanel.classList.remove("pop-up-stats-panel");
+        const statsPanelCloseButton = statsPanel.querySelector(".close-stats-panel-icon");
+        if (statsPanelCloseButton) {
+            statsPanelCloseButton.remove();
+        }
+    }
+});
+
+
+
 
 document.addEventListener("click", (e) => {
     let habitElement = null;
@@ -276,6 +304,41 @@ export function resetStatsPanel() {
     statsPanel.innerHTML = statsPanelHTML;
     statsPanel.removeAttribute("data-id");
 }
+
+function popUpStatsPanelInSmallScreen() {
+    const statsPanel = document.querySelector("#habits-stats-container");
+    const isSmallScreen = window.matchMedia("(max-width: 1122px)").matches;
+    const menu = document.querySelector("#habits-menu");
+
+    if (isSmallScreen) {
+        statsPanel.classList.add("pop-up-stats-panel");
+        addCloseStatsPanelButtonInSmallScreen();
+        menu.classList.remove("pop-up-menu");
+    } else {
+        statsPanel.classList.remove("pop-up-stats-panel");
+    }
+}
+
+function addCloseStatsPanelButtonInSmallScreen() {
+    const statsPanel = document.querySelector("#habits-stats-container");
+    const statsHeaderLeft = document.querySelector(".habits-stats-header-left");
+
+    const closeStatsPanelButton = statsHeaderLeft.querySelector(".close-stats-panel-icon");
+    if (closeStatsPanelButton) {
+        closeStatsPanelButton.remove();
+    }
+
+    const closeButton = document.createElement("img");
+    closeButton.src = "images/habits-container-icons/icons8-close-16.png";
+    closeButton.classList.add("close-stats-panel-icon");
+    statsHeaderLeft.prepend(closeButton);
+
+    closeButton.addEventListener("click", () => {
+        statsPanel.classList.remove("pop-up-stats-panel");
+        console.log("Stats panel closed in small screen");
+    });
+}
+
 
 
 

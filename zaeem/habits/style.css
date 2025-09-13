@@ -3,6 +3,8 @@
     padding: 0;
 }
 
+
+
 #habits-menu, 
 #habits-container,
 #habits-stats-container {
@@ -793,5 +795,11 @@ folder-more-icon-menu-container
 @media (max-width: 790px) {
     #habits-menu {
         display: none;
+    }
+}
+
+@media (min-width: 791px) {
+    #habits-menu {
+        display: flex;
     }
 }

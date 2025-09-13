@@ -5,6 +5,10 @@
     font-family: 'Inter', sans-serif;
 }
 
+#feature-menu {
+    min-width: 45px;
+}
+
 .line-hover-zone::before {
     content: "";
     position: absolute;

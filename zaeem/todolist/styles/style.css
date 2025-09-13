@@ -976,10 +976,7 @@ div[contenteditable="true"] {
 
 
 
-.hidden-menu {
-    position: absolute;
-    left: -9999px;
-}
+
 
 .add-folder-icon:hover,
 .close-modal-icon:hover {

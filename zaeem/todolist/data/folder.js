@@ -247,6 +247,7 @@ function clearFolderInput() {
 function changeFolderColorIndicator() {
     const selectedColor = document.getElementById("folderColorPicker").value;
     const container = document.querySelector(".folder-color-picker-container");
+    
     container.querySelectorAll(".color-indicator-circle").forEach(el => el.remove());
     const newColorPickerCircle = document.createElement("div");
     newColorPickerCircle.classList.add("color-indicator-circle");

@@ -59,7 +59,7 @@ const habitsMenu = document.getElementById("habits-menu");
 const habitsContainer = document.getElementById("habits-container");
 
 sidebarIcon.addEventListener("click", () => {
-  const isSmallScreen = window.matchMedia("(min-width: 786px)").matches;
+  const isSmallScreen = window.matchMedia("(max-width: 790px)").matches;
 
   if (isSmallScreen) {
     // Just show the menu, do not toggle icon
@@ -67,7 +67,7 @@ sidebarIcon.addEventListener("click", () => {
     const statsPanel = document.querySelector("#habits-stats-container");
 
     // ✅ If on small screen and stats panel is active, remove it
-    if (window.innerWidth < 786 && statsPanel.classList.contains("pop-up-stats-panel")) {
+    if (window.innerWidth < 790 && statsPanel.classList.contains("pop-up-stats-panel")) {
       statsPanel.classList.remove("pop-up-stats-panel");
     }
 
@@ -130,8 +130,8 @@ function updateCollapseSideBarIconSrc(e) {
 }
 
 // Create a media query list
-const mq = window.matchMedia('(max-width: 786px)');
-const mq2 = window.matchMedia('(min-width: 787px)');
+const mq = window.matchMedia('(max-width: 790px)');
+const mq2 = window.matchMedia('(min-width: 791px)');
 
 // Initial check
 updateExpandSideBarIconSrc(mq);

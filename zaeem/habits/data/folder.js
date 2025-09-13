@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
         closeAddFolderModal();
         clearAddFolderInputs();
     });
+
+    document.getElementById("folderColorPicker").addEventListener("input", changeFolderColorIndicator);
+
     
 });
 
@@ -195,6 +198,17 @@ function editFolder(folderId) {
     const addFolderButton = document.getElementById("addFolderButton");
     addFolderButton.textContent = "Save Changes";
     addFolderButton.classList.add("edit-mode");
+
+    // Update the color indicator safely
+    const colorIndicator = document.querySelector(".color-indicator-circle");
+    if (colorIndicator) {
+        colorIndicator.style.backgroundColor = folder.folderColor;
+    } else {
+        // If it doesn't exist, create it
+        changeFolderColorIndicator();
+    }
+
+    renderFolderPickerMenus();
 }
 
 
@@ -237,4 +251,21 @@ function renderFolderPickerMenus() {
             menu.appendChild(folderMenuItem);
         });
     });
+}
+
+// Change folder color indicator in modal
+function changeFolderColorIndicator() {
+    const selectedColor = document.getElementById("folderColorPicker").value;
+    const container = document.querySelector(".folder-color-picker-container");
+    
+    container.querySelectorAll(".color-indicator-circle").forEach(el => el.remove());
+    const newColorPickerCircle = document.createElement("div");
+    newColorPickerCircle.classList.add("color-indicator-circle");
+    newColorPickerCircle.style.backgroundColor = selectedColor;
+    const colorPickerIcon = container.querySelector(".color-picker-icon");
+    if (colorPickerIcon && colorPickerIcon.nextSibling) {
+        container.insertBefore(newColorPickerCircle, colorPickerIcon.nextSibling);
+    } else {
+        container.appendChild(newColorPickerCircle);
+    }
 }

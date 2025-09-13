@@ -21,7 +21,6 @@ h2 {
 }
 
 #feature-menu {
-    background-color: aqua;
     min-width: 45px;
     height: 100%;
     display: flex;
@@ -138,6 +137,11 @@ h2 {
     height: 100%;
     overflow-y: auto;
     position: relative;
+}
+
+.hidden-menu {
+    position: absolute;
+    left: -9999px;
 }
 
 .todo-list,
@@ -523,7 +527,8 @@ details[open] > summary .arrow {
 
 .todo-header-icon, 
 .collapse-sidebar-icon,
-.expand-sidebar-icon {
+.expand-sidebar-icon, 
+.close-stats-panel-icon {
     padding: 5px;
     border-radius: 4px;
 }

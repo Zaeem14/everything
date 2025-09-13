@@ -6,6 +6,7 @@
     <title>Habits</title>
     <link rel="stylesheet" href="../todolist/styles/mix.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { SetEmojiPicker } from "../general_zaeem/script.js";
         SetEmojiPicker();
@@ -25,28 +26,69 @@
 </head>
 <body>
     <div id="container">
-        <div id="feature-menu" class="strip"></div>
+        <div id="feature-menu" class="strip bg-gray-300">
+            <a href="../../homepage/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-blue-500">
+                    <img src="../../feature-menu/icons/home.png" alt="web" class="w-[1.5rem] h-[1.5rem]">
+                </div>
+            </a> 
+            <a href="../../zaeem/todolist/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-green-500">
+                    <img src="../../feature-menu/icons/todolist.png" alt="todolist" class="w-[1.5rem] h-[1.5rem]">
+                </div>
+            </a>   
+            <a href="../../zaeem/notes/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-red-500">
+                    <img src="../../feature-menu/icons/notes.png" alt="notes" class="w-[1.5rem] h-[1.5rem]">
+                </div>
+            </a>
+            <a href="../../zaeem/habits/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-yellow-500">
+                    <img src="../../feature-menu/icons/habits.png" alt="habits" class="w-[1.5rem] h-[1.5rem]">
+                </div>
+            </a>
+            <a href="../../foysal/flashcard.2.0/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-purple-500">
+                    <img src="../../feature-menu/icons/flashcards.png" alt="flashcards" class="w-[1.5rem] h-[1.5rem]">
+                </div>
+            </a>
+            <a href="../../calendar/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-pink-500">
+                    <img src="../../feature-menu/icons/calendar.png" alt="calendar" class="w-[1.5rem] h-[1.5rem]">
+                </div>
+            </a>
+            <a href="../../foysal/Flip Clock/clock/clock.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-orange-500">
+                    <img src="../../feature-menu/icons/clock.png" alt="clock" class="w-[2rem] h-[2rem]">
+                </div>
+            </a>
+            <a href="../../grades/index.html">
+                <div class="w-full h-[4rem] flex items-center justify-center bg-gray-500">
+                    <img src="../../feature-menu/icons/grades.png" alt="grades" class="w-[2rem] h-[2rem]">
+                </div>
+            </a>
+        </div>
         <div id="habits-menu" class="strip">
             <div class="habits-times">
                 <div class="habits-time-container">
-                    <img src="images/habits_menu_icons/all_icon.png" alt="all" class="habits-time-icon">
+                    <img src="images/habits_menu_icons/all-icon.png" alt="all" class="habits-time-icon">
                     <div class="habits-time" id="all">All</div>
                 </div>
                 <div class="habits-time-container">
-                    <img src="images/habits_menu_icons/sunrise.png" alt="Morning" class="habits-time-icon">
+                    <img src="images/habits_menu_icons/morning.png" alt="Morning" class="habits-time-icon">
                     <div class="habits-time" id="morning">Morning</div>
                 </div>
                 <div class="habits-time-container">
-                    <img src="images/habits_menu_icons/weather.png" alt="afternoon" class="habits-time-icon">
+                    <img src="images/habits_menu_icons/sun.png" alt="afternoon" class="habits-time-icon">
                     <div class="habits-time" id="afternoon">Afternoon</div>
                 </div>
                 <div class="habits-time-container">
-                    <img src="images/habits_menu_icons/moon.png" alt="night" class="habits-time-icon">
-                    <div class="habits-time" id="night">Night</div>
+                    <img src="images/habits_menu_icons/moon.png" alt="evening" class="habits-time-icon">
+                    <div class="habits-time" id="evening">Evening</div>
                 </div>
                 <div class="habits-time-container">
-                    <img src="images/habits_menu_icons/sleeping.png" alt="evening" class="habits-time-icon">
-                    <div class="habits-time" id="evening">Evening</div>
+                    <img src="images/habits_menu_icons/night.png" alt="evening" class="habits-time-icon">
+                    <div class="habits-time" id="night">Night</div>
                 </div>
                 <div class="habits-time-container">
                     <img src="images/habits_menu_icons/hours.png" alt="anytime" class="habits-time-icon">
@@ -450,25 +492,31 @@
                             </div>
                             <div class="habit-time-menu-container add-habit-menu-container hidden">
                                 <div class="habit-time-item-container">
-                                    <div class="habit-time-item-check-container">
+                                    <div class="habit-time-item-check-container habit-time-item-check-container-anytime">
+                                        <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-time-item-check">
+                                    </div>
+                                    <div class="habit-time-item-text-container">Anytime</div>
+                                </div>
+                                <div class="habit-time-item-container">
+                                    <div class="habit-time-item-check-container hidden">
                                         <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-time-item-check">
                                     </div>
                                     <div class="habit-time-item-text-container">Morning</div>
                                 </div>
                                 <div class="habit-time-item-container">
-                                    <div class="habit-time-item-check-container">
+                                    <div class="habit-time-item-check-container hidden">
                                         <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-time-item-check">
                                     </div>
                                     <div class="habit-time-item-text-container">Afternoon</div>
                                 </div>
                                 <div class="habit-time-item-container">
-                                    <div class="habit-time-item-check-container">
+                                    <div class="habit-time-item-check-container hidden">
                                         <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-time-item-check">
                                     </div>
                                     <div class="habit-time-item-text-container">Evening</div>
                                 </div>
                                 <div class="habit-time-item-container">
-                                    <div class="habit-time-item-check-container">
+                                    <div class="habit-time-item-check-container hidden">
                                         <img src="images/habits-container-icons/icons8-checkmark-16.png" class="habit-time-item-check">
                                     </div>
                                     <div class="habit-time-item-text-container">Night</div>
