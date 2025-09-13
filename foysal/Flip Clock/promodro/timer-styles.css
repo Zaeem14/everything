@@ -1,0 +1,177 @@
+/* Global Styles */
+:root {
+    --background-color: #1a1a1a;
+    --clock-bg: #111;
+    --digit-color: #eee;
+    --shadow-light: rgba(255, 255, 255, 0.05);
+    --shadow-dark: rgba(0, 0, 0, 0.4);
+}
+
+body {
+    background-color: var(--background-color);
+    font-family: 'Roboto Mono', monospace;
+    margin: 0;
+}
+
+/* Main Container */
+.clock-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Flip Clock Structure */
+.flip-clock {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 2rem; /* Add space below the clock */
+}
+
+.flip-unit-container {
+    display: flex;
+    gap: 10px;
+}
+
+.separator {
+    font-size: 6rem;
+    color: var(--digit-color);
+    line-height: 1.5;
+}
+
+/* Flip Card Styling */
+.flip-card {
+    position: relative;
+    width: 100px;
+    height: 150px;
+    perspective: 1000px;
+    font-size: 6rem;
+    font-weight: bold;
+    background-color: var(--clock-bg);
+    border-radius: 10px;
+    box-shadow: 
+        inset 0 2px 0 var(--shadow-light),
+        0 5px 15px var(--shadow-dark);
+    overflow: hidden;
+}
+
+/* Inner container to hold faces */
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Overlay shows the current digit when not animating */
+.digit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--digit-color);
+    z-index: 3;
+    backface-visibility: hidden;
+}
+
+/* Card Halves */
+.top, .bottom, .top-flip, .bottom-flip {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    backface-visibility: hidden;
+    color: var(--digit-color);
+    text-shadow: 0 1px 3px var(--shadow-dark);
+}
+
+/* Hide faces by default to avoid duplicate digits */
+.flip-card .top,
+.flip-card .bottom,
+.flip-card .top-flip,
+.flip-card .bottom-flip {
+    display: none;
+}
+
+.top, .top-flip {
+    top: 0;
+    align-items: flex-end;
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.bottom, .bottom-flip {
+    bottom: 0;
+    align-items: flex-start;
+    padding-top: 0.1em; /* Fine-tune alignment */
+    border-radius: 0 0 10px 10px;
+}
+
+/* Animation Elements */
+.top-flip {
+    transform-origin: bottom;
+    z-index: 2;
+}
+
+.bottom-flip {
+    transform-origin: top;
+    transform: rotateX(90deg);
+    z-index: 2;
+}
+
+/* Animation Trigger */
+.flip-card.play .top-flip {
+    display: flex;
+    animation: flip-top 0.5s ease-in forwards;
+}
+
+.flip-card.play .bottom-flip {
+    display: flex;
+    animation: flip-bottom 0.5s ease-out 0.5s forwards;
+}
+
+/* During animation show only flip faces */
+.flip-card.play .digit-overlay { display: none; }
+
+/* Keep static halves hidden; flips handle the view */
+.flip-card.play .top, .flip-card.play .bottom { display: none; }
+
+/* Keyframes */
+@keyframes flip-top {
+    to {
+        transform: rotateX(-90deg);
+    }
+}
+
+@keyframes flip-bottom {
+    to {
+        transform: rotateX(0deg);
+    }
+}
+
+/* Controls and other UI elements */
+.controls {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background-color: #444;
+}

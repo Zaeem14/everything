@@ -58,30 +58,337 @@
             </a>
         </div>
         <div class="clock-container">
-            <div class="current-time">
-                <h3 id="current-time"></h3>
+
+            <div class="flip-clock">
+              <div class="flip-unit-container">
+                <div class="flip-card" data-hours-tens></div>
+                <div class="flip-card" data-hours-ones></div>
+              </div>
+              <div class="separator">:</div>
+              <div class="flip-unit-container">
+                <div class="flip-card" data-minutes-tens></div>
+                <div class="flip-card" data-minutes-ones></div>
+              </div>
+              <div class="separator">:</div>
+              <div class="flip-unit-container">
+                <div class="flip-card" data-seconds-tens></div>
+                <div class="flip-card" data-seconds-ones></div>
+              </div>
             </div>
-        <div class="button-container">
-            <div>
-                <button class="clock-button">Clock</button>
-                <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html" class="promodro-button"><button>Promodro</button></a>
-            </div>
+
         </div>
-            
+        <div class="button-container">
+            <div class="button-wrapper">
+                <button class="clock-button active" id="clockBtn">
+                    <span class="button-icon">🕒</span>
+                    <span class="button-text">Clock</span>
+                </button>
+                <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html" class="promodro-button">
+                    <button id="promodroBtn">
+                        <span class="button-icon">📊</span>
+                        <span class="button-text">Promodro</span>
+                    </button>
+                </a>
+            </div>
+            <div class="button-hint">Select an option to continue</div>
         </div>
     </div>
 
-
     <script>
-        let time = document.getElementById("current-time");
+        const hoursTens = document.querySelector('[data-hours-tens]');
+        const hoursOnes = document.querySelector('[data-hours-ones]');
+        const minutesTens = document.querySelector('[data-minutes-tens]');
+        const minutesOnes = document.querySelector('[data-minutes-ones]');
+        const secondsTens = document.querySelector('[data-seconds-tens]');
+        const secondsOnes = document.querySelector('[data-seconds-ones]');
 
-        setInterval(() => {
-            let d = new Date();
-            time.innerHTML = d.toLocaleTimeString();
-        }, 1000);
+        function createFlipCard(element) {
+            const top = document.createElement('div');
+            top.classList.add('top');
+            const bottom = document.createElement('div');
+            bottom.classList.add('bottom');
+            const topFlip = document.createElement('div');
+            topFlip.classList.add('top-flip');
+            const bottomFlip = document.createElement('div');
+            bottomFlip.classList.add('bottom-flip');
 
-        let d = new Date();
-        time.innerHTML = d.toLocaleTimeString();
+            // Overlay digit for idle state (shows a single, full digit)
+            const overlay = document.createElement('div');
+            overlay.classList.add('digit-overlay');
+
+            element.appendChild(top);
+            element.appendChild(bottom);
+            element.appendChild(topFlip);
+            element.appendChild(bottomFlip);
+            element.appendChild(overlay);
+
+            return { top, bottom, topFlip, bottomFlip, overlay };
+        }
+
+        const cards = {
+            hoursTens: createFlipCard(hoursTens),
+            hoursOnes: createFlipCard(hoursOnes),
+            minutesTens: createFlipCard(minutesTens),
+            minutesOnes: createFlipCard(minutesOnes),
+            secondsTens: createFlipCard(secondsTens),
+            secondsOnes: createFlipCard(secondsOnes),
+        };
+
+        function setCardValue(card, value) {
+            // Keep faces ready but hidden when idle; overlay shows the digit
+            card.top.textContent = value;
+            card.bottom.textContent = value;
+            card.topFlip.textContent = '';
+            card.bottomFlip.textContent = '';
+            if (card.overlay) card.overlay.textContent = value;
+        }
+
+        let lastTime = null;
+
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const s = now.getSeconds().toString().padStart(2, '0');
+
+            if (!lastTime) {
+                // First render: set all cards without animation
+                setCardValue(cards.hoursTens, h[0]);
+                setCardValue(cards.hoursOnes, h[1]);
+                setCardValue(cards.minutesTens, m[0]);
+                setCardValue(cards.minutesOnes, m[1]);
+                setCardValue(cards.secondsTens, s[0]);
+                setCardValue(cards.secondsOnes, s[1]);
+                lastTime = now;
+                return;
+            }
+
+            const lastH = lastTime.getHours().toString().padStart(2, '0');
+            const lastM = lastTime.getMinutes().toString().padStart(2, '0');
+            const lastS = lastTime.getSeconds().toString().padStart(2, '0');
+
+            flip(cards.hoursTens, h[0], lastH[0]);
+            flip(cards.hoursOnes, h[1], lastH[1]);
+            flip(cards.minutesTens, m[0], lastM[0]);
+            flip(cards.minutesOnes, m[1], lastM[1]);
+            flip(cards.secondsTens, s[0], lastS[0]);
+            flip(cards.secondsOnes, s[1], lastS[1]);
+
+            lastTime = now;
+        }
+
+        function flip(card, newNum, lastNum) {
+            if (newNum === lastNum) return;
+
+            // Prepare faces for animation
+            card.top.textContent = lastNum;
+            card.bottom.textContent = lastNum;
+            card.topFlip.textContent = lastNum;
+            card.bottomFlip.textContent = newNum;
+
+            const parent = card.topFlip.parentElement;
+            parent.classList.add('play');
+            
+            // Hide overlay during animation to avoid any duplication
+            if (card.overlay) {
+                card.overlay.style.visibility = 'hidden';
+            }
+
+            // First animation: flip the top half down
+            card.topFlip.style.transform = 'rotateX(0deg)';
+            card.topFlip.style.zIndex = '4';
+            
+            // Trigger reflow to ensure the initial state is applied
+            void card.topFlip.offsetHeight;
+            
+            // Start the flip animation
+            card.topFlip.style.transform = 'rotateX(-90deg)';
+            
+            // When top flip completes, update the bottom half
+            setTimeout(() => {
+                card.top.textContent = newNum;
+                card.bottomFlip.style.transform = 'rotateX(0deg)';
+                
+                // When bottom flip completes, clean up
+                setTimeout(() => {
+                    card.bottom.textContent = newNum;
+                    if (card.overlay) {
+                        card.overlay.textContent = newNum;
+                        card.overlay.style.visibility = '';
+                    }
+                    parent.classList.remove('play');
+                    // Reset transforms for next flip
+                    card.topFlip.style.transform = '';
+                    card.bottomFlip.style.transform = 'rotateX(90deg)';
+                }, 250); // Half of the total animation time
+            }, 250); // Half of the total animation time
+        }
+
+        // Initialize the clock with the current time
+        updateClock();
+        
+        // Update the clock every second, syncing with the system clock
+        // to avoid drift over time
+        let expected = Date.now() + 1000;
+        const driftCorrection = 1000; // 1 second
+        
+        function syncClock() {
+            const now = Date.now();
+            const drift = now - expected;
+            
+            // Update the clock
+            updateClock();
+            
+            // Calculate next update time, adjusting for drift
+            expected += driftCorrection;
+            
+            // Schedule next update, adjusting for drift
+            setTimeout(syncClock, Math.max(0, driftCorrection - drift));
+        }
+        
+        // Start the synchronized clock
+        setTimeout(syncClock, 1000 - (Date.now() % 1000));
+
+        // Button interactions
+        const clockBtn = document.getElementById('clockBtn');
+        const promodroBtn = document.getElementById('promodroBtn');
+        const buttonHint = document.querySelector('.button-hint');
+        let isHovering = false;
+
+        // Add ripple effect to buttons
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+            circle.classList.add('ripple');
+            
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+            
+            // Remove ripple after animation completes
+            setTimeout(() => {
+                circle.remove();
+            }, 600);
+        }
+
+        // Add ripple effect to all buttons
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('click', createRipple);
+            
+            // Add hover effect
+            button.addEventListener('mouseenter', () => {
+                isHovering = true;
+                buttonHint.style.opacity = '1';
+                buttonHint.style.transform = 'translateY(0)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                isHovering = false;
+                if (!document.querySelector('button:active')) {
+                    buttonHint.style.opacity = '0.8';
+                    buttonHint.style.transform = 'translateY(5px)';
+                }
+            });
+            
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'translateY(1px)';
+            });
+            
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'translateY(-3px)';
+            });
+        });
+        
+        // Update button hint based on which button is active
+        function updateActiveButton(activeBtn) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                if (btn === activeBtn) {
+                    btn.classList.add('active');
+                    buttonHint.textContent = `${btn.textContent.trim()} is selected`;
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        // Set initial active button
+        updateActiveButton(clockBtn);
+        
+        // Add click handlers
+        clockBtn.addEventListener('click', () => {
+            updateActiveButton(clockBtn);
+        });
+        
+        promodroBtn.addEventListener('click', (e) => {
+            updateActiveButton(promodroBtn);
+            // Add a small delay before navigation to see the click effect
+            setTimeout(() => {
+                window.location.href = e.target.closest('a').href;
+            }, 300);
+        });
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                const buttons = document.querySelectorAll('button');
+                const currentIndex = Array.from(buttons).findIndex(btn => btn.classList.contains('active'));
+                let nextIndex;
+                
+                if (e.key === 'ArrowRight') {
+                    nextIndex = (currentIndex + 1) % buttons.length;
+                } else {
+                    nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+                }
+                
+                updateActiveButton(buttons[nextIndex]);
+                buttons[nextIndex].focus();
+            } else if (e.key === 'Enter') {
+                const activeButton = document.querySelector('button.active');
+                if (activeButton) {
+                    activeButton.click();
+                }
+            }
+        });
     </script>
+    <style>
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Button focus styles */
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.5);
+        }
+        
+        /* Button press effect */
+        button:active {
+            transform: translateY(1px) !important;
+        }
+    </style>
 </body>
 </html>
