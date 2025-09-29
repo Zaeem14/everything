@@ -259,10 +259,11 @@ function formatDateToISO(date) {
 // for the month view function
 function renderMonthView(date) {
     // Show month view, hide week view
-    if (monthView && weekView) {
+    if (monthView && weekView && dayView && yearView) {
         monthView.style.display = 'block';
         weekView.style.display = 'none';
-        yearGrid.style.display = 'none';
+        dayView.style.display = 'none';
+        yearView.style.display = 'none';
     }
 
     // Clear the month grid
@@ -1610,5 +1611,3 @@ document.addEventListener('DOMContentLoaded', function () {
     updateDropdownText();
     initializeView();
 });
-
-// Initialize the calendar when the DOM is fully loaded

@@ -1,134 +1,242 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
-    <title>Clock</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- ✅ Link to your external CSS fil, which name is clock.css -->
-    <link rel="stylesheet" href="/foysal/Flip Clock/promodro/Custom Session/promodro_custom.css">
+    <title>Custom Timer • Promodro</title>
+    <link rel="stylesheet" href="../timer-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e84393;
+            --primary-dark: #d63073;
+        }
+        body.focus-mode {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+        }
+        .timer-display .time { display: none; }
+        .settings-panel {
+            background: rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem auto;
+            max-width: 800px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .form-row { display: flex; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .form-col { flex: 1; min-width: 200px; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
+        .form-control { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; background: #f0f0f0; }
+        .preset-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 1rem 0; }
+        .preset-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 0.5rem 1.25rem; cursor: pointer; }
+        .custom-timer-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="feature-menu"></div>
-        <div class="flipClock-container">
-            <h1>Pomodoro Timer</h1>
-            
-            <div id="timer-display">None</div>
-            <div class="TimerButtons-Container">
-                <button id="start-button">Start</button>
-                <button id="reset-button">Reset</button>
-                <button id="pause-button" onclick="pauseTimer()">Pause</button>
-                <button id="break-button">Break</button>
-                <button id="skip-button">Skip</button>
+    <div class="clock-container">
+        <header class="timer-header">
+            <h1 class="timer-title">Custom Timer</h1>
+            <p class="timer-subtitle">Set your own work and break intervals</p>
+        </header>
+        <main>
+            <div class="flip-clock-display">
+                <div class="flip-clock">
+                    <div class="flip-unit-container">
+                        <div class="flip-card" data-minutes-tens></div>
+                        <div class="flip-card" data-minutes-ones></div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="flip-unit-container">
+                        <div class="flip-card" data-seconds-tens></div>
+                        <div class="flip-card" data-seconds-ones></div>
+                    </div>
+                </div>
+                <div class="timer-display">
+                     <div class="progress-container">
+                        <svg class="progress-circle" viewBox="0 0 100 100">
+                            <circle class="progress-bg" cx="50" cy="50" r="45" />
+                            <circle class="progress-fill" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283" />
+                        </svg>
+                    </div>
+                    <div class="timer-label" id="timerLabel">Set your timer</div>
+                </div>
             </div>
-            <div>
-                <label>Session (minutes): <input type="number" id="session-input" value="25" min="1"></label>
-                <label>Break (minutes): <input type="number" id="break-input" value="5" min="1"></label>
+            <div class="settings-panel" id="settingsPanel">
+                <h3>Timer Settings</h3>
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label" for="workMinutes">Work (minutes)</label>
+                        <input type="number" id="workMinutes" class="form-control" value="25">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label" for="breakMinutes">Break (minutes)</label>
+                        <input type="number" id="breakMinutes" class="form-control" value="5">
+                    </div>
+                </div>
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-work="25" data-break="5">25/5</button>
+                    <button class="preset-btn" data-work="50" data-break="10">50/10</button>
+                </div>
+                <div class="custom-timer-actions">
+                    <button id="startWorkBtn" class="btn btn-primary"><i class="fas fa-play"></i> Start Work</button>
+                    <button id="startBreakBtn" class="btn btn-outline"><i class="fas fa-coffee"></i> Start Break</button>
+                </div>
             </div>
-        </div>
-        <div class="button-container">
-                <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html"><button class="promodro-button">Promodro</button></a>
-                <a href="/foysal/Flip Clock/clock/clock.html"class="clock-button" ><button>Clock</button></a>
-        </div>
-            
-        </div>
+            <div class="controls" id="timerControls" style="display:none;">
+                <button id="pauseBtn" class="btn btn-outline"><i class="fas fa-pause"></i> Pause</button>
+                <button id="resetBtn" class="btn btn-outline"><i class="fas fa-redo"></i> Reset</button>
+            </div>
+        </main>
+        <footer class="navigation">
+            <button class="btn btn-outline" onclick="window.location.href='../Homepage/promodro_Homepage.html'">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </footer>
     </div>
-
-
     <script>
-        let timer;
-        let sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
-        let breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
-        let timeLeft = sessionMinutes * 60;
-        let isRunning = false;
+    document.addEventListener('DOMContentLoaded', () => {
+        const minutesTens = document.querySelector('[data-minutes-tens]');
+        const minutesOnes = document.querySelector('[data-minutes-ones]');
+        const secondsTens = document.querySelector('[data-seconds-tens]');
+        const secondsOnes = document.querySelector('[data-seconds-ones]');
+        const workInput = document.getElementById('workMinutes');
+        const breakInput = document.getElementById('breakMinutes');
+        const startWorkBtn = document.getElementById('startWorkBtn');
+        const startBreakBtn = document.getElementById('startBreakBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const timerControls = document.getElementById('timerControls');
+        const timerLabel = document.getElementById('timerLabel');
+        const progressFill = document.querySelector('.progress-fill');
+
+        let interval;
+        let isPaused = false;
+        let totalSeconds = 0;
+        let currentSeconds = 0;
         let isBreak = false;
 
-        function updateDisplay() {
-            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const seconds = (timeLeft % 60).toString().padStart(2, '0');
-            document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+        const cards = {
+            minutesTens: createFlipCard(minutesTens),
+            minutesOnes: createFlipCard(minutesOnes),
+            secondsTens: createFlipCard(secondsTens),
+            secondsOnes: createFlipCard(secondsOnes)
+        };
+
+        function createFlipCard(element) {
+            if (!element) return;
+            element.innerHTML = `
+                <div class="flip-card-inner">
+                    <div class="top">0</div><div class="bottom">0</div>
+                    <div class="top-flip">0</div><div class="bottom-flip">0</div>
+                    <div class="digit-overlay">0</div>
+                </div>`;
+            return {
+                element,
+                top: element.querySelector('.top'),
+                bottom: element.querySelector('.bottom'),
+                topFlip: element.querySelector('.top-flip'),
+                bottomFlip: element.querySelector('.bottom-flip'),
+                overlay: element.querySelector('.digit-overlay')
+            };
         }
 
-        function startTimer() {
-            if (isRunning) return;
-            sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
-            breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
-            if (!isBreak) timeLeft = sessionMinutes * 60;
-            isRunning = true;
-            timer = setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    updateDisplay();
-                } else {
-                    clearInterval(timer);
-                    isRunning = false;
-                    alert(isBreak ? 'Break is over!' : 'Time for a break!');
+        function setCardValue(card, value) {
+            if (!card) return;
+            card.overlay.textContent = value;
+            card.top.textContent = value;
+            card.bottom.textContent = value;
+        }
+
+        function animateFlip(card, newValue) {
+            const oldValue = card.top.textContent;
+            if (oldValue === newValue) return;
+
+            card.topFlip.textContent = oldValue;
+            card.bottomFlip.textContent = newValue;
+            card.element.classList.add('play');
+
+            setTimeout(() => {
+                setCardValue(card, newValue);
+                card.element.classList.remove('play');
+            }, 450);
+        }
+        
+        function updateTimeDisplay() {
+            const minutes = Math.floor(currentSeconds / 60);
+            const seconds = currentSeconds % 60;
+            const minsStr = String(minutes).padStart(2, '0');
+            const secsStr = String(seconds).padStart(2, '0');
+
+            animateFlip(cards.minutesTens, minsStr[0]);
+            animateFlip(cards.minutesOnes, minsStr[1]);
+            animateFlip(cards.secondsTens, secsStr[0]);
+            animateFlip(cards.secondsOnes, secsStr[1]);
+            
+            const progress = (currentSeconds / totalSeconds) * 283;
+            progressFill.style.strokeDashoffset = 283 - progress;
+        }
+
+        function startTimer(duration, breakTimer = false) {
+            clearInterval(interval);
+            isBreak = breakTimer;
+            totalSeconds = duration * 60;
+            currentSeconds = totalSeconds;
+            isPaused = false;
+            
+            settingsPanel.style.display = 'none';
+            timerControls.style.display = 'flex';
+            pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            timerLabel.textContent = isBreak ? 'Break Time' : 'Focus Time';
+            
+            updateTimeDisplay();
+
+            interval = setInterval(() => {
+                if (!isPaused) {
+                    currentSeconds--;
+                    updateTimeDisplay();
+                    if (currentSeconds <= 0) {
+                        clearInterval(interval);
+                        timerLabel.textContent = isBreak ? 'Break Over!' : 'Session Complete!';
+                        setTimeout(resetTimer, 2000);
+                    }
                 }
             }, 1000);
         }
 
-        function pauseTimer() {
-            clearInterval(timer);
-            isRunning = false;
-        }
-
         function resetTimer() {
-            clearInterval(timer);
-            sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
-            timeLeft = sessionMinutes * 60;
-            isRunning = false;
-            isBreak = false;
-            updateDisplay();
+            clearInterval(interval);
+            isPaused = false;
+            settingsPanel.style.display = 'block';
+            timerControls.style.display = 'none';
+            timerLabel.textContent = 'Set your timer';
+            currentSeconds = (workInput.value || 25) * 60;
+            totalSeconds = currentSeconds;
+            updateTimeDisplay();
         }
 
-        function startBreak() {
-            clearInterval(timer);
-            breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
-            timeLeft = breakMinutes * 60;
-            isRunning = false;
-            isBreak = true;
-            updateDisplay();
-        }
-
-        function skipSession() {
-            clearInterval(timer);
-            sessionMinutes = parseInt(document.getElementById('session-input').value) || 25;
-            breakMinutes = parseInt(document.getElementById('break-input').value) || 5;
-            if (isBreak) {
-                timeLeft = sessionMinutes * 60;
-                isBreak = false;
-            } else {
-                timeLeft = breakMinutes * 60;
-                isBreak = true;
-            }
-            isRunning = false;
-            updateDisplay();
-        }
-
-
-                // Update timer when user changes session or break input
-        document.getElementById('session-input').addEventListener('input', function() {
-            if (!isRunning && !isBreak) {
-                sessionMinutes = parseInt(this.value) || 25;
-                timeLeft = sessionMinutes * 60;
-                updateDisplay();
-            }
+        startWorkBtn.addEventListener('click', () => startTimer(workInput.value || 25));
+        startBreakBtn.addEventListener('click', () => startTimer(breakInput.value || 5, true));
+        pauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            pauseBtn.innerHTML = isPaused ? '<i class="fas fa-play"></i> Resume' : '<i class="fas fa-pause"></i> Pause';
+            timerLabel.textContent = isPaused ? 'Paused' : (isBreak ? 'Break Time' : 'Focus Time');
+        });
+        resetBtn.addEventListener('click', resetTimer);
+        
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                workInput.value = btn.dataset.work;
+                breakInput.value = btn.dataset.break;
+                resetTimer();
+            });
         });
 
-        document.getElementById('break-input').addEventListener('input', function() {
-            if (!isRunning && isBreak) {
-                breakMinutes = parseInt(this.value) || 5;
-                timeLeft = breakMinutes * 60;
-                updateDisplay();
-            }
-        });
-
-        document.getElementById('start-button').addEventListener('click', startTimer);
-        document.getElementById('reset-button').addEventListener('click', resetTimer);
-        document.getElementById('break-button').addEventListener('click', startBreak);
-        document.getElementById('skip-button').addEventListener('click', skipSession);
-
-        updateDisplay();
+        resetTimer(); // Initialize
+    });
     </script>
 </body>
 </html>

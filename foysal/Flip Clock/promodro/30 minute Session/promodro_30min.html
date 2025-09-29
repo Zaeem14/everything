@@ -1,105 +1,546 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
-    <title>Clock</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- ✅ Link to your external CSS fil, which name is clock.css -->
-    <link rel="stylesheet" href="/foysal/Flip Clock/promodro/30 minute Session/promodro_30min.css">
+    <title>30-Minute Focus Session • Promodro</title>
+    <link rel="stylesheet" href="../timer-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Use flip clock digits, hide legacy text time */
+        .timer-display .time { display: none; }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="feature-menu"></div>
-        <div class="flipClock-container">
-            <h1>Pomodoro Timer</h1>
-            <div id="timer-display">30:00</div>
-            <div class="TimerButtons-Container">
-                <button id="start-button">Start</button>
-                <button id="reset-button">Reset</button>
-                <button id="pause-button" onclick="pauseTimer()">Pause</button>
-                <button id="break-button">Break</button>
-                <button id="skip-button">Skip</button>
+<body class="focus-mode">
+    <div class="clock-container">
+        <header class="timer-header">
+            <h1 class="timer-title">Focus Session</h1>
+            <p class="timer-subtitle">30 minutes of deep work</p>
+        </header>
+
+        <main>
+            <div class="clock-container">
+                <div class="flip-clock">
+                    <!-- Minutes -->
+                    <div class="flip-unit-container">
+                        <div class="flip-card" id="minutesTens" data-minutes-tens>3</div>
+                        <div class="flip-card" id="minutesOnes" data-minutes-ones>0</div>
+                    </div>
+                    <div class="separator">:</div>
+                    <!-- Seconds -->
+                    <div class="flip-unit-container">
+                        <div class="flip-card" id="secondsTens" data-seconds-tens>0</div>
+                        <div class="flip-card" id="secondsOnes" data-seconds-ones>0</div>
+                    </div>
+                </div>
+                <div class="timer-display">
+                    <div class="progress-container">
+                        <svg class="progress-circle" viewBox="0 0 100 100">
+                            <circle class="progress-bg" cx="50" cy="50" r="45" />
+                            <circle class="progress-fill" cx="50" cy="50" r="45" 
+                                    stroke-dasharray="283" stroke-dashoffset="0" />
+                        </svg>
+                        <div class="time" id="time">30:00</div>
+                    </div>
+                    <div class="timer-label" id="timerLabel">Ready to focus</div>
+                    <div class="timer-state" id="timerState"></div>
+                </div>
             </div>
-        </div>
-        <div class="button-container">
-                <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html"><button class="promodro-button">Promodro</button></a>
-                <a href="/foysal/Flip Clock/clock/clock.html"class="clock-button" ><button>Clock</button></a>
-        </div>
-            
-        </div>
+
+            <div class="controls">
+                <button id="startBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Start
+                </button>
+                <button id="pauseBtn" class="btn btn-outline" disabled>
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button id="resetBtn" class="btn btn-outline">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button id="restartBtn" class="btn btn-primary">
+                    <i class="fas fa-rotate"></i> Restart
+                </button>
+            </div>
+
+            <div class="session-info">
+                <h3>Session Progress</h3>
+                <div class="session-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="sessions">0</div>
+                        <div class="stat-label">Sessions</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="completed">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalTime">0</div>
+                        <div class="stat-label">Minutes</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="navigation">
+            <button class="btn btn-outline" onclick="window.location.href='../Homepage/promodro_Homepage.html'">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </footer>
     </div>
 
-
     <script>
-        let timer;
-        let timeLeft = 30 * 60; // 50 minutes in seconds
-        let isRunning = false;
-        let isBreak = false; // Track if currently in break
-
-        function updateDisplay() {
-            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const seconds = (timeLeft % 60).toString().padStart(2, '0');
-            document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded, initializing flip timer...');
+            
+            // Timer variables
+            let timer;
+            const totalSeconds = 30 * 60; // 30 minutes in seconds
+            let currentTime = totalSeconds;
+            let isRunning = false;
+            let isPaused = false;
+            let sessionsCompleted = 0;
+            
+            // DOM Elements
+            const minutesTens = document.querySelector('[data-minutes-tens]');
+            const minutesOnes = document.querySelector('[data-minutes-ones]');
+            const secondsTens = document.querySelector('[data-seconds-tens]');
+            const secondsOnes = document.querySelector('[data-seconds-ones]');
+            const timerLabel = document.getElementById('timerLabel');
+            const timerState = document.getElementById('timerState');
+            const timeDisplay = document.getElementById('time');
+            const progressFill = document.querySelector('.progress-fill');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            
+            // Initialize flip cards
+            const cards = {
+                minutesTens: createFlipCard(minutesTens),
+                minutesOnes: createFlipCard(minutesOnes),
+                secondsTens: createFlipCard(secondsTens),
+                secondsOnes: createFlipCard(secondsOnes)
+            };
+            
+            // Set initial values for minutes and seconds
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            
+            // Format with leading zeros
+            const minsStr = minutes.toString().padStart(2, '0');
+            const secsStr = seconds.toString().padStart(2, '0');
+            
+            // Set initial values
+            if (cards.minutesTens) setCardValue(cards.minutesTens, minsStr[0]);
+            if (cards.minutesOnes) setCardValue(cards.minutesOnes, minsStr[1]);
+            if (cards.secondsTens) setCardValue(cards.secondsTens, secsStr[0]);
+            if (cards.secondsOnes) setCardValue(cards.secondsOnes, secsStr[1]);
+            
+            // Initialize the display
+            updateProgress();
+            
+            // Log initialization
+            console.log('Flip cards initialized:', cards);
+            
+            // Event Listeners
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            restartBtn.addEventListener('click', restartTimer);
+        
+        // Flip helpers (ported from 25-minute)
+        function createFlipCard(element) {
+            if (!element) return null;
+            element.innerHTML = '';
+            const container = document.createElement('div');
+            container.classList.add('flip-card-inner');
+            const top = document.createElement('div'); top.classList.add('top');
+            const bottom = document.createElement('div'); bottom.classList.add('bottom');
+            const topFlip = document.createElement('div'); topFlip.classList.add('top-flip');
+            const bottomFlip = document.createElement('div'); bottomFlip.classList.add('bottom-flip');
+            const overlay = document.createElement('div'); overlay.classList.add('digit-overlay');
+            container.appendChild(top); container.appendChild(bottom);
+            container.appendChild(topFlip); container.appendChild(bottomFlip);
+            container.appendChild(overlay);
+            element.appendChild(container);
+            return { top, bottom, topFlip, bottomFlip, overlay, element };
         }
 
-        function startTimer() {
-            if (isRunning) return;
-            isRunning = true;
-            isBreak = false;
-            timer = setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    updateDisplay();
-                } else {
+        function setCardValue(card, value) {
+            if (!card) return;
+            if (card.overlay) card.overlay.textContent = value;
+            if (card.top) card.top.textContent = value;
+            if (card.bottom) card.bottom.textContent = value;
+            if (card.topFlip) card.topFlip.textContent = '';
+            if (card.bottomFlip) card.bottomFlip.textContent = '';
+        }
+
+            // Animate flip effect
+            function animateFlip(element, oldValue, newValue) {
+                if (oldValue === newValue) return;
+                
+                // Find the card object for this element
+                let card = null;
+                for (const key in cards) {
+                    if (cards[key] && cards[key].element === element) {
+                        card = cards[key];
+                        break;
+                    }
+                }
+                
+                if (!card) {
+                    console.warn('Card not found for element:', element);
+                    return;
+                }
+                
+                // If an animation is already in progress, clear it to start the new one
+                if (card.animationTimeout) {
+                    clearTimeout(card.animationTimeout);
+                    element.classList.remove('play');
+                }
+                
+                try {
+                    // Set the values for the flip animation
+                    if (card.topFlip) card.topFlip.textContent = oldValue;
+                    if (card.bottomFlip) card.bottomFlip.textContent = newValue;
+                    
+                    // Start the animation
+                    element.classList.add('play');
+                    
+                    // After animation completes, update the static values and clean up
+                    const animationDuration = 500; // Match this with CSS animation duration
+                    
+                    card.animationTimeout = setTimeout(() => {
+                        try {
+                            // Update the static display values
+                            setCardValue(card, newValue);
+                            
+                            // Remove the animation class
+                            element.classList.remove('play');
+                            
+                            // Reset the flip elements
+                            if (card.topFlip) card.topFlip.textContent = '';
+                            if (card.bottomFlip) card.bottomFlip.textContent = '';
+                            
+                            // Clear the timeout reference
+                            delete card.animationTimeout;
+                            
+                        } catch (error) {
+                            console.error('Error in animation cleanup:', error);
+                        }
+                    }, animationDuration);
+                    
+                } catch (error) {
+                    console.error('Error in animateFlip:', error);
+                    // Fallback to immediate update if animation fails
+                    setCardValue(card, newValue);
+                    element.classList.remove('play');
+                }
+            }
+
+
+            // Pause the timer
+            function pauseTimer() {
+                if (isRunning) {
                     clearInterval(timer);
                     isRunning = false;
-                    alert('Time for a break!');
+                    isPaused = true;
+                    
+                    // Update UI
+                    startBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    timerLabel.textContent = 'Paused';
+                    timerState.textContent = 'Click start to continue';
                 }
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            clearInterval(timer);
-            isRunning = false;
-        }
-
-        function resetTimer() {
-            clearInterval(timer);
-            timeLeft = 30 * 60;
-            isRunning = false;
-            isBreak = false;
-            updateDisplay();
-        }
-
-        function startBreak() {
-            clearInterval(timer);
-            timeLeft = 5 * 60; // 5 minutes
-            isRunning = false;
-            isBreak = true;
-            updateDisplay();
-        }
-
-        function skipSession() {
-            clearInterval(timer);
-            if (isBreak) {
-                // If in break, reset to work session
-                timeLeft = 30 * 60;
-                isBreak = false;
-            } else {
-                // If in work session, reset to break
-                timeLeft = 5 * 60;
-                isBreak = true;
             }
-            isRunning = false;
-            updateDisplay();
-        }
+            
+            // Reset the timer
+            function resetTimer() {
+                console.log('Resetting timer...');
+                
+                // Clear any running timers and timeouts
+                clearInterval(timer);
+                
+                // Clear any animation timeouts
+                Object.values(cards).forEach(card => {
+                    if (card && card.animationTimeout) {
+                        clearTimeout(card.animationTimeout);
+                        delete card.animationTimeout;
+                    }
+                });
+                
+                isRunning = false;
+                isPaused = false;
+                
+                // Reset current time to total seconds
+                currentTime = totalSeconds;
+                
+                // Reset the display without animation
+                const minutes = Math.floor(currentTime / 60);
+                const seconds = currentTime % 60;
+                const minsStr = minutes.toString().padStart(2, '0');
+                const secsStr = seconds.toString().padStart(2, '0');
+                
+                // Update each card directly without animation
+                if (cards.minutesTens) setCardValue(cards.minutesTens, minsStr[0]);
+                if (cards.minutesOnes) setCardValue(cards.minutesOnes, minsStr[1]);
+                if (cards.secondsTens) setCardValue(cards.secondsTens, secsStr[0]);
+                if (cards.secondsOnes) setCardValue(cards.secondsOnes, secsStr[1]);
+                
+                // Reset progress bar
+                updateProgress();
+                
+                // Reset button states
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                if (restartBtn) restartBtn.disabled = false;
+                
+                // Reset timer label
+                timerLabel.textContent = 'Ready to focus';
+                timerState.textContent = '';
+                
+                // Remove any active animations
+                document.querySelectorAll('.flip-card').forEach(card => {
+                    card.classList.remove('play');
+                });
+                
+                console.log('Timer reset complete');
+            }
 
-        document.getElementById('start-button').addEventListener('click', startTimer);
-        document.getElementById('reset-button').addEventListener('click', resetTimer);
-        document.getElementById('break-button').addEventListener('click', startBreak);
-        document.getElementById('skip-button').addEventListener('click', skipSession);
+            // Restart the timer from the beginning (reset + start)
+            function restartTimer() {
+                try {
+                    resetTimer();
+                    // slight delay to ensure UI updates before starting
+                    setTimeout(() => {
+                        startTimer();
+                    }, 50);
+                } catch (e) {
+                    console.error('Error restarting timer:', e);
+                    // Fallback to hard reset
+                    location.reload();
+                }
+            }
 
-        updateDisplay(); // Initialize display
+            // Start the timer
+            function startTimer() {
+                if (!isRunning) {
+                    if (isPaused) {
+                        // Resume from pause
+                        isPaused = false;
+                        timerState.textContent = 'Focusing...';
+                    } else {
+                        // Start new session
+                        currentTime = totalSeconds;
+                        timerState.textContent = 'Focus session started';
+                        sessionsCompleted++;
+                    }
+                    
+                    isRunning = true;
+                    startBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    if (restartBtn) restartBtn.disabled = true;
+                    
+                    timer = setInterval(updateTimer, 1000);
+                    timerLabel.textContent = 'Focusing...';
+                    
+                    // Start progress animation
+                    updateProgress();
+                }
+            }
+            
+            // Update the timer display
+            function updateTimer() {
+                console.log('updateTimer called, currentTime:', currentTime);
+                
+                if (currentTime <= 0) {
+                    console.log('Timer reached zero, completing session...');
+                    clearInterval(timer);
+                    isRunning = false;
+                    completeSession();
+                    return;
+                }
+                
+                // Store previous time for comparison
+                const prevTime = currentTime;
+                
+                // Decrement the timer
+                currentTime--;
+                
+                console.log('Timer tick:', { 
+                    previousTime: prevTime,
+                    currentTime,
+                    minutes: Math.floor(currentTime / 60),
+                    seconds: currentTime % 60
+                });
+                
+                // Only proceed if time has actually changed
+                if (currentTime !== prevTime) {
+                    // Update the display with the new time
+                    updateDisplay();
+                    
+                    // Update timer state based on remaining time
+                    if (currentTime <= 5) {
+                        timerState.textContent = 'Almost done!';
+                        timerState.style.color = 'var(--warning-color)';
+                    } else if (currentTime <= 60) {
+                        timerState.textContent = 'Less than a minute left!';
+                        timerState.style.color = 'var(--warning-color)';
+                    } else if (currentTime <= 300) {
+                        timerState.textContent = '5 minutes remaining';
+                        timerState.style.color = 'var(--text-light)';
+                    }
+                    
+                    // Update progress circle
+                    updateProgress();
+                } else {
+                    console.warn('Timer tick without time change - possible duplicate update');
+                }
+            }
+            
+            // Complete the session
+            function completeSession() {
+                clearInterval(timer);
+                isRunning = false;
+                
+                try {
+                    // Show completion message
+                    timerLabel.textContent = 'Session Complete!';
+                    timerState.textContent = 'Take a short break!';
+                    
+                    // Reset flip cards to 00:00
+                    if (cards) {
+                        if (cards.minutesTens) setCardValue(cards.minutesTens, '0');
+                        if (cards.minutesOnes) setCardValue(cards.minutesOnes, '0');
+                        if (cards.secondsTens) setCardValue(cards.secondsTens, '0');
+                        if (cards.secondsOnes) setCardValue(cards.secondsOnes, '0');
+                    }
+                    
+                    // Play sound
+                    playCompletionSound();
+                    
+                    // Show notification if allowed
+                    if (Notification.permission === 'granted') {
+                        new Notification('Pomodoro Complete!', {
+                            body: 'Great job! Time for a short break.',
+                            icon: 'https://cdn-icons-png.flaticon.com/512/3462/3462464.png'
+                        });
+                    }
+                    
+                    // Update UI
+                    if (startBtn) startBtn.disabled = false; // allow starting again
+                    if (pauseBtn) pauseBtn.disabled = true;
+                    if (resetBtn) resetBtn.disabled = false;
+                    if (restartBtn) restartBtn.disabled = false;
+                    
+                    // Increment session counter
+                    sessionsCompleted++;
+                    
+                    // If 4 sessions completed, show long break message
+                    if (sessionsCompleted % 4 === 0) {
+                        timerState.textContent = 'Take a long break!';
+                    }
+                } catch (error) {
+                    console.error('Error completing session:', error);
+                    // Fallback to basic completion
+                    if (timerLabel) timerLabel.textContent = 'Session Complete!';
+                    if (timerState) timerState.textContent = 'Please refresh the page';
+                }
+            }
+            
+            // Update the flip display and write text time
+            function updateDisplay() {
+                const minutes = Math.floor(currentTime / 60);
+                const seconds = currentTime % 60;
+                
+                // Format with leading zeros
+                const minsStr = minutes.toString().padStart(2, '0');
+                const secsStr = seconds.toString().padStart(2, '0');
+                // Update textual time for accessibility
+                if (timeDisplay) {
+                    timeDisplay.textContent = `${minsStr}:${secsStr}`;
+                }
+                
+                // Get current display values
+                const currentDisplay = {
+                    minutesTens: cards.minutesTens?.overlay?.textContent || '0',
+                    minutesOnes: cards.minutesOnes?.overlay?.textContent || '0',
+                    secondsTens: cards.secondsTens?.overlay?.textContent || '0',
+                    secondsOnes: cards.secondsOnes?.overlay?.textContent || '0'
+                };
+                
+                // Only update if values have changed
+                if (currentDisplay.minutesTens !== minsStr[0] && cards.minutesTens) {
+                    animateFlip(cards.minutesTens.element, currentDisplay.minutesTens, minsStr[0]);
+                }
+                
+                if (currentDisplay.minutesOnes !== minsStr[1] && cards.minutesOnes) {
+                    animateFlip(cards.minutesOnes.element, currentDisplay.minutesOnes, minsStr[1]);
+                }
+                
+                if (currentDisplay.secondsTens !== secsStr[0] && cards.secondsTens) {
+                    animateFlip(cards.secondsTens.element, currentDisplay.secondsTens, secsStr[0]);
+                }
+                
+                if (currentDisplay.secondsOnes !== secsStr[1] && cards.secondsOnes) {
+                    animateFlip(cards.secondsOnes.element, currentDisplay.secondsOnes, secsStr[1]);
+                }
+                
+                // Update progress circle
+                updateProgress();
+                
+                // Debug log
+                console.log('Display updated:', { 
+                    minutes: minsStr, 
+                    seconds: secsStr,
+                    currentDisplay
+                });
+            }
+            
+            // Update the circular progress like 50-min page
+            function updateProgress() {
+                const circumference = 283; // 2 * PI * r where r=45
+                const progress = ((totalSeconds - currentTime) / totalSeconds) * circumference;
+                if (progressFill) {
+                    progressFill.style.strokeDashoffset = circumference - progress;
+                }
+            }
+            
+            // Play completion sound
+            function playCompletionSound() {
+                try {
+                    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+                    audio.volume = 0.5;
+                    audio.play().catch(error => {
+                        console.warn('Audio playback failed:', error);
+                    });
+                } catch (error) {
+                    console.error('Error playing completion sound:', error);
+                }
+            }
+            
+            // Request notification permission when page loads
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+            
+            // Handle page visibility changes
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // Page is hidden
+                    if (isRunning && !isPaused) {
+                        // Pause the timer when tab is hidden to save resources
+                        pauseTimer();
+                        // Show a message when user comes back
+                        timerState.textContent = 'Timer was paused - click resume to continue';
+                    }
+                }
+            });
+            
+            console.log('Timer initialization complete');
+        }); // End of DOMContentLoaded
     </script>
 </body>
 </html>

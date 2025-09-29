@@ -192,20 +192,5 @@
                         </div>
                     </div>
                 </div>
-            <script>
-                document.querySelector('.js-createFolder').addEventListener('click', function() {
-                    // Handle menu label click
-                    alert('New Folder Has Added');
-                    // Add your folder creation logic here
-                    const folderName = prompt('Enter folder name:');
-                    if (folderName) {
-                        // Create the new folder element
-                        const newFolder = document.createElement('div');
-                        newFolder.classList.add('folder-div');
-                        newFolder.innerHTML = `<span class="folder-icon">📁 ${folderName}</span>`;
-                        document.querySelector('.folder-list').appendChild(newFolder);
-                    }
-                });
-            </script>
     </body>
 </html>
