@@ -1,12 +1,103 @@
 document.addEventListener("DOMContentLoaded", () => {
-    PageToggles();
+    pageToggles();
     ContentEditor();
     LineHoverBehavior();
     PlaceholderHandlers();
     enableClickToAddNewLine();
+    handleContentMenu(); // safe now, works for all current + future lines
+    sidebarIconMenuToggle();
+    pageHeaderClickPagesToggle();
 });
 
-function PageToggles() {
+
+document.addEventListener("click", (e) => {
+    const targetElement = e.target;
+
+    // If clicked the button
+    if (targetElement.classList.contains("page-more-icon")) {
+        const menu = targetElement.nextElementSibling; // assume menu is the sibling div
+        togglePageMoreIconMenu(menu);
+    } 
+    // If clicked outside the menu
+    else if (!targetElement.closest(".page-more-icon-menu") &&
+             !targetElement.closest(".page-more-icon")) {
+        document.querySelectorAll(".page-more-icon-menu").forEach(menu => {
+            menu.classList.add("hidden");
+        });
+    }
+});
+
+document.addEventListener("click", (e) => {
+    const button = e.target.closest(".page-container-more-icon");
+    const menu = e.target.closest(".page-container-more-icon-menu");
+
+    // If clicked on a button
+    if (button) {
+        const menuEl = button.nextElementSibling;
+
+        // Close all menus first
+        document.querySelectorAll(".page-container-more-icon-menu").forEach(m => {
+            if (m !== menuEl) m.classList.add("hidden");
+        });
+
+        // Toggle this one
+        menuEl.classList.toggle("hidden");
+        return; // stop here so it doesn’t close immediately
+    }
+
+    // If clicked inside a menu, do nothing (let menu item handlers work)
+    if (menu) {
+        return;
+    }
+
+    // Otherwise (clicked outside) → close all
+    document.querySelectorAll(".page-container-more-icon-menu").forEach(m => {
+        m.classList.add("hidden");
+    });
+});
+
+document.addEventListener("click", (e) => {
+    const targetElement = e.target;
+    if (targetElement.classList.contains("page-icon")) {
+        const parentElement = targetElement.parentElement;
+        parentElement.className = "page-container flex items-center h-auto relative gap-2 page-hover-zone";
+        targetElement.className = "page-icon folder-icon cursor-pointer rounded p-[2px] py-[2px] text-[5rem]";
+    }
+})
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        const active = document.activeElement;
+
+        // If cursor is inside page title
+        if (active.classList.contains("page-title")) {
+            e.preventDefault(); // stop new line in title
+
+            // Grab the first .content inside .line
+            const target = document.querySelector(".first-line .content");
+            if (!target) return;
+
+            target.focus();
+
+            // Place cursor at start
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setStart(target, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            updatePlaceholder(target);
+
+        }
+    }
+});
+
+
+
+    
+
+function pageToggles() {
     const pageContainers = document.querySelectorAll(".page-container");
     const expandedState = new WeakMap();
 
@@ -14,13 +105,16 @@ function PageToggles() {
         const arrowImg = container.querySelector("img[alt='page icon']");
         const containerPadding = parseFloat(getComputedStyle(container).paddingLeft);
 
-        if (!arrowImg) return;
+        if (arrowImg) {
+            arrowImg.style.cursor = "pointer";
+            arrowImg.addEventListener("click", () => togglePage(container, arrowImg, containerPadding, expandedState));
 
-        arrowImg.style.cursor = "pointer";
-        arrowImg.addEventListener("click", () => togglePage(container, arrowImg, containerPadding, expandedState));
-
-        container.addEventListener("mouseenter", () => showPageIcons(container, expandedState));
-        container.addEventListener("mouseleave", () => hidePageIcons(container));
+            container.addEventListener("mouseenter", () => showPageIcons(container, expandedState));
+            container.addEventListener("mouseleave", () => hidePageIcons(container));
+        } else {
+            container.addEventListener("mouseenter", () => showPageIcons(container, expandedState));
+            container.addEventListener("mouseleave", () => hidePageIcons(container));
+        }
     });
 }
 
@@ -153,34 +247,7 @@ function ContentEditor() {
 }
 
 function insertNewLineAfter(currentLine) {
-    const newLine = document.createElement("div");
-    newLine.className = "line flex items-center h-auto relative gap-2 line-hover-zone";
-    newLine.innerHTML = `
-        <div class="icons flex gap-1 pt-1 absolute left-[-3rem]">
-            <img src="images/main/icons8-add-16.png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="add block icon"/>
-            <img src="images/main/icons8-menu-16 (1).png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="move block icon"/>
-        </div>
-        <div class="content w-full outline-none" contenteditable="true"></div>
-        <div class="content-menu w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded" contenteditable="true">
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
-                <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Text</div>
-            </div>
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
-                <img src="images/main/icons8-1-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Heading 1</div>
-            </div>
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
-                <img src="images/main/icons8-2-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Heading 2</div>
-            </div>
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
-                <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Heading 3</div>
-            </div>
-        </div>
-    `;
-
+    const newLine = line();
     const currentContent = currentLine.querySelector(".content");
 
     // Remove placeholder from current line if it's empty
@@ -190,9 +257,6 @@ function insertNewLineAfter(currentLine) {
 
     // Copy heading class
     const newContent = newLine.querySelector(".content");
-    if (currentContent.classList.contains("text-3xl")) newContent.classList.add("text-3xl");
-    else if (currentContent.classList.contains("text-2xl")) newContent.classList.add("text-2xl");
-    else if (currentContent.classList.contains("text-xl")) newContent.classList.add("text-xl");
 
     // Hide all other icons
     document.querySelectorAll(".line .icons img").forEach(img => img.classList.add("hidden"));
@@ -209,6 +273,65 @@ function insertNewLineAfter(currentLine) {
     return newLine;
 }
 
+function insertNewHeadingAfter(currentLine, headingSize) {
+    const newHeadingLine = heading(headingSize);
+    const currentContent = currentLine.querySelector(".content");
+    
+    // Remove placeholder from current line if it's empty
+    if (["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(currentContent.textContent.trim())) {
+        currentContent.textContent = "";
+    }
+
+    // Copy heading class
+    const newContent = newHeadingLine.querySelector(".content");
+    if (headingSize === 1) {
+        newContent.classList.add("text-3xl");
+    } else if (headingSize === 2) {
+        newContent.classList.add("text-2xl");
+    } else if (headingSize === 3) {
+        newContent.classList.add("text-xl");
+    }
+
+    // Hide all other icons
+    document.querySelectorAll(".line .icons img").forEach(img => img.classList.add("hidden"));
+
+
+
+    if (currentLine.classList.contains("first-line")) {
+    // Instead of inserting a new element, just convert this one
+    const content = currentLine.querySelector(".content");
+
+    // Remove existing heading classes
+    content.classList.remove("text-3xl", "text-2xl", "text-xl", "font-bold");
+
+    // Apply the new heading size
+    if (headingSize === 1) {
+        content.classList.add("text-3xl", "font-bold");
+    } else if (headingSize === 2) {
+        content.classList.add("text-2xl", "font-bold");
+    } else if (headingSize === 3) {
+        content.classList.add("text-xl", "font-bold");
+    }
+
+    // Update placeholder text
+    updatePlaceholder(content);
+
+    // Focus stays in same line
+    content.focus();
+    } else {
+        // Insert and show icons on new line
+        currentLine.insertAdjacentElement("afterend", newHeadingLine);
+        const icons = newHeadingLine.querySelectorAll(".icons img");
+        icons.forEach(icon => icon.classList.remove("hidden"));
+    }
+
+    // Focus new line
+    newHeadingLine.querySelector(".content").focus();
+    // Always update placeholder for new line (for headings, show correct heading placeholder)
+    updatePlaceholder(newContent);
+    return newHeadingLine;
+}
+
 
 
 function deleteCurrentLine(currentLine) {
@@ -221,27 +344,27 @@ function deleteCurrentLine(currentLine) {
     if (!prevLine) return;
 
     const prevContent = prevLine.querySelector(".content");
-    const isEmpty = prevContent?.textContent.trim() === "" || isOnlyPlaceholder(prevContent);
 
-    if (isEmpty) {
-        // Defer updating placeholder to ensure deletion is reflected
-        setTimeout(() => {
+    setTimeout(() => {
+        // Update placeholder if needed
+        if (prevContent.textContent.trim() === "" || isOnlyPlaceholder(prevContent)) {
             updatePlaceholder(prevContent);
+        }
 
-            // Show only this line’s icons
-            prevLine.querySelectorAll(".icons img").forEach(icon => icon.classList.remove("hidden"));
+        // Show icons for this line
+        prevLine.querySelectorAll(".icons img").forEach(icon => icon.classList.remove("hidden"));
 
-            // Focus and move cursor to beginning
-            prevContent.focus();
-            const range = document.createRange();
-            const sel = window.getSelection();
-            range.setStart(prevContent, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }, 0);
-    }
+        // Focus and move cursor to END of text
+        prevContent.focus();
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(prevContent);
+        range.collapse(false); // false = end
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }, 0);
 }
+
 
 
 
@@ -380,4 +503,172 @@ function isOnlyPlaceholder(contentEl) {
     const text = contentEl.textContent.trim();
     const placeholder = contentEl.dataset.placeholder || "";
     return text === placeholder;
+}
+
+function handleContentMenu() {
+    const container = document.querySelector(".content-container");
+    if (!container) return;
+
+    // Listen for "/" key on any line (event delegation)
+    container.addEventListener("keydown", (e) => {
+        if (e.key === "/") {
+            e.preventDefault(); // optional: stop "/" from being typed
+            const line = e.target.closest(".line");
+            if (!line) return;
+
+            const menu = line.querySelector(".content-menu");
+            if (menu) {
+                showContentMenu(menu);
+            }
+        }
+    });
+
+    // Listen for clicks on content menu items (event delegation)
+    container.addEventListener("click", (e) => {
+        const menuItem = e.target.closest(".content-menu div");
+        if (!menuItem) return;
+
+        const menu = menuItem.closest(".content-menu");
+        hideContentMenu(menu);
+
+        const blockType = menuItem.textContent.trim();
+        const currentLine = menu.closest(".line");
+
+        const firstLine = document.querySelector(".first-line");
+        
+
+        if (blockType === "Text") {
+            insertNewLineAfter(currentLine);
+        } else if (blockType === "Heading 1") {
+            insertNewHeadingAfter(currentLine, 1);
+        } else if (blockType === "Heading 2") {
+            insertNewHeadingAfter(currentLine, 2);
+        } else if (blockType === "Heading 3") {
+            insertNewHeadingAfter(currentLine, 3);
+        }
+    });
+
+    document.addEventListener("click", (e) => {
+        const menus = document.querySelectorAll(".content-menu");
+        menus.forEach(menu => {
+            if (!menu.contains(e.target)) {
+                hideContentMenu(menu);
+            }
+        });
+    });
+}
+
+function showContentMenu(menu) {
+    menu.classList.remove("hidden");
+}
+
+function hideContentMenu(menu) {
+    menu.classList.add("hidden");
+}
+
+function line() {
+    const newLine = document.createElement("div");
+    newLine.className = "line flex items-center h-auto relative gap-2 line-hover-zone";
+    newLine.innerHTML = `
+        <div class="icons flex gap-1 pt-1 absolute left-[-3rem]">
+            <img src="images/main/icons8-add-16.png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="add block icon"/>
+            <img src="images/main/icons8-menu-16 (1).png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="move block icon"/>
+        </div>
+        <div class="content w-full outline-none" contenteditable="true"></div>
+        <div class="content-menu top-full w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded" contenteditable="true">
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Text</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-1-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Heading 1</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-2-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Heading 2</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Heading 3</div>
+            </div>
+        </div>
+    `;
+
+    return newLine;
+}
+
+function heading(size) {
+    let headingTextXl = "";
+    if (size === 1) {
+        headingTextXl = "text-3xl"
+    } else if (size === 2) {
+        headingTextXl = "text-2xl"
+    } else if (size === 3) {
+        headingTextXl = "text-xl"
+    }
+    const newHeadingLine = document.createElement("div");
+    newHeadingLine.className = "line line-hover-zone h-auto relative gap-2 line-hover-zone";
+    newHeadingLine.innerHTML = `
+        <div class="icons flex gap-1 pt-1 absolute left-[-3rem]">
+            <img src="images/main/icons8-add-16.png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="add block icon"/>
+            <img src="images/main/icons8-menu-16 (1).png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="move block icon"/>
+        </div>
+        <div class="content w-full ${headingTextXl} font-bold outline-none" contenteditable="true"></div>
+        <div class="content-menu top-full w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded" contenteditable="true">
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Text</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-1-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Heading 1</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-2-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Heading 2</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+                <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div>Heading 3</div>
+            </div>
+        </div>
+    `;
+    return newHeadingLine;
+}
+
+function togglePageMoreIconMenu(menu) {
+    menu.classList.toggle("hidden");
+}
+
+function sidebarIconMenuToggle() {
+    const sidebarIcon = document.querySelector("img[alt='sidebar icon']");
+    const notesMenu = document.querySelector("#notes-menu");
+    
+    sidebarIcon.addEventListener("click", () => {
+        if (sidebarIcon.classList.contains("collapse-icon")) {
+            sidebarIcon.classList.remove("collapse-icon");
+            sidebarIcon.classList.add("expand-icon");
+            sidebarIcon.src = "images/container-header/expand.png";
+
+            notesMenu.classList.add("hidden");
+
+        } else {
+            sidebarIcon.classList.remove("expand-icon");
+            sidebarIcon.classList.add("collapse-icon");
+            sidebarIcon.src = "images/container-header/collapse.png";
+
+            notesMenu.classList.remove("hidden");
+        }
+    })
+}
+
+
+function pageHeaderClickPagesToggle() {
+    const pageHeader = document.querySelector(".page-header");
+    const pages = document.querySelector(".pages-container");
+    
+    pageHeader.addEventListener("click", () => {
+        pages.classList.toggle("hidden");
+    })
 }
