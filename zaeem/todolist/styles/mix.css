@@ -220,7 +220,6 @@ h2 {
 .left-side-habit,
 .right-side-habit {
     display: flex;
-    flex-direction: row;
     align-items: center;
     height: 100%;
     justify-content: center;

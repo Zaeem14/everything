@@ -96,11 +96,20 @@ export function loadFoldersFromLocalStorage() {
     const storedFolders = localStorage.getItem("folders");
     if (storedFolders) {
         const parsedFolders = JSON.parse(storedFolders);
-        folders.length = 0;
-        folders.push(...parsedFolders);
+
+        // ✅ Safety check
+        if (Array.isArray(parsedFolders)) {
+            folders.length = 0;
+            folders.push(...parsedFolders);
+        } else {
+            console.warn("Folders data in localStorage is not an array:", parsedFolders);
+            // Optional: reset it
+            localStorage.removeItem("folders");
+        }
     }
     renderFolders();
 }
+
 
 
 
