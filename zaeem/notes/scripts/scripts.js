@@ -93,9 +93,32 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+document.addEventListener("click", (e) => {
+    const targetElement = e.target;
+    if (targetElement.classList.contains("line-block-menu-icon")) {
+        blockMenuToggle();
+    } 
 
+    // If not clicked on the menu
+    else if (!targetElement.closest(".line-block-menu")) {
+        document.querySelectorAll(".line-block-menu").forEach(menu => {
+            menu.classList.add("hidden");
+        });
+    }
+}); 
 
-    
+// add-icon click handler — stop propagation so global click handlers don't race
+document.addEventListener("click", (e) => {
+    const targetElement = e.target;
+    if (targetElement && targetElement.alt === "add block icon") {
+        // prevent default click behavior and stop other click handlers from interfering
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentLine = targetElement.closest(".line");
+        if (currentLine) addIconInsertBlockNextLine(currentLine);
+    }
+});
 
 function pageToggles() {
     const pageContainers = document.querySelectorAll(".page-container");
@@ -671,4 +694,75 @@ function pageHeaderClickPagesToggle() {
     pageHeader.addEventListener("click", () => {
         pages.classList.toggle("hidden");
     })
+}
+
+function blockMenuToggle() {
+    const blockMenu = document.querySelector(".line-block-menu");
+    blockMenu.classList.toggle("hidden");
+}
+
+function addIconInsertBlockNextLine(currentLine) {
+    const currentContent = currentLine.querySelector(".content");
+
+    // Step 1: Always clear placeholder styling/text for the current line (if any)
+    // Use clearPlaceholder to remove placeholder if it matches; but also ensure the element has no leftover placeholder dataset
+    if (currentContent) {
+        // remove placeholder text if it still matches the placeholder
+        clearPlaceholder(currentContent);
+        // ensure the content is empty for a clean split
+        currentContent.textContent = "";
+    }
+
+    // Step 2: Create new line and insert it
+    const newLine = line(); // uses your existing factory
+    // insert after the current line
+    currentLine.parentNode.insertBefore(newLine, currentLine.nextSibling);
+
+    const newContent = newLine.querySelector(".content");
+
+    // Step 3: Copy heading style from current line if present (optional)
+    if (currentContent) {
+        if (currentContent.classList.contains("text-3xl")) newContent.classList.add("text-3xl");
+        else if (currentContent.classList.contains("text-2xl")) newContent.classList.add("text-2xl");
+        else if (currentContent.classList.contains("text-xl")) newContent.classList.add("text-xl");
+    }
+
+    // Hide other icons, show this new line's icons
+    document.querySelectorAll(".line .icons img").forEach(img => img.classList.add("hidden"));
+    newLine.querySelectorAll(".icons img").forEach(icon => icon.classList.remove("hidden"));
+
+    // Step 4: Apply placeholder to new content (so the visuals are correct)
+    updatePlaceholder(newContent);
+
+    // Step 5: Focus and place caret at the start of the new line.
+    // Use setTimeout to ensure this runs *after* other click/focus handlers that might exist globally.
+    setTimeout(() => {
+        newContent.focus();
+
+        // Move caret to start (collapse to start)
+        const range = document.createRange();
+        const sel = window.getSelection();
+        // If the placeholder is present and you want the caret before it, collapsing at 0 is fine.
+        // If you'd rather remove placeholder instantly when new line is focused, uncomment the next two lines:
+        // if (newContent.dataset.placeholder) { clearPlaceholder(newContent); }
+
+        range.setStart(newContent, 0);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }, 0);
+
+    return newLine;
+}
+
+// robust clearPlaceholder: removes placeholder text and dataset unconditionally if they match
+function clearPlaceholder(contentEl) {
+    if (!contentEl) return;
+    const placeholder = contentEl.dataset.placeholder || "";
+    if (placeholder && contentEl.textContent.trim() === placeholder) {
+        contentEl.textContent = "";
+        contentEl.classList.remove('text-gray-400', 'italic');
+    }
+    // make sure we remove the dataset even if content doesn't currently match exactly
+    delete contentEl.dataset.placeholder;
 }
