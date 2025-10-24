@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
     pageHeaderClickPagesToggle();
 });
 
+let suppressPlaceholder = false;
+
+
 
 document.addEventListener("click", (e) => {
     const targetElement = e.target;
@@ -269,6 +272,7 @@ function ContentEditor() {
     });
 }
 
+
 function insertNewLineAfter(currentLine) {
     const newLine = line();
     const currentContent = currentLine.querySelector(".content");
@@ -296,38 +300,39 @@ function insertNewLineAfter(currentLine) {
     return newLine;
 }
 
-function insertNewHeadingAfter(currentLine, headingSize) {
-    const newHeadingLine = heading(headingSize);
-    const currentContent = currentLine.querySelector(".content");
-    
-    // Remove placeholder from current line if it's empty
-    if (["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(currentContent.textContent.trim())) {
-        currentContent.textContent = "";
-    }
-
-    // Copy heading class
-    const newContent = newHeadingLine.querySelector(".content");
-    if (headingSize === 1) {
-        newContent.classList.add("text-3xl");
-    } else if (headingSize === 2) {
-        newContent.classList.add("text-2xl");
-    } else if (headingSize === 3) {
-        newContent.classList.add("text-xl");
-    }
-
-    // Hide all other icons
-    document.querySelectorAll(".line .icons img").forEach(img => img.classList.add("hidden"));
-
-
-
-    if (currentLine.classList.contains("first-line")) {
-    // Instead of inserting a new element, just convert this one
+// 🔹 Turn current line into a text block
+function transformToTextBlock(currentLine) {
     const content = currentLine.querySelector(".content");
+    if (!content) return;
 
-    // Remove existing heading classes
+    // Remove heading styles if present
     content.classList.remove("text-3xl", "text-2xl", "text-xl", "font-bold");
 
-    // Apply the new heading size
+    // Reset to normal text
+    content.classList.add("w-full", "outline-none");
+
+    // Clear placeholder if needed
+    clearPlaceholder(content);
+
+    // Reset placeholder to default text
+    updatePlaceholder(content);
+
+    // Focus back
+    content.focus();
+
+    return currentLine; // ✅ no new element added
+}
+
+
+// 🔹 Turn current line into a heading block
+function transformToHeadingBlock(currentLine, headingSize) {
+    const content = currentLine.querySelector(".content");
+    if (!content) return;
+
+    // Remove existing heading styles
+    content.classList.remove("text-3xl", "text-2xl", "text-xl", "font-bold");
+
+    // Apply new heading size
     if (headingSize === 1) {
         content.classList.add("text-3xl", "font-bold");
     } else if (headingSize === 2) {
@@ -336,26 +341,19 @@ function insertNewHeadingAfter(currentLine, headingSize) {
         content.classList.add("text-xl", "font-bold");
     }
 
-    // Update placeholder text
-    updatePlaceholder(content);
-
-    // Focus stays in same line
-    content.focus();
-    } else {
-        // Insert and show icons on new line
-        currentLine.insertAdjacentElement("afterend", newHeadingLine);
-        const icons = newHeadingLine.querySelectorAll(".icons img");
-        icons.forEach(icon => icon.classList.remove("hidden"));
+    // Clear current text if it's a placeholder
+    if (["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(content.textContent.trim())) {
+        content.textContent = "";
     }
 
-    // Focus new line
-    newHeadingLine.querySelector(".content").focus();
-    // Always update placeholder for new line (for headings, show correct heading placeholder)
-    updatePlaceholder(newContent);
-    return newHeadingLine;
+    // Update placeholder to new heading type
+    updatePlaceholder(content);
+
+    // Focus back on current line
+    content.focus();
+
+    return currentLine; // ✅ no new element added
 }
-
-
 
 function deleteCurrentLine(currentLine) {
     const prevLine = currentLine.previousElementSibling;
@@ -398,7 +396,7 @@ function LineHoverBehavior() {
 
     contentContainer.addEventListener("mouseover", (e) => {
         const line = e.target.closest(".line");
-        if (line) {
+        if (line && !line.classList.contains("prevent-hover-icons")) {
             line.querySelectorAll("img[alt='move block icon'], img[alt='add block icon']")
                 .forEach(icon => icon.classList.remove("hidden"));
         }
@@ -412,6 +410,7 @@ function LineHoverBehavior() {
         }
     });
 }
+
 
 function PlaceholderHandlers() {
     // Handle input event - when user types in a field
@@ -452,15 +451,18 @@ function PlaceholderHandlers() {
 
     // Handle focus out - when user clicks away from a field
     document.addEventListener("focusout", (e) => {
-        const content = e.target;
-        if (!content.classList.contains("content")) return;
+    if (suppressPlaceholder) return; // 🛑 stop placeholder flicker
 
-        if (content.textContent.trim() === "") {
-            updatePlaceholder(content);
-        } else {
-            clearPlaceholder(content);
-        }
-    });
+    const content = e.target;
+    if (!content.classList.contains("content")) return;
+
+    if (content.textContent.trim() === "") {
+        updatePlaceholder(content);
+    } else {
+        clearPlaceholder(content);
+    }
+});
+
 }
 
 function updatePlaceholder(content) {
@@ -495,13 +497,12 @@ function updatePlaceholder(content) {
     }
 }
 
-function clearPlaceholder(content) {
-    const placeholder = content.dataset.placeholder || "";
-    if (content.textContent.trim() === placeholder) {
-        content.textContent = "";
-        content.classList.remove('text-gray-400', 'italic');
-    } 
-    delete content.dataset.placeholder;
+function clearAllPlaceholders() {
+    const lines = document.querySelectorAll(".line");
+    lines.forEach(line => {
+        const content = line.querySelector(".content");
+        clearPlaceholder(content);
+    });
 }
 
 function enableClickToAddNewLine() {
@@ -509,18 +510,38 @@ function enableClickToAddNewLine() {
     if (!container) return;
 
     container.addEventListener("click", (e) => {
-        // If clicking on a line, handle placeholder but don't add new line
         const clickedLine = e.target.closest(".line");
-        if (clickedLine) {
-            const content = clickedLine.querySelector(".content");
-            if (content && content.textContent.trim() === "") {
-                updatePlaceholder(content);
-                content.focus();
-            }
-            return;
+        if (!clickedLine) return;
+
+        const clickedContent = clickedLine.querySelector(".content");
+        if (!clickedContent) return;
+
+        const isClickedEmpty =
+            clickedContent.textContent.trim() === "" ||
+            ["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(clickedContent.textContent.trim());
+
+        if (isClickedEmpty) {
+            // Remove placeholder from all other empty lines
+            document.querySelectorAll(".line .content").forEach((content) => {
+                if (content !== clickedContent) {
+                    const isEmpty =
+                        content.textContent.trim() === "" ||
+                        ["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(content.textContent.trim());
+                    if (isEmpty) {
+                        clearPlaceholder(content);
+                    }
+                }
+            });
+
+            // Ensure clicked line has the correct placeholder
+            updatePlaceholder(clickedContent);
+
+            // Focus the clicked content
+            clickedContent.focus();
         }
     });
 }
+
 
 function isOnlyPlaceholder(contentEl) {
     const text = contentEl.textContent.trim();
@@ -529,57 +550,53 @@ function isOnlyPlaceholder(contentEl) {
 }
 
 function handleContentMenu() {
-    const container = document.querySelector(".content-container");
-    if (!container) return;
+    // Single document-level delegation
 
-    // Listen for "/" key on any line (event delegation)
-    container.addEventListener("keydown", (e) => {
+    // 1️⃣ Detect "/" key to show menu
+    document.addEventListener("keydown", (e) => {
         if (e.key === "/") {
-            e.preventDefault(); // optional: stop "/" from being typed
+            e.preventDefault();
+
             const line = e.target.closest(".line");
             if (!line) return;
 
             const menu = line.querySelector(".content-menu");
-            if (menu) {
-                showContentMenu(menu);
-            }
+            if (menu) showContentMenu(menu);
         }
     });
 
-    // Listen for clicks on content menu items (event delegation)
-    container.addEventListener("click", (e) => {
+    // 2️⃣ Handle clicks on menu items
+    document.addEventListener("click", (e) => {
         const menuItem = e.target.closest(".content-menu div");
         if (!menuItem) return;
 
-        const menu = menuItem.closest(".content-menu");
-        hideContentMenu(menu);
+        e.stopPropagation(); // stop bubbling to prevent multiple insertions
 
+        const menu = menuItem.closest(".content-menu");
         const blockType = menuItem.textContent.trim();
         const currentLine = menu.closest(".line");
 
-        const firstLine = document.querySelector(".first-line");
-        
+        hideContentMenu(menu);
 
         if (blockType === "Text") {
-            insertNewLineAfter(currentLine);
+            transformToTextBlock(currentLine);
         } else if (blockType === "Heading 1") {
-            insertNewHeadingAfter(currentLine, 1);
+            transformToHeadingBlock(currentLine, 1);
         } else if (blockType === "Heading 2") {
-            insertNewHeadingAfter(currentLine, 2);
+            transformToHeadingBlock(currentLine, 2);
         } else if (blockType === "Heading 3") {
-            insertNewHeadingAfter(currentLine, 3);
+            transformToHeadingBlock(currentLine, 3);
         }
     });
 
+    // 3️⃣ Hide menus when clicking outside
     document.addEventListener("click", (e) => {
-        const menus = document.querySelectorAll(".content-menu");
-        menus.forEach(menu => {
-            if (!menu.contains(e.target)) {
-                hideContentMenu(menu);
-            }
+        document.querySelectorAll(".content-menu").forEach(menu => {
+            if (!menu.contains(e.target)) hideContentMenu(menu);
         });
     });
 }
+
 
 function showContentMenu(menu) {
     menu.classList.remove("hidden");
@@ -595,25 +612,65 @@ function line() {
     newLine.innerHTML = `
         <div class="icons flex gap-1 pt-1 absolute left-[-3rem]">
             <img src="images/main/icons8-add-16.png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="add block icon"/>
-            <img src="images/main/icons8-menu-16 (1).png" class="w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="move block icon"/>
+            <div class="w-[10rem] rounded cursor-pointer absolute top-full left-0 bg-white z-[100] h-auto p-2 border border-black box-shadow-normal hidden">
+                <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
+                    <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
+                    <div class="block-type">Text</div>
+                </div>
+                <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
+                    <img src="images/main/icons8-1-16.png" class="w-[1.2rem] h-[1.2rem]">
+                    <div class="block-type">Heading 1</div>
+                </div>
+                <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
+                    <img src="images/main/icons8-2-16.png" class="w-[1.2rem] h-[1.2rem]">
+                    <div class="block-type">Heading 2</div>
+                </div>
+                <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
+                    <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
+                    <div class="block-type">Heading 3</div>
+                </div>
+            </div>
+            <img src="images/main/icons8-menu-16 (1).png" class="line-block-menu-icon w-[1.2rem] h-[1.2rem] rounded-sm p-[2px] cursor-pointer hover:bg-gray-200 hidden " alt="move block icon"/>
+            <div class="line-block-menu hidden w-[10rem] rounded absolute top-full left-0 bg-white z-[100] h-auto p-2 border border-black box-shadow-normal">
+                <div class="flex w-full  cursor-pointer  rounded-sm p-1 flex-col">
+                    <div class="text-xs font-bold text-gray-500 rounded-sm p-1">Text</div>
+                    <div class="flex items-center gap-1 hover:bg-gray-200 cursor-pointer rounded-sm p-1">
+                        <img src="images/main/turn-into.png" class="w-[1.2rem] h-[1.2rem]">
+                        <div>Turn into</div>
+                    </div>
+                    <div class="flex items-center gap-1 hover:bg-gray-200 cursor-pointer rounded-sm p-1">
+                        <img src="images/main/paint-roller.png" class="w-[1.2rem] h-[1.2rem]">
+                        <div>Color</div>
+                    </div>
+                    <hr class="w-full my-2">
+                    <div class="flex items-center gap-1 hover:bg-gray-200 cursor-pointer rounded-sm p-1">
+                        <img src="images/container-header/icons8-arrow-16.png" class="w-[1.2rem] h-[1.2rem]">
+                        <div>Move to</div>
+                    </div>
+                    <div class="flex items-center gap-1 hover:bg-gray-200 cursor-pointer rounded-sm p-1">
+                        <img src="images/container-header/icons8-trash-can-50.png" class="w-[1.2rem] h-[1.2rem]">
+                        <div>Delete</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="content w-full outline-none" contenteditable="true"></div>
-        <div class="content-menu top-full w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded" contenteditable="true">
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+        <div class="content-menu top-full w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded">
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
                 <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Text</div>
+                <div class="block-type">Text</div>
             </div>
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
                 <img src="images/main/icons8-1-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Heading 1</div>
+                <div class="block-type">Heading 1</div>
             </div>
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
                 <img src="images/main/icons8-2-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Heading 2</div>
+                <div class="block-type">Heading 2</div>
             </div>
-            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-sm p-1 ">
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
                 <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
-                <div>Heading 3</div>
+                <div class="block-type">Heading 3</div>
             </div>
         </div>
     `;
@@ -704,56 +761,72 @@ function blockMenuToggle() {
 function addIconInsertBlockNextLine(currentLine) {
     const currentContent = currentLine.querySelector(".content");
 
-    // Step 1: Always clear placeholder styling/text for the current line (if any)
-    // Use clearPlaceholder to remove placeholder if it matches; but also ensure the element has no leftover placeholder dataset
-    if (currentContent) {
-        // remove placeholder text if it still matches the placeholder
+    // prevent placeholder from reappearing during this operation
+    suppressPlaceholder = true;
+    setTimeout(() => suppressPlaceholder = false, 200);
+
+    // if first-line is empty and its add icon is clicked, clear its placeholder
+    if (currentLine.classList.contains("first-line")) {
         clearPlaceholder(currentContent);
-        // ensure the content is empty for a clean split
         currentContent.textContent = "";
     }
 
-    // Step 2: Create new line and insert it
-    const newLine = line(); // uses your existing factory
-    // insert after the current line
-    currentLine.parentNode.insertBefore(newLine, currentLine.nextSibling);
+    // Clear placeholder for any line
+    if (currentContent) {
+        clearPlaceholder(currentContent);
+        currentContent.textContent = "";
+    }
 
+    // Create and insert new line
+    const newLine = line();
+    currentLine.parentNode.insertBefore(newLine, currentLine.nextSibling);
     const newContent = newLine.querySelector(".content");
 
-    // Step 3: Copy heading style from current line if present (optional)
+    // Copy heading styles
     if (currentContent) {
         if (currentContent.classList.contains("text-3xl")) newContent.classList.add("text-3xl");
         else if (currentContent.classList.contains("text-2xl")) newContent.classList.add("text-2xl");
         else if (currentContent.classList.contains("text-xl")) newContent.classList.add("text-xl");
     }
 
-    // Hide other icons, show this new line's icons
+    // Hide all icons first
     document.querySelectorAll(".line .icons img").forEach(img => img.classList.add("hidden"));
-    newLine.querySelectorAll(".icons img").forEach(icon => icon.classList.remove("hidden"));
 
-    // Step 4: Apply placeholder to new content (so the visuals are correct)
+    // Hide current line’s icons
+    const currentAdd = currentLine.querySelector("[alt='add block icon']");
+    const currentMove = currentLine.querySelector("[alt='move block icon']");
+    if (currentAdd) currentAdd.classList.add("hidden");
+    if (currentMove) currentMove.classList.add("hidden");
+
+    // Show icons on new line
+    const newAdd = newLine.querySelector("[alt='add block icon']");
+    const newMove = newLine.querySelector("[alt='move block icon']");
+    if (newAdd) newAdd.classList.remove("hidden");
+    if (newMove) newMove.classList.remove("hidden");
+
+    // Prevent hover re-show
+    currentLine.classList.add("prevent-hover-icons");
+    setTimeout(() => {
+        currentLine.classList.remove("prevent-hover-icons");
+    }, 150);
+
+    // Update placeholder and open menu for new line
     updatePlaceholder(newContent);
+    newLine.querySelector(".content-menu").classList.remove("hidden");
 
-    // Step 5: Focus and place caret at the start of the new line.
-    // Use setTimeout to ensure this runs *after* other click/focus handlers that might exist globally.
+    // Focus the new line
     setTimeout(() => {
         newContent.focus();
-
-        // Move caret to start (collapse to start)
         const range = document.createRange();
         const sel = window.getSelection();
-        // If the placeholder is present and you want the caret before it, collapsing at 0 is fine.
-        // If you'd rather remove placeholder instantly when new line is focused, uncomment the next two lines:
-        // if (newContent.dataset.placeholder) { clearPlaceholder(newContent); }
-
         range.setStart(newContent, 0);
         range.collapse(true);
         sel.removeAllRanges();
         sel.addRange(range);
     }, 0);
-
-    return newLine;
 }
+
+
 
 // robust clearPlaceholder: removes placeholder text and dataset unconditionally if they match
 function clearPlaceholder(contentEl) {
