@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Promodro • Flexible Focus Timer</title>
+        <link rel="stylesheet" href="timer-styles.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet" />
+        <style>
+            /* session selector */
+            .session-select {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                margin-bottom: 2rem;
+            }
+
+            .session-btn,
+            #customStart {
+                padding: 0.75rem 1.25rem;
+                border: none;
+                border-radius: 8px;
+                background: #0080ff;
+                color: #fff;
+                cursor: pointer;
+                font-weight: 700;
+                transition: background 0.3s;
+            }
+
+            .session-btn:hover,
+            #customStart:hover {
+                background: #006ad1;
+            }
+
+            .session-btn.active {
+                background: #004a90;
+            }
+
+            #customInput,
+            #customBreak {
+                width: 5rem;
+                padding: 0.5rem;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                text-align: center;
+            }
+        </style>
+        <style>
+            /* Button enhancements */
+            .session-btn,
+            #customStart,
+            .btn {
+                position: relative;
+                overflow: hidden;
+                padding: 0.85rem 1.6rem;
+                border: none;
+                border-radius: 8px;
+                background: linear-gradient(45deg, #2196F3, #00B0FF);
+                color: #fff;
+                font-weight: 700;
+                letter-spacing: .4px;
+                cursor: pointer;
+                transition: transform .25s, box-shadow .35s, background .3s;
+            }
+
+            .session-btn:hover,
+            #customStart:hover,
+            .btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, .25);
+            }
+
+            .session-btn:active,
+            #customStart:active,
+            .btn:active {
+                transform: translateY(0) scale(0.97);
+                box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+            }
+
+            .session-btn.active {
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(33, 150, 243, .7);
+                }
+
+                70% {
+                    box-shadow: 0 0 0 12px rgba(33, 150, 243, 0);
+                }
+
+                100% {
+                    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+                }
+            }
+
+            /* Center control buttons */
+            .controls {
+                justify-content: center;
+                margin-top: 2rem;
+            }
+
+            /* progress circle animation */
+            .progress-fill {
+                transition: stroke-dashoffset 0.5s linear, stroke 0.5s linear;
+            }
+
+            /* Ripple effect */
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.5);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            }
+
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="timer-container">
+            <header class="timer-header">
+                <h1 class="timer-title">Promodro Timer</h1>
+                <p class="timer-subtitle" id="sessionSubtitle">Select a session length to begin</p>
+            </header>
+
+            <!-- Session duration selection -->
+            <div class="session-select">
+                <button class="session-btn" data-minutes="25">25&nbsp;min</button>
+                <button class="session-btn" data-minutes="30">30&nbsp;min</button>
+                <button class="session-btn" data-minutes="50">50&nbsp;min</button>
+                <input type="number" id="customInput" placeholder="Custom min" min="1" />
+                <input type="number" id="customBreak" placeholder="Break" min="1" />
+                <button id="customStart">Start</button>
+            </div>
+
+            <main>
+                <div class="clock-container">
+                    <div class="flip-clock">
+                        <!-- Minutes -->
+                        <div class="flip-unit-container">
+                            <div class="flip-card" data-minutes-tens></div>
+                            <div class="flip-card" data-minutes-ones></div>
+                        </div>
+                        <div class="separator">:</div>
+                        <!-- Seconds -->
+                        <div class="flip-unit-container">
+                            <div class="flip-card" data-seconds-tens></div>
+                            <div class="flip-card" data-seconds-ones></div>
+                        </div>
+                    </div>
+                    <div class="timer-display">
+                        <div class="progress-container">
+                            <svg class="progress-circle" viewBox="0 0 100 100">
+                                <circle class="progress-bg" cx="50" cy="50" r="45" />
+                                <circle class="progress-fill" cx="50" cy="50" r="45" stroke-dasharray="283"
+                                    stroke-dashoffset="0" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="timer-label" id="timerLabel">Waiting…</div>
+                    <div class="timer-state" id="timerState"></div>
+                </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary" disabled>
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button id="pauseBtn" class="btn btn-outline" disabled>
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button id="resetBtn" class="btn btn-outline" disabled>
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        </main>
+
+        <footer class="navigation" style="margin-top:2rem;text-align:center;">
+            <button class="btn btn-outline" onclick="window.location.href='Homepage/promodro_Homepage.html'">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </footer>
+        </div>
+
+        <script>
+            // Flip clock helper to create all faces for a card
+            function createFlipCard(element) {
+                const top = document.createElement('div');
+                top.classList.add('top');
+                const bottom = document.createElement('div');
+                bottom.classList.add('bottom');
+
+                const topFlip = document.createElement('div');
+                topFlip.classList.add('top-flip');
+                const bottomFlip = document.createElement('div');
+                bottomFlip.classList.add('bottom-flip');
+
+                // Append faces to the card (no overlay; static halves are always visible)
+                element.append(top, bottom, topFlip, bottomFlip);
+
+                // Overlay to show digit when idle
+                const overlay = document.createElement('div');
+                overlay.classList.add('digit-overlay');
+                element.appendChild(overlay);
+
+                // Track the currently displayed digit for change detection
+                return { el: element, top, bottom, topFlip, bottomFlip, overlay, current: null };
+            }
+
+            const cards = {};
+            // Track previous digits to decide when to flip
+            let prev = { mT: null, mO: null, sT: null, sO: null };
+            let timer, totalSeconds, currentTime, breakSeconds = 0,
+                isRunning = false, isPaused = false, isBreak = false;
+
+            const minutesTensEl = document.querySelector('[data-minutes-tens]');
+            const minutesOnesEl = document.querySelector('[data-minutes-ones]');
+            const secondsTensEl = document.querySelector('[data-seconds-tens]');
+            const secondsOnesEl = document.querySelector('[data-seconds-ones]');
+
+            cards.minutesTens = createFlipCard(minutesTensEl);
+            cards.minutesOnes = createFlipCard(minutesOnesEl);
+            cards.secondsTens = createFlipCard(secondsTensEl);
+            cards.secondsOnes = createFlipCard(secondsOnesEl);
+
+            const timerLabel = document.getElementById('timerLabel');
+            const timerState = document.getElementById('timerState');
+            const progressFill = document.querySelector('.progress-fill');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const sessionSubtitle = document.getElementById('sessionSubtitle');
+
+            // Session selection
+            // Session selection with predefined break durations
+            document.querySelectorAll('.session-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mins = parseInt(btn.dataset.minutes);
+                    const br = mins >= 50 ? 10 : 5;
+                    document.querySelectorAll('.session-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    initTimer(mins, br);
+                });
+            });
+            document.getElementById('customStart').addEventListener('click', () => {
+                const mins = parseInt(document.getElementById('customInput').value);
+                const br = parseInt(document.getElementById('customBreak').value);
+                if (!isNaN(mins) && mins > 0) {
+                    document.querySelectorAll('.session-btn').forEach(b => b.classList.remove('active'));
+                    initTimer(mins, br);
+                }
+            });
+
+            function initTimer(minutes, breakMin = 5) {
+                prev = { mT: null, mO: null, sT: null, sO: null };
+                clearInterval(timer);
+                totalSeconds = minutes * 60;
+                breakSeconds = breakMin * 60;
+                currentTime = totalSeconds;
+                isRunning = false; isPaused = false;
+                updateDisplay();
+                updateProgress();
+                timerLabel.textContent = 'Ready';
+                sessionSubtitle.textContent = `${minutes} min focus / ${breakMin} min break`;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                resetBtn.disabled = true;
+            }
+
+            function startTimer() {
+                if (isRunning) return;
+                isRunning = true;
+                timerLabel.textContent = isBreak ? 'Break!' : 'Focus!';
+                pauseBtn.disabled = false;
+                resetBtn.disabled = false;
+                startBtn.disabled = true;
+                timer = setInterval(() => {
+                    if (currentTime <= 0) {
+                        clearInterval(timer);
+                        if (!isBreak) {
+                            // Switch to break
+                            isBreak = true;
+                            totalSeconds = breakSeconds;
+                            currentTime = breakSeconds;
+                            updateDisplay();
+                            updateProgress();
+                            timerLabel.textContent = 'Break!';
+                            startTimer(); // auto-start break
+                            return;
+                        } else {
+                            // Session and break complete
+                            timerLabel.textContent = 'Done!';
+                            timerState.textContent = '';
+                            isRunning = false;
+                            startBtn.disabled = false;
+                            pauseBtn.disabled = true;
+                            return;
+                        }
+                    }
+                    currentTime--;
+                    updateDisplay();
+                    updateProgress();
+                }, 1000);
+            }
+
+            function pauseTimer() {
+                if (!isRunning) return;
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                timerLabel.textContent = 'Paused';
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+            }
+
+            function resetTimer() {
+                clearInterval(timer);
+                currentTime = totalSeconds;
+                isRunning = isPaused = isBreak = false;
+                updateDisplay();
+                updateProgress();
+                timerLabel.textContent = 'Reset';
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                resetBtn.disabled = true;
+            }
+
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+
+            // Flip animation (exact copy from clock.html)
+            function flip(card, newNum, lastNum) {
+                if (newNum === lastNum) return;
+
+                // Prepare faces for animation
+                card.top.textContent = lastNum;
+                card.bottom.textContent = lastNum;
+                card.topFlip.textContent = lastNum;
+                card.bottomFlip.textContent = newNum;
+
+                const parent = card.el;
+                parent.classList.add('play');
+
+                // Hide overlay during animation to avoid any duplication
+                if (card.overlay) {
+                    card.overlay.style.visibility = 'hidden';
+                }
+
+                // First animation: flip the top half down
+                card.topFlip.style.transform = 'rotateX(0deg)';
+                card.topFlip.style.zIndex = '4';
+
+                // Trigger reflow to ensure the initial state is applied
+                void card.topFlip.offsetHeight;
+
+                // Start the flip animation
+                card.topFlip.style.transform = 'rotateX(-90deg)';
+
+                // When top flip completes, update the bottom half
+                setTimeout(() => {
+                    card.top.textContent = newNum;
+                    card.bottomFlip.style.transform = 'rotateX(0deg)';
+
+                    // When bottom flip completes, clean up
+                    setTimeout(() => {
+                        card.bottom.textContent = newNum;
+                        if (card.overlay) {
+                            card.overlay.textContent = newNum;
+                            card.overlay.style.visibility = '';
+                        }
+                        parent.classList.remove('play');
+                        // Reset transforms for next flip
+                        card.topFlip.style.transform = '';
+                        card.bottomFlip.style.transform = 'rotateX(90deg)';
+                    }, 250); // Half of the total animation time
+                }, 250); // Half of the total animation time
+            }
+
+            function updateDisplay() {
+                const mins = Math.floor(currentTime / 60);
+                const secs = currentTime % 60;
+                const minsStr = mins.toString().padStart(2, '0');
+                const secsStr = secs.toString().padStart(2, '0');
+                if (prev.mT === null) {
+                    // initial render
+                    setCardValue(cards.minutesTens, minsStr[0]);
+                    setCardValue(cards.minutesOnes, minsStr[1]);
+                    setCardValue(cards.secondsTens, secsStr[0]);
+                    setCardValue(cards.secondsOnes, secsStr[1]);
+                } else {
+                    flip(cards.minutesTens, minsStr[0], prev.mT);
+                    flip(cards.minutesOnes, minsStr[1], prev.mO);
+                    flip(cards.secondsTens, secsStr[0], prev.sT);
+                    flip(cards.secondsOnes, secsStr[1], prev.sO);
+                }
+                prev = { mT: minsStr[0], mO: minsStr[1], sT: secsStr[0], sO: secsStr[1] };
+            }
+
+            function setCardValue(card, newValue) {
+                // Initial render
+                if (card.current === null) {
+                    card.current = newValue;
+                    card.top.textContent = newValue;
+                    card.bottom.textContent = newValue;
+                    if (card.overlay) card.overlay.textContent = newValue;
+                    return;
+                }
+                // Skip if digit hasn't changed
+                if (card.current === newValue) return;
+
+                const oldValue = card.current;
+
+                // Prepare faces for animation
+                card.top.textContent = oldValue;
+                card.bottom.textContent = newValue;
+                card.topFlip.textContent = oldValue;
+                card.bottomFlip.textContent = newValue;
+
+                // Hide overlay during flip
+                if (card.overlay) card.overlay.style.visibility = 'hidden';
+                card.el.classList.add('play');
+
+                // After the animations, update final state
+                card.topFlip.addEventListener('animationend', () => {
+                    card.top.textContent = newValue;
+                }, { once: true });
+
+                card.bottomFlip.addEventListener('animationend', () => {
+                    card.el.classList.remove('play');
+                    // Update overlay with new value and show again
+                    if (card.overlay) {
+                        card.overlay.textContent = newValue;
+                        card.overlay.style.visibility = '';
+                    }
+                }, { once: true });
+
+                card.current = newValue;
+            }
+
+            function updateProgress() {
+                const progress = 1 - currentTime / totalSeconds;
+                const circumference = 2 * Math.PI * 45; // r = 45
+                progressFill.style.strokeDashoffset = progress * circumference;
+                // dynamic color from green to red based on progress
+                const hue = (1 - progress) * 120; // 120 -> 0
+                progressFill.style.stroke = `hsl(${hue}, 100%, 50%)`;
+            }
+
+            // Initialize based on "m" query parameter, default 25
+            const qp = parseInt(new URLSearchParams(window.location.search).get('m'));
+            initTimer(!isNaN(qp) && qp > 0 ? qp : 25);
+
+            // Ripple effect for buttons
+            function createRipple(event) {
+                const button = event.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+                circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+                circle.classList.add('ripple');
+                const ripple = button.getElementsByClassName('ripple')[0];
+                if (ripple) ripple.remove();
+                button.appendChild(circle);
+            }
+
+            // attach ripple handler
+            setTimeout(() => {
+                document.querySelectorAll('button').forEach(btn => btn.addEventListener('click', createRipple));
+            }, 0);
+
+        </script>
+    </body>
+
+</html>
