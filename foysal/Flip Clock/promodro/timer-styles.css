@@ -1,108 +1,157 @@
 /* Global Styles */
 :root {
-    --background-color: #1a1a1a;
-    --clock-bg: #111;
-    --digit-color: #eee;
-    --shadow-light: rgba(255, 255, 255, 0.05);
-    --shadow-dark: rgba(0, 0, 0, 0.4);
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --accent-color: #0080ff;
+    --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
 body {
-    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #262626 100%);
+    background-color: var(--bg-color);
+    color: var(--text-color);
     font-family: 'Roboto Mono', monospace;
     margin: 0;
-    color: #fff;
+    padding-left: 4rem;
+    /* Sidebar offset */
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 
-/* Decorative overlay for depth */
-body::before {
-    content: "";
+/* Feature Menu - Fixed Sidebar */
+#feature-menu {
     position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at top left, rgba(0, 123, 255, 0.15), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(255, 0, 123, 0.15), transparent 60%);
-    pointer-events: none;
-    z-index: -1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4rem;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Header */
+/* Timer Container */
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
 .timer-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 3rem;
 }
 
 .timer-title {
-    font-size: 2.75rem;
-    letter-spacing: 1px;
+    font-size: 2.5rem;
     margin: 0;
-    color: #fff;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    font-weight: 700;
 }
 
 .timer-subtitle {
     margin-top: 0.5rem;
-    font-size: 1.15rem;
-    font-weight: 400;
-    color: #eaeaea;
-    opacity: 0.9;
+    color: #888;
 }
 
-/* Main Container */
+/* Session Selection Controls */
+.session-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+}
+
+.session-btn,
+#customStart {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: #2a2a2a;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #333;
+}
+
+.session-btn:hover,
+#customStart:hover {
+    background: #333;
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
+}
+
+.session-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 128, 255, 0.3);
+}
+
+#customInput,
+#customBreak {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #1a1a1a;
+    color: #fff;
+    width: 80px;
+    text-align: center;
+}
+
+/* FLIP CLOCK STRUCTURE */
 .clock-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    width: 100%;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
-/* Flip Clock Structure */
 .flip-clock {
     display: flex;
-    justify-content: center;
+    gap: 1rem;
+    perspective: 2000px;
     align-items: center;
-    gap: 0.3em;
-    font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    font-weight: 900;
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
 }
 
 .flip-unit-container {
     display: flex;
-    gap: .2em;
+    gap: 0.5rem;
 }
 
 .separator {
-    font-size: 7vw;
-    color: var(--digit-color);
-    line-height: 1.5;
+    font-size: 5rem;
+    font-weight: 700;
+    color: #666;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    user-select: none;
 }
 
-/* Flip Card Styling */
+/* The Card */
 .flip-card {
     position: relative;
-    width: 7vw;
-    height: 10vw;
-    perspective: 1000px;
-    font-size: 7vw;
-    font-weight: bold;
-    background-color: var(--clock-bg);
-    border-radius: 10px;
+    width: 6rem;
+    height: 8rem;
+    background: var(--card-bg);
+    border-radius: 0.5rem;
+    font-size: 5.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-color);
     box-shadow:
-        inset 0 2px 0 var(--shadow-light),
-        0 5px 15px var(--shadow-dark);
-    overflow: hidden;
+        0 8px 16px rgba(0, 0, 0, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    transform-style: preserve-3d;
 }
 
-/* Inner container to hold faces */
-.flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-/* Overlay shows the current digit when not animating */
+/* Digit Overlay - shows when idle */
 .digit-overlay {
     position: absolute;
     top: 0;
@@ -112,209 +161,217 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--digit-color);
-    z-index: 3;
-    backface-visibility: hidden;
+    font-size: 5.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    z-index: 5;
+    pointer-events: none;
+    user-select: none;
 }
 
-/* Card Halves */
-.top,
-.top-flip {
-    clip-path: inset(0 0 50% 0);
-}
-
-.bottom,
-.bottom-flip {
-    clip-path: inset(50% 0 0 0);
-}
-
-/* Card Halves Original Rules */
+/* Card Halves (Static & Animating) */
 .top,
 .bottom,
 .top-flip,
 .bottom-flip {
     position: absolute;
-    width: 100%;
+    left: 0;
+    right: 0;
     height: 50%;
+    overflow: hidden;
+    background: linear-gradient(180deg, #2a2a2a 0%, #1e1e1e 100%);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     display: flex;
     justify-content: center;
-    overflow: hidden;
-    backface-visibility: hidden;
-    color: var(--digit-color);
-    text-shadow: 0 1px 3px var(--shadow-dark);
+    box-sizing: border-box;
+    font-size: 5.5rem;
+    font-weight: 700;
+    color: var(--text-color);
 }
 
-/* Idle state: overlay visible; static halves hidden */
-.flip-card .top,
-.flip-card .bottom {
-    visibility: hidden;
+/* Hide static halves whenidletopreventoverlapping with overlay */
+.top,
+.bottom {
+    opacity: 0;
 }
 
-/* Flip faces hidden until play */
-.flip-card .top-flip,
-.flip-card .bottom-flip {
-    display: none;
+/* Show static halves during animation */
+.flip-card.play .top,
+.flip-card.play .bottom {
+    opacity: 1;
 }
 
+/* Top Halves */
 .top,
 .top-flip {
     top: 0;
-    padding-bottom: 2px;
-
     align-items: flex-end;
-    border-radius: 10px 10px 0 0;
+    padding-bottom: 0.1rem;
+    border-radius: 0.5rem 0.5rem 0 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    transform-origin: bottom center;
 }
 
+/* Bottom Halves */
 .bottom,
 .bottom-flip {
     bottom: 0;
-    padding-top: 2px;
-
     align-items: flex-start;
-    padding-top: 0.1em;
-    /* Fine-tune alignment */
-    border-radius: 0 0 10px 10px;
+    padding-top: 0.1rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, #1e1e1e 0%, #181818 100%);
+    z-index: 1;
+    transform-origin: top center;
 }
 
-/* Animation Elements */
+/* Animation Specifics */
 .top-flip {
-    transform-origin: bottom;
-    z-index: 2;
-    transition: transform 0.25s ease-in;
+    z-index: 3;
+    transform: rotateX(0deg);
+    opacity: 0;
+    /* Hidden when idle */
 }
 
 .bottom-flip {
-    transform-origin: top;
-    transform: rotateX(90deg);
     z-index: 2;
-    transition: transform 0.25s ease-out;
+    transform: rotateX(90deg);
+    opacity: 0;
+    /* Hidden when idle */
 }
 
-/* Animation Trigger */
+/* ANIMATION STATES */
 .flip-card.play .top-flip {
-    display: flex;
+    animation: flip-down 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+    opacity: 1;
+    /* Visible during animation */
 }
 
 .flip-card.play .bottom-flip {
-    display: flex;
+    animation: flip-up 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s forwards;
+    opacity: 1;
+    /* Visible during animation */
 }
 
-/* Hide overlay during animation */
-.flip-card.play .digit-overlay {
-    visibility: hidden;
-}
-
-/* During animation show only flip faces */
-.flip-card.play .digit-overlay {
-    display: none;
-}
-
-/* Keep static halves hidden; flips handle the view */
-.flip-card.play .top,
-.flip-card.play .bottom {
-    display: none;
-}
-
-/* Keyframes */
-@keyframes flip-top {
+@keyframes flip-down {
     0% {
         transform: rotateX(0deg);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
     }
 
     100% {
         transform: rotateX(-90deg);
-        box-shadow: 0 0 10px rgba(0, 0, 0, .5);
     }
 }
 
-@keyframes flip-bottom {
+@keyframes flip-up {
     0% {
         transform: rotateX(90deg);
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, .3);
     }
 
     100% {
         transform: rotateX(0deg);
-        box-shadow: 0 0 10px rgba(0, 0, 0, .5);
     }
 }
 
-/* Clock.css style overrides to perfectly match look */
-
-/* remove clip-path */
-.top,
-.bottom,
-.top-flip,
-.bottom-flip {
-    clip-path: none;
-}
-
-/* seam between halves */
-.flip-card::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 2px;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 5;
-    pointer-events: none;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-/* gradient backgrounds like clock */
-.top,
-.bottom,
-.top-flip,
-.bottom-flip {
-    background: linear-gradient(135deg, #2c3e50, #1a1a1a);
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* static halves hidden until flip ends */
-.flip-card .top,
-.flip-card .bottom {
-    visibility: hidden;
-}
-
-/* End overrides */
-
-/* Progress circle sizing */
-.progress-container {
-    width: 220px;
-    height: 220px;
+.timer-display {
     position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.progress-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .progress-circle {
     width: 100%;
     height: 100%;
+    transform: rotate(-90deg);
 }
 
-.progress-circle circle {
-    stroke-width: 6;
+.progress-bg {
+    fill: none;
+    stroke: #333;
+    stroke-width: 8;
 }
 
-/* Controls and other UI elements */
+.progress-fill {
+    fill: none;
+    stroke: var(--accent-color);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+
+.timer-label {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.timer-state {
+    position: absolute;
+    bottom: -2rem;
+    font-size: 1rem;
+    color: #666;
+}
+
 .controls {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .btn {
-    padding: 0.8rem 1.5rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
     border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
 }
 
-.btn:hover {
-    background-color: #444;
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 128, 255, 0.4);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #444;
+    color: #ccc;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Ripple */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
 }

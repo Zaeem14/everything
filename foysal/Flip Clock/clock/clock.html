@@ -89,7 +89,7 @@
                         <span class="button-icon">🕒</span>
                         <span class="button-text">Clock</span>
                     </button>
-                    <a href="/foysal/Flip Clock/promodro/Homepage/promodro_Homepage.html" class="promodro-button">
+                    <a href="../promodro/Homepage/promodro_Homepage.html" class="promodro-button">
                         <button id="promodroBtn">
                             <span class="button-icon">📊</span>
                             <span class="button-text">Promodro</span>
@@ -355,11 +355,30 @@
             });
 
             promodroBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default anchor click bubbling
+                e.stopPropagation(); // Stop event from reaching the anchor tag
+
                 updateActiveButton(promodroBtn);
-                // Add a small delay before navigation to see the click effect
-                setTimeout(() => {
-                    window.location.href = e.target.closest('a').href;
-                }, 300);
+
+                // Get the href from the parent anchor
+                const link = e.target.closest('a');
+                const href = link ? link.getAttribute('href') : null;
+
+                if (href) {
+                    // Add a small delay before navigation to see the click effect
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                }
+            });
+
+            // Handle anchor clicks directly too, just in case
+            document.querySelector('.promodro-button').addEventListener('click', function (e) {
+                e.preventDefault();
+                // The button handler above will handle the logic if the button was clicked.
+                // If the anchor edge was clicked (padding?), we might want to trigger the same logic.
+                // If the user clicked outside the button but on the anchor, we can navigate immediately or with delay.
+                // But the design shows the button IS the content.
             });
 
             // Add keyboard navigation
