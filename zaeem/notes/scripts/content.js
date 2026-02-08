@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    ContentEditor();
-    LineHoverBehavior();
+    contentEditor();
+    lineHoverBehavior();
     PlaceholderHandlers();
     enableClickToAddNewLine();
     handleContentMenu(); // safe now, works for all current + future lines
@@ -19,7 +19,13 @@ document.addEventListener("keydown", (e) => {
 
             // Grab the first .content inside .line
             const target = document.querySelector(".first-line .content");
-            if (!target) return;
+            if (!target) {
+                // make a new line 
+                const newLine = insertNewLineAfter(document.querySelector(".first-line"));
+                const newContent = newLine.querySelector(".content");
+                updatePlaceholder(newContent);
+                newContent.focus();
+            };
 
             target.focus();
 
@@ -50,7 +56,63 @@ document.addEventListener("click", (e) => {
     }
 });
 
-function ContentEditor() {
+document.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+
+    const content = document.activeElement;
+    const line = content?.closest(".line");
+    if (!line || !line.dataset.listType) return;
+
+    // only allow indenting/unindenting on empty or placeholder lines
+    if (!isOnlyPlaceholder(content) && content.textContent.trim() !== "") return;
+
+    e.preventDefault();
+
+    const currentIndent = getIndent(line);
+
+    if (e.shiftKey) {
+        // ⬅️ SHIFT + TAB → unindent
+        if (currentIndent > 0) {
+            setIndent(line, currentIndent - 1);
+            rerenderFollowingList(line);
+        }
+    } else {
+        // ➡️ TAB → indent (STRICT RULES)
+        const isEmpty = isOnlyPlaceholder(content) || content.textContent.trim() === "";
+
+        // ❌ Block repeated indenting on empty items
+        if (isEmpty) {
+            // Allow indent ONLY if there is a filled sibling before it
+            if (!hasPreviousFilledSibling(line)) return;
+
+            // Allow only ONE level deeper from current
+            setIndent(line, currentIndent + 1);
+            rerenderFollowingList(line);
+            return;
+        }
+
+        // ❌ Non-empty items cannot be indented
+        return;
+    }
+
+});
+
+
+document.addEventListener("focusin", (e) => {
+  const content = e.target;
+  if (!content.classList.contains("content")) return;
+
+  if (isOnlyPlaceholder(content)) {
+    content.textContent = "";
+    content.classList.remove("text-gray-400", "italic");
+    delete content.dataset.placeholder;
+  }
+});
+
+
+
+
+function contentEditor() {
     const container = document.querySelector(".content-container");
     if (!container) return;
 
@@ -63,12 +125,85 @@ function ContentEditor() {
                          content.classList.contains("text-3xl");
 
         // Enhancement: Remove placeholder text for headers when typing begins
-        if (!e.ctrlKey && !e.metaKey && e.key.length === 1) {
-            const placeholderText = content.dataset.placeholder;
-            if (placeholderText && content.textContent.trim() === placeholderText) {
-                content.textContent = "";
+        if (
+            !e.ctrlKey &&
+            !e.metaKey &&
+            e.key.length === 1 &&
+            content.dataset.placeholder
+        ) {
+            const placeholder = content.dataset.placeholder;
+
+            if (content.textContent.trim() === placeholder) {
+                e.preventDefault(); // 🔴 CRITICAL
+                clearPlaceholder(content);
+
+                // insert the typed character manually
+                document.execCommand("insertText", false, e.key);
             }
         }
+
+        if (e.key === "Enter" && line.dataset.listType) {
+            const content = line.querySelector(".content");
+            const isEmpty =
+                isOnlyPlaceholder(content) || content.textContent.trim() === "";
+
+            // 🟢 ENTER on empty / placeholder list item
+            if (isEmpty) {
+                e.preventDefault();
+
+                const indent = getIndent(line);
+
+                // 🔹 CASE 1: CHILD LIST ITEM → behave like Shift + Tab
+                if (indent > 0) {
+                    setIndent(line, indent - 1);
+                    rerenderFollowingList(line);
+                    content.focus();
+                    return;
+                }
+
+                // 🔹 CASE 2: PARENT LIST ITEM → convert to text block
+                convertListLineToText(line);
+                updatePlaceholder(content);
+                content.focus();
+                return;
+            }
+
+
+            // 🟢 ENTER on non-empty list item → new sibling
+            e.preventDefault();
+
+            const newLine = insertNewLineAfter(line);
+            newLine.dataset.listType = line.dataset.listType;
+            newLine.dataset.indent = line.dataset.indent;
+
+            renderListMarker(newLine);
+            rerenderFollowingList(newLine);
+
+            newLine.querySelector(".content").focus();
+            return;
+        }
+
+
+        if (e.key === "Backspace" && line.dataset.listType) {
+            const content = line.querySelector(".content");
+
+            if (isOnlyPlaceholder(content) || content.textContent.trim() === "") {
+                e.preventDefault();
+
+                fullyExitList(line);
+
+                updatePlaceholder(content);
+                content.focus();
+
+                // 🔴 VERY IMPORTANT: stop here
+                return;
+            }
+        }
+
+
+
+
+
 
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -78,7 +213,7 @@ function ContentEditor() {
                 const newLine = insertNewLineAfter(line);
                 const newContent = newLine.querySelector(".content");
                 updatePlaceholder(newContent);
-                newContent.focus();
+                
                 return; // ✅ don’t delete the heading
             }
 
@@ -99,34 +234,65 @@ function ContentEditor() {
                 content.textContent = "";
             }
 
-            // Show placeholder in the new line
-            updatePlaceholder(newContent);
+            
 
             // Focus the new line
             newContent.focus();
         }
 
         if (e.key === "Backspace") {
-            const isEmpty = content.textContent.trim() === "" ||
-                          content.textContent === "Type here..." ||
-                          content.textContent === "Heading 1" ||
-                          content.textContent === "Heading 2" ||
-                          content.textContent === "Heading 3";
-            if (isEmpty) {
+            const text = content.textContent.trim();
+            const isPlaceholder = isOnlyPlaceholder(content);
+
+            if (text === "" || isPlaceholder) {
                 e.preventDefault();
-                // If it's a heading and empty, remove and update placeholder for previous line
-                if (isHeading && content.textContent.trim() === "") {
-                    const prevLine = line.previousElementSibling;
-                    line.remove();
-                    if (prevLine) {
-                        const prevContent = prevLine.querySelector(".content");
-                        updatePlaceholder(prevContent);
-                    }
-                    return;
+
+                const prevLine = line.previousElementSibling;
+                if (!prevLine) return;
+
+                const currentContent = line.querySelector(".content");
+                const prevContent = prevLine.querySelector(".content");
+
+                // Remove current line
+                line.remove();
+
+                // Focus previous line
+                prevContent.focus();
+
+                // If previous line is empty, restore correct placeholder
+                if (prevContent.textContent.trim() === "") {
+                    updatePlaceholder(prevContent);
+                } else {
+                    clearPlaceholder(prevContent);
                 }
-                deleteCurrentLine(line);
+
+                // Place the cursor correctly in the previous line
+                const range = document.createRange();
+                const sel = window.getSelection();
+
+                const text = prevContent.textContent.trim();
+                const isPlaceholderText =
+                    text === "" ||
+                    text === "Type here..." ||
+                    text === "Heading 1" ||
+                    text === "Heading 2" ||
+                    text === "Heading 3";
+
+                range.selectNodeContents(prevContent);
+
+                // Start for empty / placeholder lines, end otherwise
+                range.collapse(isPlaceholderText);
+
+                sel.removeAllRanges();
+                sel.addRange(range);
+
+                prevContent.focus();
+
             }
         }
+
+        enforceHeadingPlaceholders()
+
     });
 }
 
@@ -151,8 +317,7 @@ function insertNewLineAfter(currentLine) {
 
     // Insert and show icons on new line
     currentLine.insertAdjacentElement("afterend", newLine);
-    const icons = newLine.querySelectorAll(".icons img");
-    icons.forEach(icon => icon.classList.remove("hidden"));
+    
 
     // Focus new line
     newContent.focus();
@@ -171,9 +336,6 @@ function transformToTextBlock(currentLine) {
 
     // Reset to normal text
     content.classList.add("w-full", "outline-none");
-
-    // Clear placeholder if needed
-    clearPlaceholder(content);
 
     // Reset placeholder to default text
     updatePlaceholder(content);
@@ -251,13 +413,14 @@ function deleteCurrentLine(currentLine) {
 
 
 
-function LineHoverBehavior() {
+function lineHoverBehavior() {
     const contentContainer = document.querySelector(".content-container");
     if (!contentContainer) return;
 
     contentContainer.addEventListener("mouseover", (e) => {
         const line = e.target.closest(".line");
-        if (line && !line.classList.contains("prevent-hover-icons")) {
+        const content = e.target.closest(".content");
+        if (content && !line.classList.contains("prevent-hover-icons")) {
             line.querySelectorAll("img[alt='move block icon'], img[alt='add block icon']")
                 .forEach(icon => icon.classList.remove("hidden"));
         }
@@ -265,7 +428,8 @@ function LineHoverBehavior() {
 
     contentContainer.addEventListener("mouseout", (e) => {
         const line = e.target.closest(".line");
-        if (line && !line.contains(e.relatedTarget)) {
+        const content = e.target.closest(".content");
+        if (content && !line.contains(e.relatedTarget)) {
             line.querySelectorAll("img[alt='move block icon'], img[alt='add block icon']")
                 .forEach(icon => icon.classList.add("hidden"));
         }
@@ -279,29 +443,28 @@ function PlaceholderHandlers() {
         const content = e.target;
         if (!content.classList.contains("content")) return;
 
-        const placeholderText = content.dataset.placeholder;
-        if (placeholderText && content.textContent.trim() === placeholderText) {
-        content.textContent = "";
-    }
+        const isHeading =
+            content.classList.contains("text-3xl") ||
+            content.classList.contains("text-2xl") ||
+            content.classList.contains("text-xl");
 
-    // 🧠 If heading becomes empty, immediately reapply placeholder
-    if (
-        (content.classList.contains("text-3xl") ||
-        content.classList.contains("text-2xl") ||
-        content.classList.contains("text-xl")) &&
-        content.textContent.trim() === ""
-    ) {
-        updatePlaceholder(content);
-    }
+        const text = content.textContent.trim();
 
+        // If heading becomes empty → restore heading placeholder
+        if (isHeading && text === "") {
+            updatePlaceholder(content);
+            return;
+        }
 
-
-        // Remove placeholder styles only if content is not empty
-        if ((content.classList.contains('text-gray-400') || content.classList.contains('italic')) && content.textContent.trim() !== "") {
-            content.classList.remove('text-gray-400', 'italic');
+        // If user typed real content → remove placeholder
+        if (content.dataset.placeholder && text !== content.dataset.placeholder) {
+            content.classList.remove("text-gray-400", "italic");
             delete content.dataset.placeholder;
         }
+
+        enforceHeadingPlaceholders();
     });
+
 
     document.addEventListener("focusin", (e) => {
         const content = e.target;
@@ -359,42 +522,43 @@ function PlaceholderHandlers() {
         } else {
             clearPlaceholder(content);
         }
+
+        enforceHeadingPlaceholders()
     });
 
 
 }
 
 function updatePlaceholder(content) {
-    const text = content.textContent.trim();
-    // Always reapply placeholder text for empty headings (even if not a new line)
-    // Clear any existing placeholder classes
-    content.classList.remove('text-gray-400', 'italic');
+  const text = content.textContent.trim();
+  const line = content.closest(".line");
 
-    let placeholderText = "";
-    if (content.classList.contains("text-3xl")) {
-        placeholderText = "Heading 1";
-    } else if (content.classList.contains("text-2xl")) {
-        placeholderText = "Heading 2";
-    } else if (content.classList.contains("text-xl")) {
-        placeholderText = "Heading 3";
-    } else {
-        placeholderText = "Type here...";
-    }
+  const isHeading =
+    content.classList.contains("text-3xl") ||
+    content.classList.contains("text-2xl") ||
+    content.classList.contains("text-xl");
 
-    // Always update if the content is empty, for headings show heading placeholder
-    if (text === "") {
-        content.textContent = placeholderText;
-        content.dataset.placeholder = placeholderText;
-        content.classList.add('text-gray-400', 'italic');
-    } else if (["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(text)) {
-        // If already a placeholder, ensure correct placeholder for heading type
-        if (text !== placeholderText) {
-            content.textContent = placeholderText;
-        }
-        content.dataset.placeholder = placeholderText;
-        content.classList.add('text-gray-400', 'italic');
-    }
+  let placeholderText = "Type here...";
+  if (content.classList.contains("text-3xl")) placeholderText = "Heading 1";
+  if (content.classList.contains("text-2xl")) placeholderText = "Heading 2";
+  if (content.classList.contains("text-xl")) placeholderText = "Heading 3";
+
+  // ✅ LIST ITEMS: behave exactly like text blocks
+  if (line?.dataset.listType && text !== "") {
+    clearPlaceholder(content);
+    return;
+  }
+
+  if (text !== "" && !isOnlyPlaceholder(content)) {
+    clearPlaceholder(content);
+    return;
+  }
+
+  content.textContent = placeholderText;
+  content.dataset.placeholder = placeholderText;
+  content.classList.add("text-gray-400", "italic");
 }
+
 
 function clearAllPlaceholders() {
     const lines = document.querySelectorAll(".line");
@@ -427,7 +591,14 @@ function enableClickToAddNewLine() {
                         content.textContent.trim() === "" ||
                         ["Type here...", "Heading 1", "Heading 2", "Heading 3"].includes(content.textContent.trim());
                     if (isEmpty) {
-                        clearPlaceholder(content);
+                        const isHeading =
+                            content.classList.contains("text-3xl") ||
+                            content.classList.contains("text-2xl") ||
+                            content.classList.contains("text-xl");
+
+                        if (!isHeading) {
+                            clearPlaceholder(content);
+                        }
                     }
                 }
             });
@@ -442,10 +613,11 @@ function enableClickToAddNewLine() {
 }
 
 
-function isOnlyPlaceholder(contentEl) {
-    const text = contentEl.textContent.trim();
-    const placeholder = contentEl.dataset.placeholder || "";
-    return text === placeholder;
+function isOnlyPlaceholder(content) {
+    return (
+        content.dataset.placeholder &&
+        content.textContent.trim() === content.dataset.placeholder
+    );
 }
 
 function handleContentMenu() {
@@ -453,39 +625,105 @@ function handleContentMenu() {
 
     // 1️⃣ Detect "/" key to show menu
     document.addEventListener("keydown", (e) => {
-        if (e.key === "/") {
-            e.preventDefault();
+        if (e.key !== "/") return;
 
-            const line = e.target.closest(".line");
-            if (!line) return;
+        const line = e.target.closest(".line");
+        if (!line) return;
 
-            const menu = line.querySelector(".content-menu");
-            if (menu) showContentMenu(menu);
+        const content = line.querySelector(".content");
+        const menu = line.querySelector(".content-menu");
+        if (!menu) return;
+
+        if (!canOpenSlashMenu(content)) return;
+
+        showContentMenu(menu);
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key !== "Backspace") return;
+
+        const content = document.activeElement;
+        if (!content?.classList.contains("content")) return;
+
+        const line = content.closest(".line");
+        if (!line) return;
+
+        const menu = line.querySelector(".content-menu");
+        if (!menu || menu.classList.contains("hidden")) return;
+
+        // If user deletes "/" before selecting anything → close menu
+        const text = content.textContent;
+        if (!text.includes("/")) {
+            hideContentMenu(menu);
         }
     });
+
+    document.addEventListener("input", (e) => {
+        const content = e.target;
+        if (!content?.classList.contains("content")) return;
+
+        const line = content.closest(".line");
+        if (!line) return;
+
+        const menu = line.querySelector(".content-menu");
+        if (!menu || menu.classList.contains("hidden")) return;
+
+        // If slash no longer exists and nothing selected → close menu
+        if (!content.textContent.includes("/")) {
+            hideContentMenu(menu);
+        }
+    });
+
+
+
+
 
     // 2️⃣ Handle clicks on menu items
     document.addEventListener("click", (e) => {
         const menuItem = e.target.closest(".content-menu div");
         if (!menuItem) return;
 
-        e.stopPropagation(); // stop bubbling to prevent multiple insertions
+        e.stopPropagation();
 
         const menu = menuItem.closest(".content-menu");
         const blockType = menuItem.textContent.trim();
         const currentLine = menu.closest(".line");
 
+        delete currentLine.dataset.openedByAdd;
+
         hideContentMenu(menu);
 
-        if (blockType === "Text") {
-            transformToTextBlock(currentLine);
-        } else if (blockType === "Heading 1") {
-            transformToHeadingBlock(currentLine, 1);
-        } else if (blockType === "Heading 2") {
-            transformToHeadingBlock(currentLine, 2);
-        } else if (blockType === "Heading 3") {
-            transformToHeadingBlock(currentLine, 3);
+        // 🔴 KEY LOGIC: if current line is a list → insert below
+        let targetLine = currentLine;
+
+        // always remove "/" from the current line
+        const currentContent = currentLine.querySelector(".content");
+        if (currentContent) {
+            currentContent.textContent = "";
         }
+
+        if (currentLine.dataset.listType) {
+            targetLine = insertNewLineAfter(currentLine);
+        }
+
+
+        // 🟢 Apply transformation to the TARGET line
+        if (blockType === "Text") {
+            transformToTextBlock(targetLine);
+        } else if (blockType === "Heading 1") {
+            transformToHeadingBlock(targetLine, 1);
+        } else if (blockType === "Heading 2") {
+            transformToHeadingBlock(targetLine, 2);
+        } else if (blockType === "Heading 3") {
+            transformToHeadingBlock(targetLine, 3);
+        } else if (blockType === "Bulleted List") {
+            makeListLine(targetLine, "bullet");
+        } else if (blockType === "Numbered List") {
+            makeListLine(targetLine, "number");
+        }
+
+        // focus the new / transformed block
+        targetLine.querySelector(".content").focus();
     });
 
     // 3️⃣ Hide menus when clicking outside
@@ -554,7 +792,7 @@ function line() {
             </div>
         </div>
         <div class="content w-full outline-none" contenteditable="true"></div>
-        <div class="content-menu top-full w-[10rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded">
+        <div class="content-menu top-full w-[15rem] outline-none flex flex-col items-center p-2 absolute bg-white z-[100] hidden border border-black box-shadow-normal rounded">
             <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
                 <img src="images/main/icons8-text-16.png" class="w-[1.2rem] h-[1.2rem]">
                 <div class="block-type">Text</div>
@@ -571,6 +809,15 @@ function line() {
                 <img src="images/main/icons8-3-16.png" class="w-[1.2rem] h-[1.2rem]">
                 <div class="block-type">Heading 3</div>
             </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
+                <img src="images/main/icons8-list-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div class="block-type">Bulleted List</div>
+            </div>
+            <div class="flex w-full gap-2 items-center cursor-pointer hover:bg-gray-200 rounded-l p-1 ">
+                <img src="images/main/icons8-numbered-list-16.png" class="w-[1.2rem] h-[1.2rem]">
+                <div class="block-type">Numbered List</div>
+            </div>
+
         </div>
     `;
 
@@ -637,8 +884,10 @@ function addIconInsertBlockNextLine(currentLine) {
 
     // Create and insert new line
     const newLine = line();
+    console.log(newLine);
     currentLine.parentNode.insertBefore(newLine, currentLine.nextSibling);
     const newContent = newLine.querySelector(".content");
+    console.log(newContent);
 
     // Hide current line’s icons
     const currentAdd = currentLine.querySelector("[alt='add block icon']");
@@ -646,32 +895,38 @@ function addIconInsertBlockNextLine(currentLine) {
     if (currentAdd) currentAdd.classList.add("hidden");
     if (currentMove) currentMove.classList.add("hidden");
 
-    // Show icons on new line
-    const newAdd = newLine.querySelector("[alt='add block icon']");
-    const newMove = newLine.querySelector("[alt='move block icon']");
-    if (newAdd) newAdd.classList.remove("hidden");
-    if (newMove) newMove.classList.remove("hidden");
+    
 
     // Prevent hover re-show
-    currentLine.classList.add("prevent-hover-icons");
+    currentContent.classList.add("prevent-hover-icons");
     setTimeout(() => {
-        currentLine.classList.remove("prevent-hover-icons");
+        currentContent.classList.remove("prevent-hover-icons");
     }, 150);
 
-    // Update placeholder and open menu for new line
-    updatePlaceholder(newContent);
-    newLine.querySelector(".content-menu").classList.remove("hidden");
+    newLine.dataset.openedByAdd = "true";
 
-    // Focus the new line
+
+
+    
+
     setTimeout(() => {
         newContent.focus();
+
         const range = document.createRange();
         const sel = window.getSelection();
         range.setStart(newContent, 0);
         range.collapse(true);
         sel.removeAllRanges();
         sel.addRange(range);
+
+        // OPEN MENU FIRST
+        showContentMenu(newLine.querySelector(".content-menu"));
+
+        // ONLY apply placeholder visually
+        newContent.dataset.placeholder = "Type here...";
+        newContent.classList.add("text-gray-400", "italic");
     }, 0);
+
 }
 
 
@@ -687,3 +942,209 @@ function clearPlaceholder(contentEl) {
     // make sure we remove the dataset even if content doesn't currently match exactly
     delete contentEl.dataset.placeholder;
 }
+
+function enforceHeadingPlaceholders() {
+    document.querySelectorAll(".content").forEach(content => {
+        const isHeading =
+            content.classList.contains("text-3xl") ||
+            content.classList.contains("text-2xl") ||
+            content.classList.contains("text-xl");
+
+        if (!isHeading) return;
+
+        const text = content.textContent.trim();
+        const placeholder = content.dataset.placeholder;
+
+        // If heading is empty or lost its placeholder → restore it
+        if (text === "") {
+            updatePlaceholder(content);
+        }
+
+    });
+}
+
+function getRealText(el) {
+    return Array.from(el.childNodes)
+        .filter(n => !(n.classList && n.classList.contains("placeholder")))
+        .map(n => n.textContent)
+        .join("");
+}
+
+
+function canOpenSlashMenu(contentEl) {
+  const line = contentEl.closest(".line");
+
+  // ✅ allow menu if line was created by add icon
+  if (line?.dataset.openedByAdd) return true;
+
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return false;
+
+  const range = sel.getRangeAt(0);
+  const offset = range.startOffset;
+  const text = getRealText(contentEl);
+
+  const leftChar = text[offset - 2];
+  if (leftChar && leftChar.trim() !== "") return false;
+
+  return true;
+}
+
+function makeListLine(line, type) {
+  line.dataset.listType = type; // "bullet" | "number"
+  line.dataset.indent = "0";
+  line.classList.add("list-line");
+  renderListMarker(line);
+}
+
+function getIndent(line) {
+  return parseInt(line.dataset.indent || "0", 10);
+}
+
+function setIndent(line, indent) {
+  line.dataset.indent = Math.max(0, indent).toString();
+  renderListMarker(line);
+}
+
+
+
+function renderListMarker(line) {
+  let marker = line.querySelector(".list-marker");
+  if (!marker) {
+    marker = document.createElement("div");
+    marker.className = "list-marker w-6 text-right select-none";
+    line.insertBefore(marker, line.querySelector(".content"));
+  }
+
+  const indent = getIndent(line);
+  const type = line.dataset.listType;
+
+  marker.style.marginLeft = `${indent * 1.5}rem`;
+
+  if (type === "bullet") {
+    const bullets = ["●", "○", "■"];
+    marker.textContent = bullets[indent % bullets.length];
+  }
+
+  if (type === "number") {
+    marker.textContent = getNumberMarker(line);
+  }
+}
+
+function getNumberMarker(line) {
+  const indent = getIndent(line);
+  let index = 1;
+
+  let prev = line.previousElementSibling;
+
+  while (prev) {
+    if (prev.dataset.listType === "number") {
+      const prevIndent = getIndent(prev);
+
+      // same level → count
+      if (prevIndent === indent) {
+        index++;
+      }
+
+      // parent reached → stop
+      if (prevIndent < indent) {
+        break;
+      }
+    }
+    prev = prev.previousElementSibling;
+  }
+
+  const cycle = indent % 3;
+
+  // 0 → numeric
+  if (cycle === 0) {
+    return index + ".";
+  }
+
+  // 1 → alphabetic
+  if (cycle === 1) {
+    return String.fromCharCode(96 + index) + ".";
+  }
+
+  // 2 → roman numerals
+  if (cycle === 2) {
+    return toRoman(index) + ".";
+  }
+}
+
+
+
+
+function toRoman(num) {
+  const map = [
+    ["m",1000],["cm",900],["d",500],["cd",400],
+    ["c",100],["xc",90],["l",50],["xl",40],
+    ["x",10],["ix",9],["v",5],["iv",4],["i",1]
+  ];
+  let res = "";
+  for (const [r,n] of map) {
+    while (num >= n) {
+      res += r;
+      num -= n;
+    }
+  }
+  return res;
+}
+
+function rerenderFollowingList(line) {
+  let next = line.nextElementSibling;
+  while (
+    next &&
+    next.dataset.listType === line.dataset.listType &&
+    getIndent(next) === getIndent(line)
+  ) {
+    renderListMarker(next);
+    next = next.nextElementSibling;
+  }
+}
+
+function fullyExitList(line) {
+    delete line.dataset.listType;
+    delete line.dataset.indent;
+    line.classList.remove("list-line");
+
+    const marker = line.querySelector(".list-marker");
+    if (marker) marker.remove();
+
+    // 🔴 reset any leftover spacing
+    line.style.paddingLeft = "";
+}
+
+function convertListLineToText(line) {
+    delete line.dataset.listType;
+    delete line.dataset.indent;
+
+    line.classList.remove("list-line");
+
+    const marker = line.querySelector(".list-marker");
+    if (marker) marker.remove();
+
+    // 🔑 this is what actually removes the left space
+    line.style.paddingLeft = "";
+}
+
+function hasPreviousFilledSibling(line) {
+  let prev = line.previousElementSibling;
+  const indent = getIndent(line);
+
+  while (prev) {
+    if (prev.dataset.listType !== line.dataset.listType) return false;
+
+    if (getIndent(prev) === indent) {
+      const content = prev.querySelector(".content");
+      return content && content.textContent.trim() !== "";
+    }
+
+    if (getIndent(prev) < indent) return false;
+
+    prev = prev.previousElementSibling;
+  }
+
+  return false;
+}
+

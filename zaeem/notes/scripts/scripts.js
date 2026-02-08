@@ -59,6 +59,9 @@ document.addEventListener("click", (e) => {
         const parentElement = targetElement.parentElement;
         parentElement.className = "page-container flex items-center h-auto relative gap-2 page-hover-zone";
         targetElement.className = "page-icon folder-icon cursor-pointer rounded p-[2px] py-[2px] text-[5rem]";
+
+        // delete the text inside the page title "add icon"
+        targetElement.textContent = "😀";
     }
 })
 
@@ -81,7 +84,7 @@ document.addEventListener("click", (e) => {
 
 
 
-function pageToggles() {
+export function pageToggles() {
     const pageContainers = document.querySelectorAll(".page-container");
     const expandedState = new WeakMap();
 
